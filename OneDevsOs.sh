@@ -207,6 +207,8 @@ gdebi
 flatpak
 fonts-noto fonts-noto-cjk
 polkitd pkexec
+snap
+snapd
 
 # Instalador
 calamares calamares-settings-debian
@@ -241,6 +243,8 @@ if ! id -u dev >/dev/null 2>&1; then
   echo "dev:live" | chpasswd
 fi
 
+systemctl enable snapd.socket || true
+systemctl enable snapd.service || true
 systemctl enable lightdm || true
 systemctl enable NetworkManager || true
 systemctl enable bluetooth || true
