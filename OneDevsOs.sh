@@ -393,7 +393,153 @@ allowWeakPasswordsDefault: true
 userShell: /bin/bash
 EOF
 
-  cat > config/includes.chroot/etc/calamares/branding/onedevs/branding.desc <<'EOF'
+ ## cat > config/includes.chroot/etc/calamares/branding/onedevs/branding.desc <<'EOF'
+# ---
+# componentName: onedevs
+# strings:
+#  productName: "OneDevsOS"
+#  shortProductName: "OneDevsOS"
+#  version: "1.0 AlbertEinstein"
+ # shortVersion: "1.0"
+ # versionedName: "OneDevsOS 1.0"
+ # shortVersionedName: "OneDevsOS 1.0"
+#  bootloaderEntryName: "OneDevsOS"
+#  productUrl: "https://onedevs.example.com"
+ # supportUrl: "https://onedevs.example.com/support"
+  #knownIssuesUrl: "https://onedevs.example.com/issues"
+ # releaseNotesUrl: "https://onedevs.example.com/release"
+# images:
+#  productLogo: "logo.png"
+ # productIcon: "logo.png"
+  #slideshow: "show.qml"
+ #style:
+ # sidebarBackground: "#2c3e50"
+  #sidebarText: "#ecf0f1"
+  #sidebarTextSelect: "#3498db"
+ #EOF
+
+  #cat > config/includes.chroot/etc/calamares/branding/onedevs/show.qml <<'EOF'
+ #import QtQuick 2.0
+  #import calamares.slideshow 1.0
+ #Presentation {
+  #id: presentation
+  #Slide {
+   # Image { anchors.centerIn: parent; source: "logo.png" }
+    #Text {
+     # anchors.centerIn: parent
+      #anchors.verticalCenterOffset: 100
+      #text: "Bem-vindo ao OneDevsOS"
+      #font.pixelSize: 24
+      #color: "#2c3e50"
+   # }
+  #}
+ #}
+ #EOF
+
+ # cat > config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d/01_onedevs.conf <<'EOF'
+ #[greeter]
+# background=/usr/share/backgrounds/onedevs/wallpaper.png
+# theme-name=Adwaita-dark
+# icon-theme-name=Papirus-Dark
+# font-name=Sans 11
+# xft-antialias=true
+# xft-dpi=96
+# xft-hintstyle=hintfull
+# xft-rgba=rgb
+# indicators=~host;~spacer;~clock;~spacer;~session;~power
+# EOF
+
+ # cat > config/includes.chroot/etc/os-release <<EOF
+ #NAME="OneDevsOS"
+ #VERSION="1.0 (${CODENAME})"
+ #ID=onedevs
+ #ID_LIKE=debian
+ #PRETTY_NAME="OneDevsOS ${CODENAME} 1.0"
+ #VERSION_ID="1.0"
+ #VERSION_CODENAME=${CODENAME}
+ #HOME_URL="https://onedevs.example.com"
+ #SUPPORT_URL="https://onedevs.example.com/support"
+ #BUG_REPORT_URL="https://onedevs.example.com/bugs"
+ #EOF
+
+#cat > config/includes.chroot/etc/issue <<EOF
+#OneDevsOS ${CODENAME} 1.0 - Dev Edition \n \l
+#EOF
+
+#cat > config/includes.chroot/etc/issue.net <<EOF
+#OneDevsOS ${CODENAME} 1.0 - Dev Edition
+# EOF
+
+#cat > config/includes.chroot/usr/share/applications/onedevs-install.desktop <<'EOF'
+# [Desktop Entry]
+# Name=Instalar OneDevsOS
+# Name[pt_BR]=Instalar OneDevsOS
+# Comment=Instalar OneDevsOS no disco
+# Comment[pt_BR]=Instalar OneDevsOS no disco
+# Exec=pkexec calamares
+# Icon=system-software-install
+# Type=Application
+# Categories=System;Settings;
+# Terminal=false
+# StartupNotify=true
+# EOF
+
+ #cat > config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop <<'EOF'
+ # [Desktop Entry]
+ # Name=Instalar OneDevsOS
+ # Name[pt_BR]=Instalar OneDevsOS
+ # Comment=Instalar OneDevsOS no disco
+ # Comment[pt_BR]=Instalar OneDevsOS no disco
+ # Exec=pkexec calamares
+ # Icon=system-software-install
+ # Type=Application
+ # Categories=System;Settings;
+ # Terminal=false
+ # StartupNotify=true
+ # EOF
+
+#chmod +x config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop || true
+
+ #mkdir -p config/includes.chroot/usr/share/plymouth/themes/onedevs
+ #cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.plymouth <<'EOF'
+ # [Plymouth Theme]
+ # Name=OneDevsOS
+ # Description=Boot theme for OneDevsOS
+ # ModuleName=script
+ # [script]
+ # ImageDir=/usr/share/plymouth/themes/onedevs
+ # ScriptFile=/usr/share/plymouth/themes/onedevs/onedevs.script
+ # EOF
+
+ #cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.script <<'EOF'
+ # Simples tema de boot
+ # Window.SetBackgroundTopColor(0.16, 0.24, 0.31);
+ # Window.SetBackgroundBottomColor(0.16, 0.24, 0.31);
+ # message_sprite = Sprite();
+ # message_sprite.SetPosition(Window.GetWidth() / 2 - 100, Window.GetHeight() - 50, 10000);
+ # fun message_callback(text) {
+ #  my_image = Image.Text(text, 1, 1, 1);
+ #  message_sprite.SetImage(my_image);
+ # }
+ # Plymouth.SetMessageFunction(message_callback);
+ # EOF
+
+ #  cat > config/includes.chroot/etc/skel/.config/autostart/nm-applet.desktop <<'EOF'
+ # [Desktop Entry]
+ # Type=Application
+ # Name=NetworkManager Applet
+ # Exec=nm-applet
+ # X-GNOME-Autostart-enabled=true
+ # EOF
+
+   #mkdir -p config/includes.chroot/usr/share/backgrounds/onedevs
+   #log "ATENÇÃO: adicione wallpaper.png e logo.png em:"
+  #log " - config/includes.chroot/usr/share/backgrounds/onedevs/wallpaper.png"
+  # log " - config/includes.chroot/etc/calamares/branding/onedevs/logo.png"
+  # log "Arquivos do live-build gerados/atualizados."
+ #}
+
+cat > config/includes.chroot/etc/calamares/branding/onedevs/branding.desc <<'EOF'
 ---
 componentName: onedevs
 strings:
@@ -404,13 +550,13 @@ strings:
   versionedName: "OneDevsOS 1.0"
   shortVersionedName: "OneDevsOS 1.0"
   bootloaderEntryName: "OneDevsOS"
-  productUrl: "https://onedevs.example.com"
-  supportUrl: "https://onedevs.example.com/support"
-  knownIssuesUrl: "https://onedevs.example.com/issues"
-  releaseNotesUrl: "https://onedevs.example.com/release"
+  productUrl: "https://onedevsofficial@proton.me"
+  supportUrl: "https://onedevsofficial@proton.me"
+  knownIssuesUrl: "https://onedevsofficial@proton.me"
+  releaseNotesUrl: "https://onedevs@proton.me"
 images:
-  productLogo: "logo.png"
-  productIcon: "logo.png"
+  productLogo: "https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG/Calamares/logo.png"
+  productIcon: "https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG/Calamares/logo.png"
   slideshow: "show.qml"
 style:
   sidebarBackground: "#2c3e50"
@@ -418,13 +564,13 @@ style:
   sidebarTextSelect: "#3498db"
 EOF
 
-  cat > config/includes.chroot/etc/calamares/branding/onedevs/show.qml <<'EOF'
+cat > config/includes.chroot/etc/calamares/branding/onedevs/show.qml <<'EOF'
 import QtQuick 2.0
 import calamares.slideshow 1.0
 Presentation {
   id: presentation
   Slide {
-    Image { anchors.centerIn: parent; source: "logo.png" }
+    Image { anchors.centerIn: parent; source: "https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG/Calamares/logo.png" }
     Text {
       anchors.centerIn: parent
       anchors.verticalCenterOffset: 100
@@ -436,9 +582,9 @@ Presentation {
 }
 EOF
 
-  cat > config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d/01_onedevs.conf <<'EOF'
+cat > config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d/01_onedevs.conf <<'EOF'
 [greeter]
-background=/usr/share/backgrounds/onedevs/wallpaper.png
+background=https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG/Wallpapers/wallpaper.png
 theme-name=Adwaita-dark
 icon-theme-name=Papirus-Dark
 font-name=Sans 11
@@ -449,59 +595,8 @@ xft-rgba=rgb
 indicators=~host;~spacer;~clock;~spacer;~session;~power
 EOF
 
-  cat > config/includes.chroot/etc/os-release <<EOF
-NAME="OneDevsOS"
-VERSION="1.0 (${CODENAME})"
-ID=onedevs
-ID_LIKE=debian
-PRETTY_NAME="OneDevsOS ${CODENAME} 1.0"
-VERSION_ID="1.0"
-VERSION_CODENAME=${CODENAME}
-HOME_URL="https://onedevs.example.com"
-SUPPORT_URL="https://onedevs.example.com/support"
-BUG_REPORT_URL="https://onedevs.example.com/bugs"
-EOF
-
-  cat > config/includes.chroot/etc/issue <<EOF
-OneDevsOS ${CODENAME} 1.0 - Dev Edition \n \l
-EOF
-
-  cat > config/includes.chroot/etc/issue.net <<EOF
-OneDevsOS ${CODENAME} 1.0 - Dev Edition
-EOF
-
-  cat > config/includes.chroot/usr/share/applications/onedevs-install.desktop <<'EOF'
-[Desktop Entry]
-Name=Instalar OneDevsOS
-Name[pt_BR]=Instalar OneDevsOS
-Comment=Instalar OneDevsOS no disco
-Comment[pt_BR]=Instalar OneDevsOS no disco
-Exec=pkexec calamares
-Icon=system-software-install
-Type=Application
-Categories=System;Settings;
-Terminal=false
-StartupNotify=true
-EOF
-
-  cat > config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop <<'EOF'
-[Desktop Entry]
-Name=Instalar OneDevsOS
-Name[pt_BR]=Instalar OneDevsOS
-Comment=Instalar OneDevsOS no disco
-Comment[pt_BR]=Instalar OneDevsOS no disco
-Exec=pkexec calamares
-Icon=system-software-install
-Type=Application
-Categories=System;Settings;
-Terminal=false
-StartupNotify=true
-EOF
-
-  chmod +x config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop || true
-
-  mkdir -p config/includes.chroot/usr/share/plymouth/themes/onedevs
-  cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.plymouth <<'EOF'
+mkdir -p config/includes.chroot/usr/share/plymouth/themes/onedevs
+cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.plymouth <<'EOF'
 [Plymouth Theme]
 Name=OneDevsOS
 Description=Boot theme for OneDevsOS
@@ -511,10 +606,13 @@ ImageDir=/usr/share/plymouth/themes/onedevs
 ScriptFile=/usr/share/plymouth/themes/onedevs/onedevs.script
 EOF
 
-  cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.script <<'EOF'
+cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.script <<'EOF'
 # Simples tema de boot
 Window.SetBackgroundTopColor(0.16, 0.24, 0.31);
 Window.SetBackgroundBottomColor(0.16, 0.24, 0.31);
+logo = Image("https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG/BootSlash/boot.png");
+logo_sprite = Sprite(logo);
+logo_sprite.SetPosition(Window.GetWidth()/2 - logo.GetWidth()/2, Window.GetHeight()/2 - logo.GetHeight()/2, 10000);
 message_sprite = Sprite();
 message_sprite.SetPosition(Window.GetWidth() / 2 - 100, Window.GetHeight() - 50, 10000);
 fun message_callback(text) {
@@ -524,22 +622,7 @@ fun message_callback(text) {
 Plymouth.SetMessageFunction(message_callback);
 EOF
 
-  cat > config/includes.chroot/etc/skel/.config/autostart/nm-applet.desktop <<'EOF'
-[Desktop Entry]
-Type=Application
-Name=NetworkManager Applet
-Exec=nm-applet
-X-GNOME-Autostart-enabled=true
-EOF
-
-  mkdir -p config/includes.chroot/usr/share/backgrounds/onedevs
-  log "ATENÇÃO: adicione wallpaper.png e logo.png em:"
-  log " - config/includes.chroot/usr/share/backgrounds/onedevs/wallpaper.png"
-  log " - config/includes.chroot/etc/calamares/branding/onedevs/logo.png"
-  log "Arquivos do live-build gerados/atualizados."
-}
-
-run_build() {
+ run_build() {
   log "Limpando ambiente anterior..."
   sudo lb clean --purge || true
 
