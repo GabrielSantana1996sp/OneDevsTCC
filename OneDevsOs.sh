@@ -559,8 +559,8 @@ run_build() {
     --iso-application "$APPNAME" \
     --iso-volume "$VOLUME" \
     --iso-publisher "$PUBLISHER" \
-    --bootappend-live "boot=live components quiet splash username=$USERNAME hostname=$HOSTNAME"
-
+    --bootappend-live "boot=live components quiet splash persistence persistence-label=ONDEVS username=$USERNAME hostname=$HOSTNAME"
+    
   log "Configuração do live-build concluída."
   log "Iniciando build da ISO (pode levar bastante tempo)..."
 
