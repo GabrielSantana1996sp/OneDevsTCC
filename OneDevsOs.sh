@@ -160,6 +160,20 @@ nginx
 php php-cli
 mariadb-server
 
+#BootLoader
+grub-pc
+grub-efi-amd64
+grub-efi-amd64-bin
+grub-efi-amd64-signed
+shim-signed
+os-prober
+
+#FullDesktop
+lightdm-gtk-greeter-settings
+xfce4-whiskermenu-plugin
+papirus-icon-theme
+adwaita-icon-theme
+
 #DevOps
 podman
 ansible
@@ -232,7 +246,23 @@ xserver-xorg-video-all
 mesa-utils
 EOF
     log "Criada config/package-lists/onedevs.list.chroot"
-  fi
+fi
+ 
+log "config/hooks/live/9998-onedevs-external.hook.chroot"
+
+#!/bin/bash
+set -e
+
+echo "Instalando Nix dentro do chroot..."
+
+# Baixar e instalar Nix no modo daemon
+sh <(curl --proto '=https' --tlsv1.2 -sSf https://nixos.org/nix/install) --daemon || true
+
+# Configurar ambiente para o usuário dev
+if [ -f /etc/profile.d/nix.sh ]; then
+  echo ". /etc/profile.d/nix.sh" >> /home/dev/.bashrc
+  chown dev:dev /home/dev/.bashrc
+fi
 
   cat > config/hooks/live/9999-onedevs-config.hook.chroot <<'EOF'
 #!/bin/bash
@@ -529,8 +559,7 @@ run_build() {
     --iso-application "$APPNAME" \
     --iso-volume "$VOLUME" \
     --iso-publisher "$PUBLISHER" \
-    --bootappend-live "boot=live components quiet splash username=$USERNAME hostname=$HOSTNAME" \
-    || error "Falha na configuração do live-build."
+    --bootappend-live "boot=live components quiet splash username=$USERNAME hostname=$HOSTNAME"
 
   log "Configuração do live-build concluída."
   log "Iniciando build da ISO (pode levar bastante tempo)..."
