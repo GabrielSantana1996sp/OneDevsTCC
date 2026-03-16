@@ -248,21 +248,19 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
 fi
  
-log "config/hooks/live/9998-onedevs-external.hook.chroot"
-
+cat > config/hooks/live/9998-onedevs-external.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-
 echo "Instalando Nix dentro do chroot..."
-
 # Baixar e instalar Nix no modo daemon
 sh <(curl --proto '=https' --tlsv1.2 -sSf https://nixos.org/nix/install) --daemon || true
-
 # Configurar ambiente para o usuário dev
 if [ -f /etc/profile.d/nix.sh ]; then
-  echo ". /etc/profile.d/nix.sh" >> /home/dev/.bashrc
-  chown dev:dev /home/dev/.bashrc
+    echo ". /etc/profile.d/nix.sh" >> /home/dev/.bashrc
+    chown dev:dev /home/dev/.bashrc
 fi
+EOF
+chmod +x config/hooks/live/9998-onedevs-external.hook.chroot
 
   cat > config/hooks/live/9999-onedevs-config.hook.chroot <<'EOF'
 #!/bin/bash
