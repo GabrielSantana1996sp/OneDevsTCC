@@ -161,11 +161,6 @@ php php-cli
 mariadb-server
 
 #BootLoader
-grub-pc
-grub-efi-amd64
-grub-efi-amd64-bin
-grub-efi-amd64-signed
-shim-signed
 os-prober
 
 #FullDesktop
@@ -570,7 +565,6 @@ else
   # se quiser usar prepare_archives em OFFLINE, descomente a linha abaixo:
   # prepare_archives
 fi
-
 
 run_build
 log "Processo finalizado."
