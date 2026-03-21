@@ -150,6 +150,25 @@ generate_livebuild_files() {
   # CORREÇÃO: polkit rules para Calamares abrir sem senha
   mkdir -p config/includes.chroot/usr/share/polkit-1/actions
 
+  # CORREÇÃO: ignorar validade de assinatura dos repos (problema do Trixie testing)
+  mkdir -p config/includes.chroot/etc/apt/apt.conf.d
+  cat > config/includes.chroot/etc/apt/apt.conf.d/99onedevs-no-valid-until <<'EOF'
+Acquire::Check-Valid-Until "false";
+Acquire::AllowInsecureRepositories "true";
+Acquire::AllowDowngradeToInsecureRepositories "true";
+EOF
+
+  # CORREÇÃO: também adicionar para o chroot do live-build (afeta o build, não só o sistema)
+  mkdir -p config/apt
+  cat > config/apt/preferences <<'EOF'
+Package: *
+Pin: release o=Debian
+Pin-Priority: 500
+EOF
+  cat > config/apt/apt.conf <<'EOF'
+Acquire::Check-Valid-Until "false";
+EOF
+
   if [ ! -f config/package-lists/onedevs.list.chroot ]; then
     cat > config/package-lists/onedevs.list.chroot <<'EOF'
 # Sistema Base
