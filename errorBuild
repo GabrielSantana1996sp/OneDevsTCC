@@ -206,3 +206,74 @@ I: Retrieving Packages
 I: Validating Packages 
 I: Resolving dependencies of required packages...
 I: Resolving dependencies of base packages...
+
+4°buildRun
+
+I: Configuring libc-bin...
+I: Base system installed successfully.
+[2026-03-16 20:22:49] lb bootstrap_cache save
+P: Saving bootstrap stage to cache...
+P: Bootstrap stage completed
+P: Begin unmounting filesystems...
+P: Saving caches...
+Reading package lists...
+Building dependency tree...
+[2026-03-16 20:22:52] lb chroot 
+P: Setting up clean exit handler
+[2026-03-16 20:22:53] lb chroot_cache restore
+[2026-03-16 20:22:53] lb chroot_prep install all mode-archives-chroot
+[2026-03-16 20:22:53] lb chroot_devpts install
+P: Begin mounting /dev/pts...
+[2026-03-16 20:22:53] lb chroot_proc install
+P: Begin mounting /proc...
+[2026-03-16 20:22:53] lb chroot_selinuxfs install
+[2026-03-16 20:22:53] lb chroot_sysfs install
+P: Begin mounting /sys...
+[2026-03-16 20:22:53] lb chroot_debianchroot install
+P: Configuring file /etc/debian_chroot
+[2026-03-16 20:22:54] lb chroot_dpkg install
+P: Configuring file /sbin/start-stop-daemon
+dpkg-divert: warning: diverting file '/usr/sbin/start-stop-daemon' from an Essential package with rename is dangerous, use --no-rename
+[2026-03-16 20:22:54] lb chroot_tmpfs install
+[2026-03-16 20:22:54] lb chroot_sysv-rc install
+P: Configuring file /usr/sbin/policy-rc.d
+[2026-03-16 20:22:54] lb chroot_hosts install
+P: Configuring file /etc/hosts
+[2026-03-16 20:22:55] lb chroot_resolv install
+P: Configuring file /etc/resolv.conf
+[2026-03-16 20:22:55] lb chroot_hostname install
+P: Configuring file /etc/hostname
+P: Configuring file /bin/hostname
+dpkg-divert: warning: diverting file '/usr/bin/hostname' from an Essential package with rename is dangerous, use --no-rename
+[2026-03-16 20:22:55] lb chroot_apt install
+P: Configuring file /etc/apt/apt.conf
+[2026-03-16 20:22:55] lb chroot_archives chroot install
+P: Configuring file /etc/apt/sources.list
+Hit:1 http://deb.debian.org/debian trixie InRelease
+Get:2 http://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
+Get:3 http://security.debian.org trixie-security InRelease [43.4 kB]
+Get:4 http://deb.debian.org/debian trixie/non-free Sources [75.9 kB]
+Err:2 http://deb.debian.org/debian trixie-updates InRelease
+  Sub-process /usr/bin/sqv returned an error code (1), error message is: Verifying signature:            Not live until 2026-03-21T13:39:02Z Verifying signature:            Not live until 2026-03-21T13:39:11Z
+Get:5 http://deb.debian.org/debian trixie/contrib Sources [52.3 kB]
+Get:6 http://deb.debian.org/debian trixie/main Sources [10.5 MB]
+Err:3 http://security.debian.org trixie-security InRelease
+  Sub-process /usr/bin/sqv returned an error code (1), error message is: Verifying signature:            Not live until 2026-03-21T10:10:47Z Verifying signature:            Not live until 2026-03-21T10:10:47Z
+Get:7 http://deb.debian.org/debian trixie/non-free-firmware Sources [6552 B]
+Get:8 http://deb.debian.org/debian trixie/main Translation-en [6484 kB]
+Get:9 http://deb.debian.org/debian trixie/contrib Translation-en [49.6 kB]
+Get:10 http://deb.debian.org/debian trixie/non-free Translation-en [67.1 kB]
+Get:11 http://deb.debian.org/debian trixie/non-free-firmware Translation-en [4704 B]
+Reading package lists...
+W: OpenPGP signature verification failed: http://deb.debian.org/debian trixie-updates InRelease: Sub-process /usr/bin/sqv returned an error code (1), error message is: Verifying signature:            Not live until 2026-03-21T13:39:02Z Verifying signature:            Not live until 2026-03-21T13:39:11Z
+E: The repository 'http://deb.debian.org/debian trixie-updates InRelease' is not signed.
+W: OpenPGP signature verification failed: http://security.debian.org trixie-security InRelease: Sub-process /usr/bin/sqv returned an error code (1), error message is: Verifying signature:            Not live until 2026-03-21T10:10:47Z Verifying signature:            Not live until 2026-03-21T10:10:47Z
+E: The repository 'http://security.debian.org trixie-security InRelease' is not signed.
+E: An unexpected failure occurred, exiting...
+P: Begin unmounting filesystems...
+P: Saving caches...
+Reading package lists...
+Building dependency tree...
+onedevs@onedevs-virtualbox:~/OneDevs$ 
+
+
