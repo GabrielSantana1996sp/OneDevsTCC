@@ -71,7 +71,7 @@ prepare_archives() {
   mkdir -p "${ARCHIVES_DIR}/pool/main/custom"
   mkdir -p "${ARCHIVES_DIR}/dists/${DIST}/main/binary-${ARCH}"
 
-  PACKAGES=$(sed -E 's/<!--.*?-->//g' "${PACKAGE_LIST}" | sed -E '/^[[:space:]]*$/d' | xargs echo)
+  PACKAGES=$(grep -v '^[[:space:]]*#' "${PACKAGE_LIST}" | grep -v '^[[:space:]]*$' | tr '\n' ' ')
 
   if [ -z "${PACKAGES}" ]; then
     log "Lista de pacotes vazia; pulando download."
