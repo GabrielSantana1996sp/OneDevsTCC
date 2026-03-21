@@ -580,6 +580,7 @@ run_build() {
     --mirror-binary "http://deb.debian.org/debian" \
     --mirror-chroot-security "http://security.debian.org/" \
     --mirror-binary-security "http://security.debian.org/" \
+    --apt-options "--yes -oAcquire::Check-Valid-Until=false" \
     --iso-application "$APPNAME" \
     --iso-volume "$VOLUME" \
     --iso-publisher "$PUBLISHER" \
