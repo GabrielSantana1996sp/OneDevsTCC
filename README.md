@@ -45,7 +45,8 @@ sudo apt-get update && sudo apt-get install -y \
 
 2. Execute o script principal:
    ```bash
-   ./Script_ISO
+   sudo lb clean --purge
+   sudo ./Script_ISO
    ```
 
 3. O processo irá:
