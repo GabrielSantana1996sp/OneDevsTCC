@@ -138,7 +138,8 @@ check_dependencies() {
 generate_livebuild_files() {
   log "Gerando arquivos do live-build..."
   mkdir -p config/{package-lists,hooks/live,includes.chroot/etc/skel,archives}
-  mkdir -p config/includes.chroot/etc/calamares/{branding/onedevs,modules}
+  mkdir -p config/includes.chroot/etc/calamares/modules
+  mkdir -p config/includes.chroot/usr/share/calamares/branding/onedevs
   mkdir -p config/includes.chroot/usr/share/backgrounds/onedevs
   mkdir -p config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d
   mkdir -p config/includes.chroot/etc/sysctl.d
@@ -284,11 +285,11 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
   fi
 
-  # CORREÇÃO: hook para baixar assets do GitHub localmente (imagens não carregam por URL)
+  # CORREÇÃO: hook para baixar assets do GitHub localmente
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-echo "Baixando assets do OneDevsOS do GitHub..."
+echo "=== Baixando assets do OneDevsOS do GitHub ==="
 
 BASE="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG"
 
@@ -296,22 +297,36 @@ mkdir -p /usr/share/backgrounds/onedevs
 mkdir -p /usr/share/calamares/branding/onedevs
 mkdir -p /usr/share/plymouth/themes/onedevs
 
-# Wallpaper para LightDM
-curl -fsSL "${BASE}/Wallpapers/wallpaper.png" \
-  -o /usr/share/backgrounds/onedevs/wallpaper.png || \
-  echo "AVISO: wallpaper não baixado"
+download_asset() {
+  local url="$1"
+  local dest="$2"
+  local name="$3"
+  if curl -fsSL --retry 3 --retry-delay 2 "${url}" -o "${dest}"; then
+    echo "OK: ${name} baixado ($(du -h "${dest}" | cut -f1))"
+  else
+    echo "AVISO: falha ao baixar ${name} de ${url}"
+  fi
+}
 
-# Logo para Calamares
-curl -fsSL "${BASE}/Calamares/logo.png" \
-  -o /usr/share/calamares/branding/onedevs/logo.png || \
-  echo "AVISO: logo não baixado"
+download_asset "${BASE}/Wallpapers/wallpaper.png" \
+  "/usr/share/backgrounds/onedevs/wallpaper.png" "wallpaper"
 
-# Logo de boot para Plymouth
-curl -fsSL "${BASE}/BootSlash/boot.png" \
-  -o /usr/share/plymouth/themes/onedevs/boot.png || \
-  echo "AVISO: boot splash não baixado"
+download_asset "${BASE}/Calamares/logo.png" \
+  "/usr/share/calamares/branding/onedevs/logo.png" "logo calamares"
 
-echo "Assets baixados com sucesso."
+# Copia logo também para /etc/calamares/branding (fallback)
+mkdir -p /etc/calamares/branding/onedevs
+cp /usr/share/calamares/branding/onedevs/logo.png \
+   /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
+
+download_asset "${BASE}/BootSlash/boot.png" \
+  "/usr/share/plymouth/themes/onedevs/boot.png" "boot splash"
+
+echo "=== Listagem dos assets ==="
+ls -lh /usr/share/calamares/branding/onedevs/ 2>/dev/null || echo "Vazio"
+ls -lh /usr/share/backgrounds/onedevs/ 2>/dev/null || echo "Vazio"
+ls -lh /usr/share/plymouth/themes/onedevs/ 2>/dev/null || echo "Vazio"
+echo "=== Hook de assets concluído ==="
 EOF
   chmod +x config/hooks/live/9997-onedevs-assets.hook.chroot
 
@@ -359,30 +374,30 @@ EOF
 ---
 modules-search: [ local, /usr/lib/calamares/modules ]
 sequence:
-- show:
-  - welcome
-  - locale
-  - keyboard
-  - partition
-  - users
-  - summary
-- exec:
-  - partition
-  - mount
-  - unpackfs
-  - machineid
-  - fstab
-  - locale
-  - keyboard
-  - localecfg
-  - users
-  - displaymanager
-  - networkcfg
-  - hwclock
-  - bootloader
-  - umount
-- show:
-  - finished
+  - show:
+    - welcome
+    - locale
+    - keyboard
+    - partition
+    - users
+    - summary
+  - exec:
+    - partition
+    - mount
+    - unpackfs
+    - machineid
+    - fstab
+    - locale
+    - keyboard
+    - localecfg
+    - users
+    - displaymanager
+    - networkcfg
+    - hwclock
+    - bootloader
+    - umount
+  - show:
+    - finished
 branding: onedevs
 prompt-install: true
 dont-chroot: false
@@ -449,7 +464,7 @@ userShell: /bin/bash
 EOF
 
   # CORREÇÃO: caminhos locais em vez de URLs do GitHub
-  cat > config/includes.chroot/etc/calamares/branding/onedevs/branding.desc <<'EOF'
+  cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
 ---
 componentName: onedevs
 strings:
@@ -475,7 +490,7 @@ style:
 EOF
 
   # CORREÇÃO: imagem local no QML
-  cat > config/includes.chroot/etc/calamares/branding/onedevs/show.qml <<'EOF'
+  cat > config/includes.chroot/usr/share/calamares/branding/onedevs/show.qml <<'EOF'
 import QtQuick 2.0
 import calamares.slideshow 1.0
 Presentation {
@@ -551,7 +566,7 @@ Name=Instalar OneDevsOS
 Name[pt_BR]=Instalar OneDevsOS
 Comment=Instalar OneDevsOS no disco
 Comment[pt_BR]=Instalar OneDevsOS no disco
-Exec=sudo calamares
+Exec=pkexec calamares
 Icon=system-software-install
 Type=Application
 Categories=System;Settings;
