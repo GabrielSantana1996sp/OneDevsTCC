@@ -291,7 +291,14 @@ EOF
 set -e
 echo "=== Baixando assets do OneDevsOS do GitHub ==="
 
-BASE="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG"
+BASE="https://github.com/GabrielSantana1996sp/OneDevsTCC/blob/main/IMG/BootSlash/Boot%20splash%20(Plymouth).png
+https://github.com/GabrielSantana1996sp/OneDevsTCC/blob/1599184b6802842d05c890efff6b72f83f843abd/IMG/Calamares/Calamares.png
+https://github.com/GabrielSantana1996sp/OneDevsTCC/blob/1599184b6802842d05c890efff6b72f83f843abd/IMG/Ligthdm/LigthDM.png
+https://github.com/GabrielSantana1996sp/OneDevsTCC/blob/1599184b6802842d05c890efff6b72f83f843abd/IMG/Wallpapers/Classico.png
+https://github.com/GabrielSantana1996sp/OneDevsTCC/blob/1599184b6802842d05c890efff6b72f83f843abd/IMG/Wallpapers/Cosmos.png
+https://github.com/GabrielSantana1996sp/OneDevsTCC/blob/1599184b6802842d05c890efff6b72f83f843abd/IMG/Wallpapers/Energia.png
+https://github.com/GabrielSantana1996sp/OneDevsTCC/blob/1599184b6802842d05c890efff6b72f83f843abd/IMG/Wallpapers/RetroTerminal.png
+https://github.com/GabrielSantana1996sp/OneDevsTCC/blob/1599184b6802842d05c890efff6b72f83f843abd/IMG/Wallpapers/universe.png"
 
 mkdir -p /usr/share/backgrounds/onedevs
 mkdir -p /usr/share/calamares/branding/onedevs
