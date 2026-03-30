@@ -127,6 +127,23 @@ generate_livebuild_files() {
   mkdir -p config/includes.chroot/etc/skel/Desktop
   mkdir -p config/includes.chroot/etc/skel/.config/autostart
 
+  # Bloqueia grub-pc ANTES da instalação via config/apt (lido pelo live-build antes dos pacotes)
+  mkdir -p config/apt
+  cat > config/apt/preferences <<'EOF'
+Package: *
+Pin: release o=Debian
+Pin-Priority: 500
+
+Package: grub-pc grub-pc-bin
+Pin: release *
+Pin-Priority: -1
+EOF
+
+  cat > config/apt/apt.conf <<'EOF'
+Acquire::Check-Valid-Until "false";
+Acquire::Check-Date "false";
+EOF
+
   if [ ! -f config/package-lists/onedevs.list.chroot ]; then
     cat > config/package-lists/onedevs.list.chroot <<'EOF'
 # Sistema Base
@@ -161,7 +178,6 @@ php php-cli
 mariadb-server
 
 #BootLoader
-grub-pc
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
@@ -247,6 +263,28 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
 fi
  
+  # Exclusão explícita do grub-pc para evitar conflito com grub-efi
+  mkdir -p config/package-lists
+  cat > config/package-lists/exclude.list.chroot <<'EOF'
+!grub-pc
+!grub-pc-bin
+EOF
+
+  # Hook 0001: bloqueia grub-pc e grub-efi conflitantes no chroot
+  cat > config/hooks/live/0001-block-grub-conflict.hook.chroot <<'EOF'
+#!/bin/bash
+set -e
+echo "=== Bloqueando grub conflitante no chroot ==="
+mkdir -p /etc/apt/preferences.d
+cat > /etc/apt/preferences.d/block-grub <<'PREF'
+Package: grub-pc grub-pc-bin grub-efi-amd64 grub-efi-amd64-bin grub-efi-amd64-signed
+Pin: release *
+Pin-Priority: -1
+PREF
+echo "Grub bloqueado via apt preferences."
+EOF
+  chmod +x config/hooks/live/0001-block-grub-conflict.hook.chroot
+
   # Hook 9997: baixa assets do GitHub para paths locais
   GITHUB_RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG"
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<HOOKEOF
@@ -523,6 +561,7 @@ run_build() {
     --architectures "$ARCH" \
     --debian-installer none \
     --archive-areas "main contrib non-free non-free-firmware" \
+    --bootloaders "syslinux,grub-efi" \
     --mirror-bootstrap "http://deb.debian.org/debian" \
     --mirror-chroot "http://deb.debian.org/debian" \
     --mirror-binary "http://deb.debian.org/debian" \
