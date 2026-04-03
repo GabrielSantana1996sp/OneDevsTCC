@@ -8,11 +8,10 @@
 # Atenção: este projeto pode incluir softwares de terceiros
 # licenciados sob GPL, MIT, BSD e outras licenças.
 # Cada componente mantém sua licença original.
-#sudo apt-get install -y debootstrap live-build xorriso squashfs-tools syslinux-common isolinux dpkg-dev apt-utils dpkg-dev apt-utils
 
 set -euo pipefail
 
-# Config
+# ── Config ────────────────────────────────────────────────────────────────────
 DIST="trixie"
 CODENAME="AlbertEinstein"
 APPNAME="OneDevsOS - ${CODENAME}"
@@ -26,109 +25,85 @@ PACKAGE_LIST="${LIVEBUILD_DIR}/config/package-lists/onedevs.list.chroot"
 ARCHIVES_DIR="${LIVEBUILD_DIR}/config/archives"
 TMPWORK="/tmp/onedevs-archives-work"
 
-log(){ printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
+# URLs raw do GitHub (commit fixo para estabilidade)
+COMMIT="38f0fe21e88015f157a1cfccbd06fc67a5e9bb18"
+RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/${COMMIT}/IMG"
+
+log()  { printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
 error(){ log "ERRO: $*"; exit 1; }
 
-# Checagem de rede
+# ── Checagem de rede ──────────────────────────────────────────────────────────
 ONLINE=0
 check_network() {
-  TEST_HOST="8.8.8.8"
-  TEST_PORT=53
-  TIMEOUT=3
-
-  if ! ip route show default >/dev/null 2>&1; then
-    ONLINE=0; return 0
-  fi
-
-  if bash -c "cat < /dev/null > /dev/tcp/${TEST_HOST}/${TEST_PORT}" >/dev/null 2>&1; then
-    ONLINE=1; return 0
-  fi
-
-  if command -v ping >/dev/null 2>&1 && ping -c1 -W"$TIMEOUT" "$TEST_HOST" >/dev/null 2>&1; then
-    ONLINE=1; return 0
-  fi
-
+  if ! ip route show default >/dev/null 2>&1; then ONLINE=0; return 0; fi
+  if bash -c "cat < /dev/null > /dev/tcp/8.8.8.8/53" >/dev/null 2>&1; then ONLINE=1; return 0; fi
+  if ping -c1 -W3 8.8.8.8 >/dev/null 2>&1; then ONLINE=1; return 0; fi
   ONLINE=0
-  return 0
+}
+check_network
+[ "${ONLINE}" -eq 1 ] && log "Rede detectada: modo ONLINE" || log "Nenhuma rede: modo OFFLINE"
+
+# ── Verificação de dependências ───────────────────────────────────────────────
+check_dependencies() {
+  log "Verificando dependências..."
+  local DEPS="debootstrap live-build xorriso squashfs-tools syslinux-common isolinux"
+  local MISSING=""
+  for dep in $DEPS; do
+    dpkg-query -W -f='${Status}' "$dep" 2>/dev/null | grep -q "install ok installed" || MISSING="$MISSING $dep"
+  done
+  if [ -n "$MISSING" ]; then
+    log "Dependências faltando:$MISSING"
+    sudo apt-get update -qq
+    sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y $MISSING
+  else
+    log "Todas as dependências instaladas."
+  fi
 }
 
-check_network
-
-if [ "${ONLINE}" -eq 1 ]; then
-  log "Rede detectada: modo ONLINE"
-else
-  log "Nenhuma rede detectada: modo OFFLINE"
-fi
-
-# Prepara config/archives (opcional; apenas útil em offline)
+# ── Prepara cache de pacotes ──────────────────────────────────────────────────
 prepare_archives() {
-  log "Preparando config/archives para ${DIST}/${ARCH} ..."
-  if [ ! -f "${PACKAGE_LIST}" ]; then
-    error "Lista de pacotes não encontrada: ${PACKAGE_LIST}"
-  fi
-
+  log "Preparando cache de pacotes..."
+  [ -f "${PACKAGE_LIST}" ] || error "Lista não encontrada: ${PACKAGE_LIST}"
   rm -rf "${TMPWORK}"
-  mkdir -p "${TMPWORK}"
   mkdir -p "${ARCHIVES_DIR}/pool/main/custom"
   mkdir -p "${ARCHIVES_DIR}/dists/${DIST}/main/binary-${ARCH}"
-
-  PACKAGES=$(sed -E 's/<!--.*?-->//g' "${PACKAGE_LIST}" | sed -E '/^[[:space:]]*$/d' | xargs echo)
-
-  if [ -z "${PACKAGES}" ]; then
-    log "Lista de pacotes vazia; pulando download."
-    return 0
-  fi
-
-  log "Pacotes (amostra): $(echo "${PACKAGES}" | cut -c1-200)"
-  log "Limpando cache apt e atualizando..."
-  sudo apt-get clean
-  sudo rm -f /var/cache/apt/archives/*.deb || true
-  sudo apt-get update
-
-  log "Baixando pacotes e dependências (--download-only)..."
-  sudo apt-get --download-only install -y ${PACKAGES} || true
-
-  APT_CACHE_DIR="/var/cache/apt/archives"
-  log "Copiando .deb de ${APT_CACHE_DIR} para ${ARCHIVES_DIR}/pool/main/custom/"
-  find "${APT_CACHE_DIR}" -maxdepth 1 -type f -name "*.deb" -exec cp -v -- "{}" "${ARCHIVES_DIR}/pool/main/custom/" \;
-
-  log "Gerando Packages.gz e Release em ${ARCHIVES_DIR}..."
-  if ! command -v dpkg-scanpackages >/dev/null 2>&1; then
-    log "Instalando dpkg-dev..."
-    sudo apt-get install -y dpkg-dev
-  fi
-
+  local PACKAGES
+  PACKAGES=$(grep -v '^[[:space:]]*#' "${PACKAGE_LIST}" | grep -v '^[[:space:]]*$' | tr '\n' ' ')
+  [ -n "${PACKAGES}" ] || { log "Lista vazia."; return 0; }
+  sudo apt-get -q update || true
+  # shellcheck disable=SC2086
+  sudo apt-get --download-only install -y $PACKAGES || true
+  find /var/cache/apt/archives -maxdepth 1 -name "*.deb" \
+    -exec cp -v -- "{}" "${ARCHIVES_DIR}/pool/main/custom/" \;
+  command -v dpkg-scanpackages >/dev/null 2>&1 || sudo apt-get install -y dpkg-dev
+  command -v apt-ftparchive   >/dev/null 2>&1 || sudo apt-get install -y apt-utils
   pushd "${ARCHIVES_DIR}" >/dev/null
-  dpkg-scanpackages pool /dev/null | gzip -9c > "dists/${DIST}/main/binary-${ARCH}/Packages.gz" || true
-
-  if ! command -v apt-ftparchive >/dev/null 2>&1; then
-    log "Instalando apt-utils..."
-    sudo apt-get install -y apt-utils
-  fi
-
+  dpkg-scanpackages pool /dev/null | gzip -9c \
+    > "dists/${DIST}/main/binary-${ARCH}/Packages.gz" || true
   apt-ftparchive release . > Release || true
   chmod -R a+r .
   popd >/dev/null
-
-  log "config/archives preparado."
+  log "Cache preparado."
 }
 
-# Gera/atualiza arquivos do live-build
+# ── Gera arquivos do live-build ───────────────────────────────────────────────
 generate_livebuild_files() {
   log "Gerando arquivos do live-build..."
-  mkdir -p config/{package-lists,hooks/live,includes.chroot/etc/skel,archives}
-  mkdir -p config/includes.chroot/etc/calamares/{branding/onedevs,modules}
-  mkdir -p config/includes.chroot/usr/share/backgrounds/onedevs
-  mkdir -p config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d
-  mkdir -p config/includes.chroot/etc/sysctl.d
-  mkdir -p config/includes.chroot/usr/share/plymouth/themes/onedevs
-  mkdir -p config/includes.chroot/etc/apt/sources.list.d
-  mkdir -p config/includes.chroot/usr/share/applications
-  mkdir -p config/includes.chroot/etc/skel/Desktop
-  mkdir -p config/includes.chroot/etc/skel/.config/autostart
 
-  # Bloqueia grub-pc ANTES da instalação via config/apt (lido pelo live-build antes dos pacotes)
-  mkdir -p config/apt
+  # Diretórios
+  mkdir -p config/{package-lists,hooks/live,apt,archives}
+  mkdir -p config/includes.chroot/etc/{calamares/modules,apt/apt.conf.d}
+  mkdir -p config/includes.chroot/etc/{lightdm/lightdm-gtk-greeter.conf.d,sysctl.d}
+  mkdir -p config/includes.chroot/etc/skel/{Desktop,.config/autostart}
+  mkdir -p config/includes.chroot/usr/share/{calamares/branding/onedevs,backgrounds/onedevs}
+  mkdir -p config/includes.chroot/usr/share/{plymouth/themes/onedevs,applications,polkit-1/actions}
+
+  # ── APT: ignora validade + bloqueia grub-pc ──────────────────────────────
+  cat > config/apt/apt.conf <<'EOF'
+Acquire::Check-Valid-Until "false";
+Acquire::Check-Date "false";
+EOF
+
   cat > config/apt/preferences <<'EOF'
 Package: *
 Pin: release o=Debian
@@ -139,17 +114,18 @@ Pin: release *
 Pin-Priority: -1
 EOF
 
-  cat > config/apt/apt.conf <<'EOF'
+  cat > config/includes.chroot/etc/apt/apt.conf.d/99onedevs <<'EOF'
 Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
 EOF
 
+  # ── Lista de pacotes ──────────────────────────────────────────────────────
   if [ ! -f config/package-lists/onedevs.list.chroot ]; then
     cat > config/package-lists/onedevs.list.chroot <<'EOF'
 # Sistema Base
 live-boot live-config live-config-systemd
 
-# Desktop Environment - XFCE
+# Desktop XFCE
 xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
 xfce4-session xfce4-power-manager xfce4-panel xfce4-settings
 xfce4-terminal lxappearance feh
@@ -157,8 +133,12 @@ pasystray pavucontrol
 thunar thunar-archive-plugin
 mousepad
 network-manager-gnome
+lightdm-gtk-greeter-settings
+xfce4-whiskermenu-plugin
+papirus-icon-theme
+adwaita-icon-theme
 
-# Ferramentas de desenvolvimento
+# Desenvolvimento
 python3 python3-pip python3-venv
 default-jdk default-jre
 golang-go
@@ -171,32 +151,26 @@ git
 make cmake autoconf automake
 gdb
 
-# Servidores e bancos de dados
+# Servidores
 apache2
 nginx
 php php-cli
 mariadb-server
 
-#BootLoader
+# Bootloader (apenas EFI — grub-pc excluído por conflito)
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
 shim-signed
 os-prober
 
-#FullDesktop
-lightdm-gtk-greeter-settings
-xfce4-whiskermenu-plugin
-papirus-icon-theme
-adwaita-icon-theme
-
-#DevOps
+# DevOps
 podman
 ansible
 docker.io
 systemd-container
 
-# Segurança
+# Segurança (DevSecOps)
 apparmor
 nftables
 fail2ban
@@ -216,7 +190,7 @@ man-db
 mkdocs
 pandoc
 
-# Utilitários básicos
+# Utilitários
 tmux
 htop
 ranger
@@ -239,8 +213,8 @@ fonts-noto fonts-noto-cjk
 polkitd pkexec
 snapd
 
-# Instalador
-calamares calamares-settings-debian
+# Instalador (sem calamares-settings-debian — usamos config própria)
+calamares
 
 # Plymouth
 plymouth plymouth-themes
@@ -261,146 +235,162 @@ xserver-xorg-video-all
 mesa-utils
 EOF
     log "Criada config/package-lists/onedevs.list.chroot"
-fi
- 
-  # Exclusão explícita do grub-pc para evitar conflito com grub-efi
-  mkdir -p config/package-lists
+  fi
+
+  # ── Exclusão explícita do grub-pc ─────────────────────────────────────────
   cat > config/package-lists/exclude.list.chroot <<'EOF'
 !grub-pc
 !grub-pc-bin
 EOF
 
-  # Hook 0001: bloqueia grub-pc e grub-efi conflitantes no chroot
-  cat > config/hooks/live/0001-block-grub-conflict.hook.chroot <<'EOF'
+  # ── Hook 0001: bloqueia grub-pc no chroot antes da instalação ─────────────
+  cat > config/hooks/live/0001-block-grub-pc.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-echo "=== Bloqueando grub conflitante no chroot ==="
+echo "=== Bloqueando grub-pc no chroot ==="
 mkdir -p /etc/apt/preferences.d
-cat > /etc/apt/preferences.d/block-grub <<'PREF'
-Package: grub-pc grub-pc-bin grub-efi-amd64 grub-efi-amd64-bin grub-efi-amd64-signed
+cat > /etc/apt/preferences.d/block-grub-pc <<'PREF'
+Package: grub-pc grub-pc-bin
 Pin: release *
 Pin-Priority: -1
 PREF
-echo "Grub bloqueado via apt preferences."
+echo "grub-pc bloqueado."
 EOF
-  chmod +x config/hooks/live/0001-block-grub-conflict.hook.chroot
+  chmod +x config/hooks/live/0001-block-grub-pc.hook.chroot
 
-  # Hook 9997: baixa assets do GitHub para paths locais
-  GITHUB_RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG"
+  # ── Hook 9997: baixa assets do GitHub com nomes CORRETOS ─────────────────
+  # Nomes reais dos arquivos no repositório:
+  #   BootSlash/Boot splash (Plymouth).png
+  #   Calamares/Calamares.png
+  #   Ligthdm/LigthDM.png
+  #   Wallpapers/Classico.png, Cosmos.png, Energia.png, RetroTerminal.png, universe.png
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<HOOKEOF
 #!/bin/bash
 set -e
-echo "=== Baixando assets do OneDevsOS ==="
-RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG"
+echo "=== Baixando assets do OneDevsOS do GitHub ==="
+
+COMMIT="${COMMIT}"
+RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/\${COMMIT}/IMG"
+
 mkdir -p /usr/share/backgrounds/onedevs
 mkdir -p /usr/share/calamares/branding/onedevs
 mkdir -p /etc/calamares/branding/onedevs
 mkdir -p /usr/share/plymouth/themes/onedevs
+
 dl() {
   local url="\$1" dest="\$2" name="\$3"
-  curl -fsSL --retry 3 --retry-delay 2 "\$url" -o "\$dest" \
-    && echo "OK: \$name" \
-    || echo "AVISO: falha \$name"
+  if curl -fsSL --retry 3 --retry-delay 2 "\$url" -o "\$dest"; then
+    echo "OK: \$name ($(du -h "\$dest" 2>/dev/null | cut -f1))"
+  else
+    echo "AVISO: falha ao baixar \$name"
+  fi
 }
-dl "\${RAW}/Wallpapers/wallpaper.png"  /usr/share/backgrounds/onedevs/wallpaper.png   "wallpaper LightDM"
-dl "\${RAW}/Calamares/logo.png"        /usr/share/calamares/branding/onedevs/logo.png "logo Calamares"
-dl "\${RAW}/BootSlash/boot.png"        /usr/share/plymouth/themes/onedevs/boot.png    "boot splash Plymouth"
-cp /usr/share/calamares/branding/onedevs/logo.png /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
+
+# Wallpapers
+dl "\${RAW}/Wallpapers/Classico.png"     /usr/share/backgrounds/onedevs/Classico.png     "Classico"
+dl "\${RAW}/Wallpapers/Cosmos.png"       /usr/share/backgrounds/onedevs/Cosmos.png       "Cosmos"
+dl "\${RAW}/Wallpapers/Energia.png"      /usr/share/backgrounds/onedevs/Energia.png      "Energia"
+dl "\${RAW}/Wallpapers/RetroTerminal.png" /usr/share/backgrounds/onedevs/RetroTerminal.png "RetroTerminal"
+dl "\${RAW}/Wallpapers/universe.png"     /usr/share/backgrounds/onedevs/universe.png     "universe"
+
+# Wallpaper padrão do LightDM = Classico
+cp /usr/share/backgrounds/onedevs/Classico.png /usr/share/backgrounds/onedevs/wallpaper.png
+
+# Logo do Calamares
+dl "\${RAW}/Calamares/Calamares.png" \
+   /usr/share/calamares/branding/onedevs/logo.png "logo Calamares"
+cp /usr/share/calamares/branding/onedevs/logo.png \
+   /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
+
+# Boot splash Plymouth
+dl "\${RAW}/BootSlash/Boot%20splash%20(Plymouth).png" \
+   /usr/share/plymouth/themes/onedevs/boot.png "boot splash"
+
 echo "=== Listagem assets ==="
-ls -lh /usr/share/calamares/branding/onedevs/ 2>/dev/null || true
 ls -lh /usr/share/backgrounds/onedevs/         2>/dev/null || true
+ls -lh /usr/share/calamares/branding/onedevs/  2>/dev/null || true
 ls -lh /usr/share/plymouth/themes/onedevs/     2>/dev/null || true
 echo "=== Hook 9997 OK ==="
 HOOKEOF
   chmod +x config/hooks/live/9997-onedevs-assets.hook.chroot
 
-cat > config/hooks/live/9998-onedevs-external.hook.chroot <<'EOF'
+  # ── Hook 9998: instala Nix ────────────────────────────────────────────────
+  cat > config/hooks/live/9998-onedevs-external.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
 echo "Instalando Nix dentro do chroot..."
-# Baixar e instalar Nix no modo daemon
 sh <(curl --proto '=https' --tlsv1.2 -sSf https://nixos.org/nix/install) --daemon || true
-# Configurar ambiente para o usuário dev
 if [ -f /etc/profile.d/nix.sh ]; then
     echo ". /etc/profile.d/nix.sh" >> /home/dev/.bashrc
     chown dev:dev /home/dev/.bashrc
 fi
 EOF
-chmod +x config/hooks/live/9998-onedevs-external.hook.chroot
+  chmod +x config/hooks/live/9998-onedevs-external.hook.chroot
 
+  # ── Hook 9999: configura usuário e serviços ───────────────────────────────
   cat > config/hooks/live/9999-onedevs-config.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-echo "Configurando usuário live..."
+echo "Configurando usuário e serviços..."
 if ! id -u dev >/dev/null 2>&1; then
   useradd -m -s /bin/bash -G sudo,netdev,plugdev,audio,video dev
   echo "dev:live" | chpasswd
 fi
-
-systemctl enable snapd.socket || true
-systemctl enable snapd.service || true
-systemctl enable lightdm || true
+systemctl enable snapd.socket   || true
+systemctl enable snapd.service  || true
+systemctl enable lightdm        || true
 systemctl enable NetworkManager || true
-systemctl enable bluetooth || true
-systemctl enable cups || true
-
+systemctl enable cups           || true
 if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
   plymouth-set-default-theme onedevs || true
   update-initramfs -u || true
 fi
-
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
-
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
 EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
+  # ── Calamares: settings.conf (YAML correto) ───────────────────────────────
   cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
-modules-search: [ local ]
-instances:
-- id: onedevs
-  module: packages
-  config: packages.conf
+modules-search: [ local, /usr/lib/calamares/modules ]
 sequence:
-- show:
-  - welcome
-  - locale
-  - keyboard
-  - partition
-  - users
-  - summary
-  - exec:
-  - partition
-  - mount
-  - unpackfs
-  - packages
-  - machineid
-  - fstab
-  - locale
-  - keyboard
-  - localecfg
-  - users
-  - displaymanager
-  - networkcfg
-  - hwclock
-  - bootloader
-  - umount
   - show:
-  - finished
+    - welcome
+    - locale
+    - keyboard
+    - partition
+    - users
+    - summary
+  - exec:
+    - partition
+    - mount
+    - unpackfs
+    - machineid
+    - fstab
+    - locale
+    - keyboard
+    - localecfg
+    - users
+    - displaymanager
+    - networkcfg
+    - hwclock
+    - bootloader
+    - umount
+  - show:
+    - finished
 branding: onedevs
 prompt-install: true
 dont-chroot: false
 EOF
 
+  # ── Calamares: partition.conf ─────────────────────────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
 ---
 defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
 allowManualPartitioning: true
-
-# Perfil 1: Usar disco inteiro com swap = 15% da RAM
 erase-ram15:
   filesystem: ext4
   mountPoint: /
@@ -408,22 +398,18 @@ erase-ram15:
     size: "ram:15%"
     min: 512MiB
     max: 8GiB
-
-# Perfil 2: Usar disco inteiro com swap escalonado
 erase-scaled:
   filesystem: ext4
   mountPoint: /
   swap:
     sizes:
-      - { ram: 4GiB,  size: "ram:50%" }
-      - { ram: 8GiB,  size: "ram:25%" }
-      - { ram: 16GiB, size: "ram:12.5%" }
-      - { ram: 32GiB, size: "ram:6.25%" }
-      - { ram: 64GiB, size: "ram:3.125%" }
+      - { ram: 4GiB,   size: "ram:50%"     }
+      - { ram: 8GiB,   size: "ram:25%"     }
+      - { ram: 16GiB,  size: "ram:12.5%"   }
+      - { ram: 32GiB,  size: "ram:6.25%"   }
+      - { ram: 64GiB,  size: "ram:3.125%"  }
       - { ram: 128GiB, size: "ram:1.5625%" }
     fallback: 2GiB
-
-# Perfil: criptografia LUKS
 encrypt:
   enabled: true
   luksCipher: aes-xts-plain64
@@ -431,6 +417,7 @@ encrypt:
   luksHash: sha512
 EOF
 
+  # ── Calamares: users.conf ─────────────────────────────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/users.conf <<'EOF'
 ---
 defaultGroups:
@@ -457,7 +444,8 @@ allowWeakPasswordsDefault: true
 userShell: /bin/bash
 EOF
 
-cat > config/includes.chroot/etc/calamares/branding/onedevs/branding.desc <<'EOF'
+  # ── Calamares: branding.desc (path CORRETO: /usr/share/calamares/) ────────
+  cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
 ---
 componentName: onedevs
 strings:
@@ -473,8 +461,8 @@ strings:
   knownIssuesUrl: "https://onedevsofficial@proton.me"
   releaseNotesUrl: "https://onedevs@proton.me"
 images:
-  productLogo: "https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG/Calamares/logo.png"
-  productIcon: "https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG/Calamares/logo.png"
+  productLogo: "logo.png"
+  productIcon: "logo.png"
   slideshow: "show.qml"
 style:
   sidebarBackground: "#2c3e50"
@@ -482,27 +470,34 @@ style:
   sidebarTextSelect: "#3498db"
 EOF
 
-cat > config/includes.chroot/etc/calamares/branding/onedevs/show.qml <<'EOF'
+  # ── Calamares: slideshow (imagens locais) ─────────────────────────────────
+  cat > config/includes.chroot/usr/share/calamares/branding/onedevs/show.qml <<'EOF'
 import QtQuick 2.0
 import calamares.slideshow 1.0
 Presentation {
   id: presentation
   Slide {
-    Image { anchors.centerIn: parent; source: "https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG/Calamares/logo.png" }
+    Image {
+      anchors.centerIn: parent
+      source: "logo.png"
+      fillMode: Image.PreserveAspectFit
+      width: 200; height: 200
+    }
     Text {
       anchors.centerIn: parent
-      anchors.verticalCenterOffset: 100
-      text: "Bem-vindo ao OneDevsOS"
-      font.pixelSize: 24
-      color: "#2c3e50"
+      anchors.verticalCenterOffset: 120
+      text: "Bem-vindo ao OneDevsOS - DevSecOps Edition"
+      font.pixelSize: 22
+      color: "#ecf0f1"
     }
   }
 }
 EOF
 
-cat > config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d/01_onedevs.conf <<'EOF'
+  # ── LightDM: wallpaper local ──────────────────────────────────────────────
+  cat > config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d/01_onedevs.conf <<'EOF'
 [greeter]
-background=https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG/Wallpapers/wallpaper.png
+background=/usr/share/backgrounds/onedevs/wallpaper.png
 theme-name=Adwaita-dark
 icon-theme-name=Papirus-Dark
 font-name=Sans 11
@@ -513,8 +508,8 @@ xft-rgba=rgb
 indicators=~host;~spacer;~clock;~spacer;~session;~power
 EOF
 
-mkdir -p config/includes.chroot/usr/share/plymouth/themes/onedevs
-cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.plymouth <<'EOF'
+  # ── Plymouth: tema com imagem local ──────────────────────────────────────
+  cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.plymouth <<'EOF'
 [Plymouth Theme]
 Name=OneDevsOS
 Description=Boot theme for OneDevsOS
@@ -524,15 +519,18 @@ ImageDir=/usr/share/plymouth/themes/onedevs
 ScriptFile=/usr/share/plymouth/themes/onedevs/onedevs.script
 EOF
 
-cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.script <<'EOF'
-# Simples tema de boot
+  cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.script <<'EOF'
 Window.SetBackgroundTopColor(0.16, 0.24, 0.31);
-Window.SetBackgroundBottomColor(0.16, 0.24, 0.31);
-logo = Image("https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/main/IMG/BootSlash/boot.png");
+Window.SetBackgroundBottomColor(0.11, 0.16, 0.22);
+logo = Image("boot.png");
 logo_sprite = Sprite(logo);
-logo_sprite.SetPosition(Window.GetWidth()/2 - logo.GetWidth()/2, Window.GetHeight()/2 - logo.GetHeight()/2, 10000);
+logo_sprite.SetPosition(
+  Window.GetWidth()/2  - logo.GetWidth()/2,
+  Window.GetHeight()/2 - logo.GetHeight()/2,
+  10000
+);
 message_sprite = Sprite();
-message_sprite.SetPosition(Window.GetWidth() / 2 - 100, Window.GetHeight() - 50, 10000);
+message_sprite.SetPosition(Window.GetWidth()/2 - 100, Window.GetHeight() - 50, 10000);
 fun message_callback(text) {
   my_image = Image.Text(text, 1, 1, 1);
   message_sprite.SetImage(my_image);
@@ -540,11 +538,47 @@ fun message_callback(text) {
 Plymouth.SetMessageFunction(message_callback);
 EOF
 
+  # ── Desktop: atalho do instalador ────────────────────────────────────────
+  cat > config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop <<'EOF'
+[Desktop Entry]
+Name=Instalar OneDevsOS
+Name[pt_BR]=Instalar OneDevsOS
+Comment=Instalar OneDevsOS no disco
+Comment[pt_BR]=Instalar OneDevsOS no disco
+Exec=pkexec calamares
+Icon=system-software-install
+Type=Application
+Categories=System;Settings;
+Terminal=false
+StartupNotify=true
+EOF
+  chmod +x config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop
+
+  # ── Polkit: Calamares sem senha ───────────────────────────────────────────
+  cat > config/includes.chroot/usr/share/polkit-1/actions/org.onedevs.calamares.policy <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <action id="org.freedesktop.policykit.exec">
+    <description>Run Calamares installer</description>
+    <message>Authentication required</message>
+    <defaults>
+      <allow_any>yes</allow_any>
+      <allow_inactive>yes</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
+</policyconfig>
+EOF
+
+  log "Arquivos do live-build gerados/atualizados."
 } # end generate_livebuild_files
 
+# ── Build ─────────────────────────────────────────────────────────────────────
 run_build() {
-  # Sincroniza relógio para evitar erro "not valid yet" do APT
-  log "Sincronizando relógio..."
+  log "Sincronizando relógio (evita erro 'not valid yet' do APT)..."
   sudo timedatectl set-ntp true 2>/dev/null || true
   sleep 3
   command -v ntpdate >/dev/null 2>&1 && sudo ntpdate -u pool.ntp.org 2>/dev/null || true
@@ -553,7 +587,7 @@ run_build() {
   log "Limpando ambiente anterior..."
   sudo lb clean --purge || true
 
-  log "Executando lb config ..."
+  log "Executando lb config..."
   lb config \
     --mode debian \
     --distribution "$DIST" \
@@ -572,67 +606,47 @@ run_build() {
     --iso-volume "$VOLUME" \
     --iso-publisher "$PUBLISHER" \
     --bootappend-live "boot=live components quiet splash persistence persistence-label=ONDEVS username=$USERNAME hostname=$HOSTNAME"
-    
-  log "Configuração do live-build concluída."
-  log "Iniciando build da ISO (pode levar bastante tempo)..."
 
+  log "Iniciando build da ISO (pode levar 1-2h)..."
   sudo lb build 2>&1 | tee build-onedevsos.log
-  BUILD_EXIT=${PIPESTATUS[0]:-0}
+  local BUILD_EXIT=${PIPESTATUS[0]:-0}
 
   if [ "${BUILD_EXIT}" -eq 0 ]; then
-    log "Build da ISO concluído com sucesso!"
-    ISO_CANDIDATE=$(ls -1t live-image-*.hybrid.iso 2>/dev/null || true)
+    log "Build concluído com sucesso!"
+    local ISO_CANDIDATE
+    ISO_CANDIDATE=$(ls -1t live-image-*.hybrid.iso 2>/dev/null | head -1 || true)
     if [ -n "${ISO_CANDIDATE}" ]; then
+      local CODENAME_LC ISO_NAME
       CODENAME_LC=$(echo "${CODENAME}" | tr '[:upper:]' '[:lower:]')
       ISO_NAME="onedevsos-${CODENAME_LC}-1.0-${ARCH}.iso"
       mv "${ISO_CANDIDATE}" "${ISO_NAME}" || true
-      log "ISO renomeada para: ${ISO_NAME}"
-      log "Para testar: qemu-system-x86_64 -m 2048 -cdrom ${ISO_NAME} -boot d"
+      log "ISO: ${ISO_NAME} ($(du -h "${ISO_NAME}" | cut -f1))"
+      log "Testar: qemu-system-x86_64 -m 4096 -cdrom ${ISO_NAME} -boot d -enable-kvm"
     else
-      log "ISO padrão não encontrada; verifique build-onedevsos.log"
+      log "ISO não encontrada; verifique build-onedevsos.log"
     fi
   else
-    error "Falha no build da ISO. Verifique build-onedevsos.log"
+    error "Falha no build. Verifique build-onedevsos.log"
   fi
 }
 
-# Verificação de dependências
-check_dependencies() {
-  log "Verificando dependências..."
-  DEPS="debootstrap live-build xorriso squashfs-tools syslinux-common isolinux"
-  MISSING=""
-  for dep in $DEPS; do
-    if ! dpkg-query -W -f='${Status}' "$dep" 2>/dev/null | grep -q "install ok installed"; then
-      MISSING="$MISSING $dep"
-    fi
-  done
+# ── CLI ───────────────────────────────────────────────────────────────────────
+case "${1:-}" in
+  generate_only)
+    generate_livebuild_files
+    log "Modo generate_only completo."
+    exit 0
+    ;;
+  clean)
+    log "Limpando ambiente de build..."
+    sudo lb clean --purge
+    rm -rf config/ .build/ .stage/
+    log "Ambiente limpo."
+    exit 0
+    ;;
+esac
 
-  if [ -n "$MISSING" ]; then
-    log "Dependências faltando:${MISSING}"
-    echo "Instale manualmente executando:"
-    echo "  sudo apt-get update && sudo apt-get install -y debootstrap live-build xorriso squashfs-tools syslinux-common isolinux"
-    return 1
-  else
-    log "Todas as dependências instaladas."
-    return 0
-  fi
-}
-# CLI mode
-if [ "${1:-}" = "generate_only" ]; then
-  generate_livebuild_files
-  log "Modo generate_only completo."
-  exit 0
-fi
-
-if [ "${1:-}" = "clean" ]; then
-  log "Limpando ambiente de build..."
-  sudo lb clean --purge
-  rm -rf config/ .build/ .stage/
-  log "Ambiente limpo."
-  exit 0
-fi
-
-# Main
+# ── Main ──────────────────────────────────────────────────────────────────────
 log "OneDevsOS Build Script - ${CODENAME} (${DIST}) ${ARCH}"
 check_dependencies
 generate_livebuild_files
@@ -640,12 +654,13 @@ generate_livebuild_files
 if [ "${ONLINE:-0}" -eq 1 ]; then
   log "Modo ONLINE: live-build baixará pacotes durante o build"
 else
-  log "Modo OFFLINE: pulando preparação de archives"
-  log "AVISO: Build offline pode falhar se pacotes não estiverem em cache"
-  # se quiser usar prepare_archives em OFFLINE, descomente a linha abaixo:
-  # prepare_archives
+  log "Modo OFFLINE: verificando cache..."
+  if [ -f "${ARCHIVES_DIR}/dists/${DIST}/main/binary-${ARCH}/Packages.gz" ]; then
+    log "Cache encontrado — build offline possível."
+  else
+    error "Cache não encontrado. Rode com internet primeiro."
+  fi
 fi
-
 
 run_build
 log "Processo finalizado."
