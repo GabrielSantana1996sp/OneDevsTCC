@@ -716,6 +716,102 @@ EOF
 </policyconfig>
 EOF
 
+  # ── Script de limpeza pós-instalação (removido pelo Calamares) ──────────────
+  # Roda dentro do sistema recém-instalado antes do primeiro boot
+  mkdir -p config/includes.chroot/etc/calamares/modules
+  cat > config/includes.chroot/etc/calamares/modules/removeuser.conf <<'EOF'
+---
+script: /etc/calamares/scripts/remove-live-user.sh
+EOF
+
+  mkdir -p config/includes.chroot/etc/calamares/scripts
+  cat > config/includes.chroot/etc/calamares/scripts/remove-live-user.sh <<'EOF'
+#!/bin/bash
+# Remove usuário live e configurações temporárias após instalação
+# Executado pelo Calamares como módulo shellprocess
+
+set -e
+echo "[OneDevsOS] Limpando configurações do ambiente live..."
+
+# Remove usuário dev (live session only)
+if id -u dev >/dev/null 2>&1; then
+  userdel -r dev 2>/dev/null || true
+  echo "[OneDevsOS] Usuário 'dev' removido."
+fi
+
+# Remove sudoers irrestrito do live
+rm -f /etc/sudoers.d/dev
+echo "[OneDevsOS] sudoers live removido."
+
+# Remove senha root vazia/temporária se existir
+passwd -l root 2>/dev/null || true
+
+# Remove marcadores do ambiente live
+rm -f /etc/live/config.conf 2>/dev/null || true
+rm -f /var/lib/live/config/.*  2>/dev/null || true
+
+# Remove autologin do lightdm (live usa autologin, sistema instalado não deve)
+if [ -f /etc/lightdm/lightdm.conf ]; then
+  sed -i 's/^autologin-user=.*//' /etc/lightdm/lightdm.conf || true
+  sed -i 's/^autologin-user-timeout=.*//' /etc/lightdm/lightdm.conf || true
+fi
+
+# Remove alias de credenciais do issue
+cat > /etc/issue <<'ISSUE'
+OneDevsOS 1.0 AlbertEinstein - DevSecOps Edition
+
+ \l
+ISSUE
+
+echo "[OneDevsOS] Sistema limpo e pronto para uso."
+EOF
+  chmod +x config/includes.chroot/etc/calamares/scripts/remove-live-user.sh
+
+  # Adiciona o módulo removeuser na sequência do Calamares (antes do umount)
+  # Substitui o settings.conf para incluir o shellprocess
+  cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
+---
+modules-search: [ local, /usr/lib/calamares/modules ]
+sequence:
+- show:
+  - welcome
+  - locale
+  - keyboard
+  - partition
+  - users
+  - summary
+- exec:
+  - partition
+  - mount
+  - unpackfs
+  - machineid
+  - fstab
+  - locale
+  - keyboard
+  - localecfg
+  - users
+  - displaymanager
+  - networkcfg
+  - hwclock
+  - bootloader
+  - shellprocess@remove-live
+  - umount
+- show:
+  - finished
+branding: onedevs
+prompt-install: true
+dont-chroot: false
+EOF
+
+  # Configuração do shellprocess para rodar o script de limpeza
+  cat > config/includes.chroot/etc/calamares/modules/shellprocess@remove-live.conf <<'EOF'
+---
+dontChroot: false
+timeout: 30
+script:
+  - "-": /etc/calamares/scripts/remove-live-user.sh
+EOF
+
   log "Arquivos do live-build gerados/atualizados."
 } # end generate_livebuild_files
 
