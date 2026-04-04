@@ -293,8 +293,11 @@ dl "\${RAW}/Wallpapers/Energia.png"      /usr/share/backgrounds/onedevs/Energia.
 dl "\${RAW}/Wallpapers/RetroTerminal.png" /usr/share/backgrounds/onedevs/RetroTerminal.png "RetroTerminal"
 dl "\${RAW}/Wallpapers/universe.png"     /usr/share/backgrounds/onedevs/universe.png     "universe"
 
-# Wallpaper padrão do LightDM = Classico
-cp /usr/share/backgrounds/onedevs/Classico.png /usr/share/backgrounds/onedevs/wallpaper.png
+# Wallpaper do LightDM (arquivo dedicado no repo: Ligthdm/LigthDM.png)
+dl "\${RAW}/Ligthdm/LigthDM.png" /usr/share/backgrounds/onedevs/wallpaper.png "LightDM wallpaper"
+# Fallback: se falhar, usa Classico
+[ -s /usr/share/backgrounds/onedevs/wallpaper.png ] || \
+  cp /usr/share/backgrounds/onedevs/Classico.png /usr/share/backgrounds/onedevs/wallpaper.png 2>/dev/null || true
 
 # Logo do Calamares
 dl "\${RAW}/Calamares/Calamares.png" \
@@ -313,6 +316,30 @@ ls -lh /usr/share/plymouth/themes/onedevs/     2>/dev/null || true
 echo "=== Hook 9997 OK ==="
 HOOKEOF
   chmod +x config/hooks/live/9997-onedevs-assets.hook.chroot
+
+  # ── Hook 9996: garante symlink do branding do Calamares ─────────────────────
+  cat > config/hooks/live/9996-calamares-branding.hook.chroot <<'EOF'
+#!/bin/bash
+set -e
+echo "=== Configurando branding do Calamares ==="
+# Garante que /etc/calamares/branding/onedevs aponta para o path correto
+mkdir -p /etc/calamares/branding
+if [ -d /usr/share/calamares/branding/onedevs ]; then
+  if [ ! -e /etc/calamares/branding/onedevs ]; then
+    ln -sf /usr/share/calamares/branding/onedevs /etc/calamares/branding/onedevs
+    echo "Symlink criado: /etc/calamares/branding/onedevs"
+  fi
+fi
+# Verifica se o logo foi baixado, copia para ambos os locais
+if [ -f /usr/share/calamares/branding/onedevs/logo.png ]; then
+  cp /usr/share/calamares/branding/onedevs/logo.png /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
+  echo "Logo copiado para /etc/calamares/branding/onedevs/"
+fi
+ls -lh /usr/share/calamares/branding/onedevs/ 2>/dev/null || echo "Pasta branding vazia"
+ls -lh /etc/calamares/branding/onedevs/       2>/dev/null || echo "Pasta branding etc vazia"
+echo "=== Hook 9996 OK ==="
+EOF
+  chmod +x config/hooks/live/9996-calamares-branding.hook.chroot
 
   # ── Hook 9998: instala Nix ────────────────────────────────────────────────
   cat > config/hooks/live/9998-onedevs-external.hook.chroot <<'EOF'
@@ -356,30 +383,30 @@ EOF
 ---
 modules-search: [ local, /usr/lib/calamares/modules ]
 sequence:
-  - show:
-    - welcome
-    - locale
-    - keyboard
-    - partition
-    - users
-    - summary
-  - exec:
-    - partition
-    - mount
-    - unpackfs
-    - machineid
-    - fstab
-    - locale
-    - keyboard
-    - localecfg
-    - users
-    - displaymanager
-    - networkcfg
-    - hwclock
-    - bootloader
-    - umount
-  - show:
-    - finished
+- show:
+  - welcome
+  - locale
+  - keyboard
+  - partition
+  - users
+  - summary
+- exec:
+  - partition
+  - mount
+  - unpackfs
+  - machineid
+  - fstab
+  - locale
+  - keyboard
+  - localecfg
+  - users
+  - displaymanager
+  - networkcfg
+  - hwclock
+  - bootloader
+  - umount
+- show:
+  - finished
 branding: onedevs
 prompt-install: true
 dont-chroot: false
@@ -539,13 +566,21 @@ Plymouth.SetMessageFunction(message_callback);
 EOF
 
   # ── Desktop: atalho do instalador ────────────────────────────────────────
+  # Wrapper script para o Calamares (garante que abre com privilégios)
+  mkdir -p config/includes.chroot/usr/local/bin
+  cat > config/includes.chroot/usr/local/bin/onedevs-install <<'WEOF'
+#!/bin/bash
+exec sudo calamares "$@"
+WEOF
+  chmod +x config/includes.chroot/usr/local/bin/onedevs-install
+
   cat > config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop <<'EOF'
 [Desktop Entry]
 Name=Instalar OneDevsOS
 Name[pt_BR]=Instalar OneDevsOS
 Comment=Instalar OneDevsOS no disco
 Comment[pt_BR]=Instalar OneDevsOS no disco
-Exec=pkexec calamares
+Exec=onedevs-install
 Icon=system-software-install
 Type=Application
 Categories=System;Settings;
