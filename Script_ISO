@@ -358,23 +358,131 @@ EOF
   cat > config/hooks/live/9999-onedevs-config.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-echo "Configurando usuário e serviços..."
+echo "========================================"
+echo " OneDevsOS - Configuração do sistema"
+echo "========================================"
+
+# ── Usuário dev ───────────────────────────────────────────────────────────────
 if ! id -u dev >/dev/null 2>&1; then
-  useradd -m -s /bin/bash -G sudo,netdev,plugdev,audio,video dev
-  echo "dev:live" | chpasswd
+  useradd -m -s /bin/bash dev
 fi
-systemctl enable snapd.socket   || true
-systemctl enable snapd.service  || true
-systemctl enable lightdm        || true
-systemctl enable NetworkManager || true
-systemctl enable cups           || true
-if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
-  plymouth-set-default-theme onedevs || true
-  update-initramfs -u || true
-fi
+
+# Grupos completos para ambiente DevSecOps
+usermod -aG   sudo,netdev,plugdev,audio,video,  docker,bluetooth,cdrom,floppy,  disk,adm,dialout   dev 2>/dev/null || usermod -aG sudo,netdev,plugdev,audio,video dev
+
+echo "dev:live" | chpasswd
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
+echo "✓ Usuário dev configurado"
+
+# ── Serviços do sistema ───────────────────────────────────────────────────────
+services=(
+  lightdm
+  NetworkManager
+  bluetooth
+  cups
+  snapd.socket
+  snapd.service
+  apparmor
+  auditd
+  fail2ban
+  clamav-freshclam
+  docker
+)
+for svc in "${services[@]}"; do
+  systemctl enable "$svc" 2>/dev/null && echo "✓ $svc habilitado" || echo "- $svc não disponível"
+done
+
+# ── Plymouth ──────────────────────────────────────────────────────────────────
+if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
+  update-alternatives --install     /usr/share/plymouth/themes/default.plymouth     default.plymouth     /usr/share/plymouth/themes/onedevs/onedevs.plymouth 100 || true
+  plymouth-set-default-theme onedevs 2>/dev/null || true
+  update-initramfs -u 2>/dev/null || true
+  echo "✓ Plymouth tema onedevs ativado"
+fi
+
+# ── AppArmor ──────────────────────────────────────────────────────────────────
+if command -v aa-enabled >/dev/null 2>&1; then
+  # Coloca perfis em modo complain para não quebrar o live
+  find /etc/apparmor.d -maxdepth 1 -type f ! -name "*.dpkg-new"     -exec aa-complain {} \; 2>/dev/null || true
+  echo "✓ AppArmor em modo complain"
+fi
+
+# ── Docker: socket acessível para usuário dev ────────────────────────────────
+if [ -S /var/run/docker.sock ]; then
+  chmod 666 /var/run/docker.sock 2>/dev/null || true
+fi
+mkdir -p /home/dev/.docker
+cat > /home/dev/.docker/config.json <<'DOCKERCFG'
+{
+  "detachKeys": "ctrl-q,q"
+}
+DOCKERCFG
+
+# ── Git: config global padrão ─────────────────────────────────────────────────
+sudo -u dev git config --global init.defaultBranch main   2>/dev/null || true
+sudo -u dev git config --global core.editor vim           2>/dev/null || true
+sudo -u dev git config --global pull.rebase false         2>/dev/null || true
+echo "✓ Git configurado"
+
+# ── Aliases DevSecOps no bashrc ───────────────────────────────────────────────
+cat >> /home/dev/.bashrc <<'BASHRC'
+
+# ── OneDevsOS DevSecOps aliases ──────────────────────────────
+alias ll='ls -lah --color=auto'
+alias gs='git status'
+alias gl='git log --oneline --graph --all'
+alias dc='docker compose'
+alias k='kubectl'
+alias lynis-scan='sudo lynis audit system'
+alias clamcheck='sudo clamscan -r --bell'
+alias aide-check='sudo aide --check'
+alias ports='ss -tulnp'
+alias myip='curl -s ifconfig.me'
+export EDITOR=vim
+export PATH="$PATH:/usr/local/go/bin:$HOME/.cargo/bin:$HOME/.nix-profile/bin"
+BASHRC
+
+# ── Autostart: nm-applet ──────────────────────────────────────────────────────
+mkdir -p /etc/skel/.config/autostart
+cat > /etc/skel/.config/autostart/nm-applet.desktop <<'AUTOSTART'
+[Desktop Entry]
+Type=Application
+Name=NetworkManager Applet
+Exec=nm-applet
+X-GNOME-Autostart-enabled=true
+AUTOSTART
+
+# ── Desktop: permissões corretas ─────────────────────────────────────────────
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
+cp -r /etc/skel/Desktop /home/dev/ 2>/dev/null || true
+cp -r /etc/skel/.config /home/dev/ 2>/dev/null || true
+chown -R dev:dev /home/dev/ 2>/dev/null || true
+
+# ── os-release personalizado ──────────────────────────────────────────────────
+cat > /etc/os-release <<'OSRELEASE'
+NAME="OneDevsOS"
+VERSION="1.0 (AlbertEinstein)"
+ID=onedevs
+ID_LIKE=debian
+PRETTY_NAME="OneDevsOS 1.0 AlbertEinstein"
+VERSION_ID="1.0"
+VERSION_CODENAME=alberteinstein
+HOME_URL="https://onedevsofficial@proton.me"
+SUPPORT_URL="https://onedevsofficial@proton.me"
+BUG_REPORT_URL="https://onedevsofficial@proton.me"
+OSRELEASE
+
+cat > /etc/issue <<'ISSUE'
+OneDevsOS 1.0 AlbertEinstein - DevSecOps Edition
+Usuário: dev | Senha: live
+
+ \l
+ISSUE
+
+echo "========================================"
+echo " OneDevsOS configurado com sucesso!"
+echo "========================================"
 EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
