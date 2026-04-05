@@ -293,11 +293,8 @@ dl "\${RAW}/Wallpapers/Energia.png"      /usr/share/backgrounds/onedevs/Energia.
 dl "\${RAW}/Wallpapers/RetroTerminal.png" /usr/share/backgrounds/onedevs/RetroTerminal.png "RetroTerminal"
 dl "\${RAW}/Wallpapers/universe.png"     /usr/share/backgrounds/onedevs/universe.png     "universe"
 
-# Wallpaper do LightDM (arquivo dedicado no repo: Ligthdm/LigthDM.png)
-dl "\${RAW}/Ligthdm/LigthDM.png" /usr/share/backgrounds/onedevs/wallpaper.png "LightDM wallpaper"
-# Fallback: se falhar, usa Classico
-[ -s /usr/share/backgrounds/onedevs/wallpaper.png ] || \
-  cp /usr/share/backgrounds/onedevs/Classico.png /usr/share/backgrounds/onedevs/wallpaper.png 2>/dev/null || true
+# Wallpaper padrão do LightDM = Classico
+cp /usr/share/backgrounds/onedevs/Classico.png /usr/share/backgrounds/onedevs/wallpaper.png
 
 # Logo do Calamares
 dl "\${RAW}/Calamares/Calamares.png" \
@@ -317,30 +314,6 @@ echo "=== Hook 9997 OK ==="
 HOOKEOF
   chmod +x config/hooks/live/9997-onedevs-assets.hook.chroot
 
-  # ── Hook 9996: garante symlink do branding do Calamares ─────────────────────
-  cat > config/hooks/live/9996-calamares-branding.hook.chroot <<'EOF'
-#!/bin/bash
-set -e
-echo "=== Configurando branding do Calamares ==="
-# Garante que /etc/calamares/branding/onedevs aponta para o path correto
-mkdir -p /etc/calamares/branding
-if [ -d /usr/share/calamares/branding/onedevs ]; then
-  if [ ! -e /etc/calamares/branding/onedevs ]; then
-    ln -sf /usr/share/calamares/branding/onedevs /etc/calamares/branding/onedevs
-    echo "Symlink criado: /etc/calamares/branding/onedevs"
-  fi
-fi
-# Verifica se o logo foi baixado, copia para ambos os locais
-if [ -f /usr/share/calamares/branding/onedevs/logo.png ]; then
-  cp /usr/share/calamares/branding/onedevs/logo.png /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
-  echo "Logo copiado para /etc/calamares/branding/onedevs/"
-fi
-ls -lh /usr/share/calamares/branding/onedevs/ 2>/dev/null || echo "Pasta branding vazia"
-ls -lh /etc/calamares/branding/onedevs/       2>/dev/null || echo "Pasta branding etc vazia"
-echo "=== Hook 9996 OK ==="
-EOF
-  chmod +x config/hooks/live/9996-calamares-branding.hook.chroot
-
   # ── Hook 9998: instala Nix ────────────────────────────────────────────────
   cat > config/hooks/live/9998-onedevs-external.hook.chroot <<'EOF'
 #!/bin/bash
@@ -358,135 +331,27 @@ EOF
   cat > config/hooks/live/9999-onedevs-config.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-echo "========================================"
-echo " OneDevsOS - Configuração do sistema"
-echo "========================================"
-
-# ── Usuário dev ───────────────────────────────────────────────────────────────
+echo "Configurando usuário e serviços..."
 if ! id -u dev >/dev/null 2>&1; then
-  useradd -m -s /bin/bash dev
+  useradd -m -s /bin/bash -G sudo,netdev,plugdev,audio,video dev
+  echo "dev:live" | chpasswd
 fi
-
-# Grupos completos para ambiente DevSecOps
-usermod -aG   sudo,netdev,plugdev,audio,video,  docker,bluetooth,cdrom,floppy,  disk,adm,dialout   dev 2>/dev/null || usermod -aG sudo,netdev,plugdev,audio,video dev
-
-echo "dev:live" | chpasswd
+systemctl enable snapd.socket   || true
+systemctl enable snapd.service  || true
+systemctl enable lightdm        || true
+systemctl enable NetworkManager || true
+systemctl enable cups           || true
+if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
+  plymouth-set-default-theme onedevs || true
+  update-initramfs -u || true
+fi
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
-echo "✓ Usuário dev configurado"
-
-# ── Serviços do sistema ───────────────────────────────────────────────────────
-services=(
-  lightdm
-  NetworkManager
-  bluetooth
-  cups
-  snapd.socket
-  snapd.service
-  apparmor
-  auditd
-  fail2ban
-  clamav-freshclam
-  docker
-)
-for svc in "${services[@]}"; do
-  systemctl enable "$svc" 2>/dev/null && echo "✓ $svc habilitado" || echo "- $svc não disponível"
-done
-
-# ── Plymouth ──────────────────────────────────────────────────────────────────
-if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
-  update-alternatives --install     /usr/share/plymouth/themes/default.plymouth     default.plymouth     /usr/share/plymouth/themes/onedevs/onedevs.plymouth 100 || true
-  plymouth-set-default-theme onedevs 2>/dev/null || true
-  update-initramfs -u 2>/dev/null || true
-  echo "✓ Plymouth tema onedevs ativado"
-fi
-
-# ── AppArmor ──────────────────────────────────────────────────────────────────
-if command -v aa-enabled >/dev/null 2>&1; then
-  # Coloca perfis em modo complain para não quebrar o live
-  find /etc/apparmor.d -maxdepth 1 -type f ! -name "*.dpkg-new"     -exec aa-complain {} \; 2>/dev/null || true
-  echo "✓ AppArmor em modo complain"
-fi
-
-# ── Docker: socket acessível para usuário dev ────────────────────────────────
-if [ -S /var/run/docker.sock ]; then
-  chmod 666 /var/run/docker.sock 2>/dev/null || true
-fi
-mkdir -p /home/dev/.docker
-cat > /home/dev/.docker/config.json <<'DOCKERCFG'
-{
-  "detachKeys": "ctrl-q,q"
-}
-DOCKERCFG
-
-# ── Git: config global padrão ─────────────────────────────────────────────────
-sudo -u dev git config --global init.defaultBranch main   2>/dev/null || true
-sudo -u dev git config --global core.editor vim           2>/dev/null || true
-sudo -u dev git config --global pull.rebase false         2>/dev/null || true
-echo "✓ Git configurado"
-
-# ── Aliases DevSecOps no bashrc ───────────────────────────────────────────────
-cat >> /home/dev/.bashrc <<'BASHRC'
-
-# ── OneDevsOS DevSecOps aliases ──────────────────────────────
-alias ll='ls -lah --color=auto'
-alias gs='git status'
-alias gl='git log --oneline --graph --all'
-alias dc='docker compose'
-alias k='kubectl'
-alias lynis-scan='sudo lynis audit system'
-alias clamcheck='sudo clamscan -r --bell'
-alias aide-check='sudo aide --check'
-alias ports='ss -tulnp'
-alias myip='curl -s ifconfig.me'
-export EDITOR=vim
-export PATH="$PATH:/usr/local/go/bin:$HOME/.cargo/bin:$HOME/.nix-profile/bin"
-BASHRC
-
-# ── Autostart: nm-applet ──────────────────────────────────────────────────────
-mkdir -p /etc/skel/.config/autostart
-cat > /etc/skel/.config/autostart/nm-applet.desktop <<'AUTOSTART'
-[Desktop Entry]
-Type=Application
-Name=NetworkManager Applet
-Exec=nm-applet
-X-GNOME-Autostart-enabled=true
-AUTOSTART
-
-# ── Desktop: permissões corretas ─────────────────────────────────────────────
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
-cp -r /etc/skel/Desktop /home/dev/ 2>/dev/null || true
-cp -r /etc/skel/.config /home/dev/ 2>/dev/null || true
-chown -R dev:dev /home/dev/ 2>/dev/null || true
-
-# ── os-release personalizado ──────────────────────────────────────────────────
-cat > /etc/os-release <<'OSRELEASE'
-NAME="OneDevsOS"
-VERSION="1.0 (AlbertEinstein)"
-ID=onedevs
-ID_LIKE=debian
-PRETTY_NAME="OneDevsOS 1.0 AlbertEinstein"
-VERSION_ID="1.0"
-VERSION_CODENAME=alberteinstein
-HOME_URL="https://onedevsofficial@proton.me"
-SUPPORT_URL="https://onedevsofficial@proton.me"
-BUG_REPORT_URL="https://onedevsofficial@proton.me"
-OSRELEASE
-
-cat > /etc/issue <<'ISSUE'
-OneDevsOS 1.0 AlbertEinstein - DevSecOps Edition
-Usuário: dev | Senha: live
-
- \l
-ISSUE
-
-echo "========================================"
-echo " OneDevsOS configurado com sucesso!"
-echo "========================================"
 EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
-  # ── Calamares: settings.conf (YAML correto) ───────────────────────────────
+  # ── Calamares: settings.conf MÍNIMO ─────────────────────────────────────────
   cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
 modules-search: [ local, /usr/lib/calamares/modules ]
@@ -506,12 +371,10 @@ sequence:
   - fstab
   - locale
   - keyboard
-  - localecfg
   - users
-  - displaymanager
-  - networkcfg
   - hwclock
   - bootloader
+  - shellprocess@remove-live
   - umount
 - show:
   - finished
@@ -674,21 +537,13 @@ Plymouth.SetMessageFunction(message_callback);
 EOF
 
   # ── Desktop: atalho do instalador ────────────────────────────────────────
-  # Wrapper script para o Calamares (garante que abre com privilégios)
-  mkdir -p config/includes.chroot/usr/local/bin
-  cat > config/includes.chroot/usr/local/bin/onedevs-install <<'WEOF'
-#!/bin/bash
-exec sudo calamares "$@"
-WEOF
-  chmod +x config/includes.chroot/usr/local/bin/onedevs-install
-
   cat > config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop <<'EOF'
 [Desktop Entry]
 Name=Instalar OneDevsOS
 Name[pt_BR]=Instalar OneDevsOS
 Comment=Instalar OneDevsOS no disco
 Comment[pt_BR]=Instalar OneDevsOS no disco
-Exec=onedevs-install
+Exec=pkexec calamares
 Icon=system-software-install
 Type=Application
 Categories=System;Settings;
@@ -716,94 +571,7 @@ EOF
 </policyconfig>
 EOF
 
-  # ── Script de limpeza pós-instalação (removido pelo Calamares) ──────────────
-  # Roda dentro do sistema recém-instalado antes do primeiro boot
-  mkdir -p config/includes.chroot/etc/calamares/modules
-  cat > config/includes.chroot/etc/calamares/modules/removeuser.conf <<'EOF'
----
-script: /etc/calamares/scripts/remove-live-user.sh
-EOF
-
-  mkdir -p config/includes.chroot/etc/calamares/scripts
-  cat > config/includes.chroot/etc/calamares/scripts/remove-live-user.sh <<'EOF'
-#!/bin/bash
-# Remove usuário live e configurações temporárias após instalação
-# Executado pelo Calamares como módulo shellprocess
-
-set -e
-echo "[OneDevsOS] Limpando configurações do ambiente live..."
-
-# Remove usuário dev (live session only)
-if id -u dev >/dev/null 2>&1; then
-  userdel -r dev 2>/dev/null || true
-  echo "[OneDevsOS] Usuário 'dev' removido."
-fi
-
-# Remove sudoers irrestrito do live
-rm -f /etc/sudoers.d/dev
-echo "[OneDevsOS] sudoers live removido."
-
-# Remove senha root vazia/temporária se existir
-passwd -l root 2>/dev/null || true
-
-# Remove marcadores do ambiente live
-rm -f /etc/live/config.conf 2>/dev/null || true
-rm -f /var/lib/live/config/.*  2>/dev/null || true
-
-# Remove autologin do lightdm (live usa autologin, sistema instalado não deve)
-if [ -f /etc/lightdm/lightdm.conf ]; then
-  sed -i 's/^autologin-user=.*//' /etc/lightdm/lightdm.conf || true
-  sed -i 's/^autologin-user-timeout=.*//' /etc/lightdm/lightdm.conf || true
-fi
-
-# Remove alias de credenciais do issue
-cat > /etc/issue <<'ISSUE'
-OneDevsOS 1.0 AlbertEinstein - DevSecOps Edition
-
- \l
-ISSUE
-
-echo "[OneDevsOS] Sistema limpo e pronto para uso."
-EOF
-  chmod +x config/includes.chroot/etc/calamares/scripts/remove-live-user.sh
-
-  # Adiciona o módulo removeuser na sequência do Calamares (antes do umount)
-  # Substitui o settings.conf para incluir o shellprocess
-  cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
----
-modules-search: [ local, /usr/lib/calamares/modules ]
-sequence:
-- show:
-  - welcome
-  - locale
-  - keyboard
-  - partition
-  - users
-  - summary
-- exec:
-  - partition
-  - mount
-  - unpackfs
-  - machineid
-  - fstab
-  - locale
-  - keyboard
-  - localecfg
-  - users
-  - displaymanager
-  - networkcfg
-  - hwclock
-  - bootloader
-  - shellprocess@remove-live
-  - umount
-- show:
-  - finished
-branding: onedevs
-prompt-install: true
-dont-chroot: false
-EOF
-
-  # Configuração do shellprocess para rodar o script de limpeza
+  # ── Calamares: shellprocess remove-live + script de limpeza ────────────────
   cat > config/includes.chroot/etc/calamares/modules/shellprocess@remove-live.conf <<'EOF'
 ---
 dontChroot: false
@@ -811,6 +579,20 @@ timeout: 30
 script:
   - "-": /etc/calamares/scripts/remove-live-user.sh
 EOF
+
+  mkdir -p config/includes.chroot/etc/calamares/scripts
+  cat > config/includes.chroot/etc/calamares/scripts/remove-live-user.sh <<'EOF'
+#!/bin/bash
+set -e
+echo "[OneDevsOS] Limpando ambiente live..."
+id -u dev >/dev/null 2>&1 && userdel -r dev 2>/dev/null || true
+rm -f /etc/sudoers.d/dev
+passwd -l root 2>/dev/null || true
+sed -i 's/^autologin-user=.*//' /etc/lightdm/lightdm.conf 2>/dev/null || true
+printf 'OneDevsOS 1.0 AlbertEinstein - DevSecOps Edition\n\\n \\l\n' > /etc/issue
+echo "[OneDevsOS] Sistema pronto."
+EOF
+  chmod +x config/includes.chroot/etc/calamares/scripts/remove-live-user.sh
 
   log "Arquivos do live-build gerados/atualizados."
 } # end generate_livebuild_files
