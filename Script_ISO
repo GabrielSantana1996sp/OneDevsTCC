@@ -25,7 +25,6 @@ PACKAGE_LIST="${LIVEBUILD_DIR}/config/package-lists/onedevs.list.chroot"
 ARCHIVES_DIR="${LIVEBUILD_DIR}/config/archives"
 TMPWORK="/tmp/onedevs-archives-work"
 
-# URLs raw do GitHub (commit fixo para estabilidade)
 COMMIT="38f0fe21e88015f157a1cfccbd06fc67a5e9bb18"
 RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/${COMMIT}/IMG"
 
@@ -90,15 +89,15 @@ prepare_archives() {
 generate_livebuild_files() {
   log "Gerando arquivos do live-build..."
 
-  # Diretórios
   mkdir -p config/{package-lists,hooks/live,apt,archives}
-  mkdir -p config/includes.chroot/etc/{calamares/modules,apt/apt.conf.d}
+  mkdir -p config/includes.chroot/etc/{calamares/modules,calamares/scripts,apt/apt.conf.d}
   mkdir -p config/includes.chroot/etc/{lightdm/lightdm-gtk-greeter.conf.d,sysctl.d}
   mkdir -p config/includes.chroot/etc/skel/{Desktop,.config/autostart}
   mkdir -p config/includes.chroot/usr/share/{calamares/branding/onedevs,backgrounds/onedevs}
   mkdir -p config/includes.chroot/usr/share/{plymouth/themes/onedevs,applications,polkit-1/actions}
+  mkdir -p config/includes.chroot/usr/local/bin
 
-  # ── APT: ignora validade + bloqueia grub-pc ──────────────────────────────
+  # ── APT ───────────────────────────────────────────────────────────────────
   cat > config/apt/apt.conf <<'EOF'
 Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
@@ -157,7 +156,7 @@ nginx
 php php-cli
 mariadb-server
 
-# Bootloader (apenas EFI — grub-pc excluído por conflito)
+# Bootloader EFI
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
@@ -170,7 +169,7 @@ ansible
 docker.io
 systemd-container
 
-# Segurança (DevSecOps)
+# Segurança DevSecOps
 apparmor
 nftables
 fail2ban
@@ -213,7 +212,7 @@ fonts-noto fonts-noto-cjk
 polkitd pkexec
 snapd
 
-# Instalador (sem calamares-settings-debian — usamos config própria)
+# Instalador
 calamares
 
 # Plymouth
@@ -237,17 +236,15 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
   fi
 
-  # ── Exclusão explícita do grub-pc ─────────────────────────────────────────
   cat > config/package-lists/exclude.list.chroot <<'EOF'
 !grub-pc
 !grub-pc-bin
 EOF
 
-  # ── Hook 0001: bloqueia grub-pc no chroot antes da instalação ─────────────
+  # ── Hook 0001: bloqueia grub-pc ───────────────────────────────────────────
   cat > config/hooks/live/0001-block-grub-pc.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-echo "=== Bloqueando grub-pc no chroot ==="
 mkdir -p /etc/apt/preferences.d
 cat > /etc/apt/preferences.d/block-grub-pc <<'PREF'
 Package: grub-pc grub-pc-bin
@@ -258,59 +255,33 @@ echo "grub-pc bloqueado."
 EOF
   chmod +x config/hooks/live/0001-block-grub-pc.hook.chroot
 
-  # ── Hook 9997: baixa assets do GitHub com nomes CORRETOS ─────────────────
-  # Nomes reais dos arquivos no repositório:
-  #   BootSlash/Boot splash (Plymouth).png
-  #   Calamares/Calamares.png
-  #   Ligthdm/LigthDM.png
-  #   Wallpapers/Classico.png, Cosmos.png, Energia.png, RetroTerminal.png, universe.png
+  # ── Hook 9997: assets do GitHub ───────────────────────────────────────────
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<HOOKEOF
 #!/bin/bash
 set -e
-echo "=== Baixando assets do OneDevsOS do GitHub ==="
-
+echo "=== Baixando assets ==="
 COMMIT="${COMMIT}"
 RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/\${COMMIT}/IMG"
-
 mkdir -p /usr/share/backgrounds/onedevs
 mkdir -p /usr/share/calamares/branding/onedevs
 mkdir -p /etc/calamares/branding/onedevs
 mkdir -p /usr/share/plymouth/themes/onedevs
-
 dl() {
-  local url="\$1" dest="\$2" name="\$3"
-  if curl -fsSL --retry 3 --retry-delay 2 "\$url" -o "\$dest"; then
-    echo "OK: \$name ($(du -h "\$dest" 2>/dev/null | cut -f1))"
-  else
-    echo "AVISO: falha ao baixar \$name"
-  fi
+  curl -fsSL --retry 3 --retry-delay 2 "\$1" -o "\$2" && echo "OK: \$3" || echo "AVISO: falha \$3"
 }
-
-# Wallpapers
-dl "\${RAW}/Wallpapers/Classico.png"     /usr/share/backgrounds/onedevs/Classico.png     "Classico"
-dl "\${RAW}/Wallpapers/Cosmos.png"       /usr/share/backgrounds/onedevs/Cosmos.png       "Cosmos"
-dl "\${RAW}/Wallpapers/Energia.png"      /usr/share/backgrounds/onedevs/Energia.png      "Energia"
+dl "\${RAW}/Wallpapers/Classico.png"      /usr/share/backgrounds/onedevs/Classico.png      "Classico"
+dl "\${RAW}/Wallpapers/Cosmos.png"        /usr/share/backgrounds/onedevs/Cosmos.png        "Cosmos"
+dl "\${RAW}/Wallpapers/Energia.png"       /usr/share/backgrounds/onedevs/Energia.png       "Energia"
 dl "\${RAW}/Wallpapers/RetroTerminal.png" /usr/share/backgrounds/onedevs/RetroTerminal.png "RetroTerminal"
-dl "\${RAW}/Wallpapers/universe.png"     /usr/share/backgrounds/onedevs/universe.png     "universe"
-
-# Wallpaper padrão do LightDM = Classico
-cp /usr/share/backgrounds/onedevs/Classico.png /usr/share/backgrounds/onedevs/wallpaper.png
-
-# Logo do Calamares
-dl "\${RAW}/Calamares/Calamares.png" \
-   /usr/share/calamares/branding/onedevs/logo.png "logo Calamares"
-cp /usr/share/calamares/branding/onedevs/logo.png \
-   /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
-
-# Boot splash Plymouth
-dl "\${RAW}/BootSlash/Boot%20splash%20(Plymouth).png" \
-   /usr/share/plymouth/themes/onedevs/boot.png "boot splash"
-
-echo "=== Listagem assets ==="
-ls -lh /usr/share/backgrounds/onedevs/         2>/dev/null || true
-ls -lh /usr/share/calamares/branding/onedevs/  2>/dev/null || true
-ls -lh /usr/share/plymouth/themes/onedevs/     2>/dev/null || true
-echo "=== Hook 9997 OK ==="
+dl "\${RAW}/Wallpapers/universe.png"      /usr/share/backgrounds/onedevs/universe.png      "universe"
+dl "\${RAW}/Ligthdm/LigthDM.png"         /usr/share/backgrounds/onedevs/wallpaper.png     "LightDM wallpaper"
+[ -s /usr/share/backgrounds/onedevs/wallpaper.png ] || \
+  cp /usr/share/backgrounds/onedevs/Classico.png /usr/share/backgrounds/onedevs/wallpaper.png 2>/dev/null || true
+dl "\${RAW}/Calamares/Calamares.png"      /usr/share/calamares/branding/onedevs/logo.png   "logo Calamares"
+cp /usr/share/calamares/branding/onedevs/logo.png /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
+dl "\${RAW}/BootSlash/Boot%20splash%20(Plymouth).png" /usr/share/plymouth/themes/onedevs/boot.png "boot splash"
+echo "=== Assets OK ==="
+ls -lh /usr/share/calamares/branding/onedevs/ 2>/dev/null || true
 HOOKEOF
   chmod +x config/hooks/live/9997-onedevs-assets.hook.chroot
 
@@ -318,16 +289,13 @@ HOOKEOF
   cat > config/hooks/live/9998-onedevs-external.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-echo "Instalando Nix dentro do chroot..."
+echo "Instalando Nix..."
 sh <(curl --proto '=https' --tlsv1.2 -sSf https://nixos.org/nix/install) --daemon || true
-if [ -f /etc/profile.d/nix.sh ]; then
-    echo ". /etc/profile.d/nix.sh" >> /home/dev/.bashrc
-    chown dev:dev /home/dev/.bashrc
-fi
+[ -f /etc/profile.d/nix.sh ] && echo ". /etc/profile.d/nix.sh" >> /home/dev/.bashrc && chown dev:dev /home/dev/.bashrc || true
 EOF
   chmod +x config/hooks/live/9998-onedevs-external.hook.chroot
 
-  # ── Hook 9999: configura usuário e serviços ───────────────────────────────
+  # ── Hook 9999: usuário e serviços ─────────────────────────────────────────
   cat > config/hooks/live/9999-onedevs-config.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
@@ -336,11 +304,7 @@ if ! id -u dev >/dev/null 2>&1; then
   useradd -m -s /bin/bash -G sudo,netdev,plugdev,audio,video dev
   echo "dev:live" | chpasswd
 fi
-systemctl enable snapd.socket   || true
-systemctl enable snapd.service  || true
-systemctl enable lightdm        || true
-systemctl enable NetworkManager || true
-systemctl enable cups           || true
+systemctl enable lightdm NetworkManager cups snapd.socket snapd.service || true
 if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
   plymouth-set-default-theme onedevs || true
   update-initramfs -u || true
@@ -348,10 +312,21 @@ fi
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
+cat > /etc/os-release <<'OSRELEASE'
+NAME="OneDevsOS"
+VERSION="1.0 (AlbertEinstein)"
+ID=onedevs
+ID_LIKE=debian
+PRETTY_NAME="OneDevsOS 1.0 AlbertEinstein"
+VERSION_ID="1.0"
+VERSION_CODENAME=alberteinstein
+HOME_URL="https://onedevsofficial@proton.me"
+OSRELEASE
+echo "Configuração concluída."
 EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
-  # ── Calamares: settings.conf MÍNIMO ─────────────────────────────────────────
+  # ── Calamares: settings.conf ──────────────────────────────────────────────
   cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
 modules-search: [ local, /usr/lib/calamares/modules ]
@@ -442,7 +417,8 @@ allowWeakPasswordsDefault: true
 userShell: /bin/bash
 EOF
 
-  # ── Calamares: branding.desc (path CORRETO: /usr/share/calamares/) ────────
+  # ── Calamares: branding SEM slideshow (resolve caixa vazia) ──────────────
+  # O show.qml com calamares.slideshow quebra silenciosamente no Trixie
   cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
 ---
 componentName: onedevs
@@ -461,38 +437,15 @@ strings:
 images:
   productLogo: "logo.png"
   productIcon: "logo.png"
-  slideshow: "show.qml"
 style:
   sidebarBackground: "#2c3e50"
   sidebarText: "#ecf0f1"
   sidebarTextSelect: "#3498db"
 EOF
+  # NOTA: slideshow removido intencionalmente — calamares.slideshow QML
+  # não está disponível no Calamares do Trixie e causa tela em branco
 
-  # ── Calamares: slideshow (imagens locais) ─────────────────────────────────
-  cat > config/includes.chroot/usr/share/calamares/branding/onedevs/show.qml <<'EOF'
-import QtQuick 2.0
-import calamares.slideshow 1.0
-Presentation {
-  id: presentation
-  Slide {
-    Image {
-      anchors.centerIn: parent
-      source: "logo.png"
-      fillMode: Image.PreserveAspectFit
-      width: 200; height: 200
-    }
-    Text {
-      anchors.centerIn: parent
-      anchors.verticalCenterOffset: 120
-      text: "Bem-vindo ao OneDevsOS - DevSecOps Edition"
-      font.pixelSize: 22
-      color: "#ecf0f1"
-    }
-  }
-}
-EOF
-
-  # ── LightDM: wallpaper local ──────────────────────────────────────────────
+  # ── LightDM ───────────────────────────────────────────────────────────────
   cat > config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d/01_onedevs.conf <<'EOF'
 [greeter]
 background=/usr/share/backgrounds/onedevs/wallpaper.png
@@ -506,7 +459,7 @@ xft-rgba=rgb
 indicators=~host;~spacer;~clock;~spacer;~session;~power
 EOF
 
-  # ── Plymouth: tema com imagem local ──────────────────────────────────────
+  # ── Plymouth ──────────────────────────────────────────────────────────────
   cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.plymouth <<'EOF'
 [Plymouth Theme]
 Name=OneDevsOS
@@ -536,14 +489,20 @@ fun message_callback(text) {
 Plymouth.SetMessageFunction(message_callback);
 EOF
 
-  # ── Desktop: atalho do instalador ────────────────────────────────────────
+  # ── Desktop: wrapper + atalho ─────────────────────────────────────────────
+  cat > config/includes.chroot/usr/local/bin/onedevs-install <<'EOF'
+#!/bin/bash
+exec sudo -E calamares "$@"
+EOF
+  chmod +x config/includes.chroot/usr/local/bin/onedevs-install
+
   cat > config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop <<'EOF'
 [Desktop Entry]
 Name=Instalar OneDevsOS
 Name[pt_BR]=Instalar OneDevsOS
 Comment=Instalar OneDevsOS no disco
 Comment[pt_BR]=Instalar OneDevsOS no disco
-Exec=pkexec calamares
+Exec=onedevs-install
 Icon=system-software-install
 Type=Application
 Categories=System;Settings;
@@ -552,7 +511,7 @@ StartupNotify=true
 EOF
   chmod +x config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop
 
-  # ── Polkit: Calamares sem senha ───────────────────────────────────────────
+  # ── Polkit ────────────────────────────────────────────────────────────────
   cat > config/includes.chroot/usr/share/polkit-1/actions/org.onedevs.calamares.policy <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE policyconfig PUBLIC
@@ -571,7 +530,7 @@ EOF
 </policyconfig>
 EOF
 
-  # ── Calamares: shellprocess remove-live + script de limpeza ────────────────
+  # ── Calamares: shellprocess + script limpeza pós-instalação ───────────────
   cat > config/includes.chroot/etc/calamares/modules/shellprocess@remove-live.conf <<'EOF'
 ---
 dontChroot: false
@@ -580,7 +539,6 @@ script:
   - "-": /etc/calamares/scripts/remove-live-user.sh
 EOF
 
-  mkdir -p config/includes.chroot/etc/calamares/scripts
   cat > config/includes.chroot/etc/calamares/scripts/remove-live-user.sh <<'EOF'
 #!/bin/bash
 set -e
@@ -589,7 +547,6 @@ id -u dev >/dev/null 2>&1 && userdel -r dev 2>/dev/null || true
 rm -f /etc/sudoers.d/dev
 passwd -l root 2>/dev/null || true
 sed -i 's/^autologin-user=.*//' /etc/lightdm/lightdm.conf 2>/dev/null || true
-printf 'OneDevsOS 1.0 AlbertEinstein - DevSecOps Edition\n\\n \\l\n' > /etc/issue
 echo "[OneDevsOS] Sistema pronto."
 EOF
   chmod +x config/includes.chroot/etc/calamares/scripts/remove-live-user.sh
@@ -599,7 +556,7 @@ EOF
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 run_build() {
-  log "Sincronizando relógio (evita erro 'not valid yet' do APT)..."
+  log "Sincronizando relógio..."
   sudo timedatectl set-ntp true 2>/dev/null || true
   sleep 3
   command -v ntpdate >/dev/null 2>&1 && sudo ntpdate -u pool.ntp.org 2>/dev/null || true
