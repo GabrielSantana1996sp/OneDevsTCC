@@ -327,35 +327,38 @@ EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
   # ── Calamares: settings.conf ──────────────────────────────────────────────
-  cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
+cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
 modules-search: [ local, /usr/lib/calamares/modules ]
 sequence:
-- show:
-  - welcome
-  - locale
-  - keyboard
-  - partition
-  - users
-  - summary
-- exec:
-  - partition
-  - mount
-  - unpackfs
-  - machineid
-  - fstab
-  - locale
-  - keyboard
-  - users
-  - hwclock
-  - bootloader
-  - shellprocess@remove-live
-  - umount
-- show:
-  - finished
+  - show:
+    - welcome
+    - locale
+    - keyboard
+    - partition
+    - users
+    - summary
+  - exec:
+    - partition
+    - mount
+    - unpackfs
+    - machineid
+    - fstab
+    - locale
+    - keyboard
+    - users
+    - hwclock
+    - bootloader
+    - shellprocess@remove-live
+    - umount
+  - show:
+    - finished
+
 branding: onedevs
 prompt-install: true
 dont-chroot: false
+disable-cancel: false
+allow-cascade: true
 EOF
 
   # ── Calamares: partition.conf ─────────────────────────────────────────────
@@ -419,29 +422,26 @@ EOF
 
   # ── Calamares: branding SEM slideshow (resolve caixa vazia) ──────────────
   # O show.qml com calamares.slideshow quebra silenciosamente no Trixie
-  cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
+
+cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
 ---
 componentName: onedevs
 strings:
   productName: "OneDevsOS"
   shortProductName: "OneDevsOS"
   version: "1.0 AlbertEinstein"
-  shortVersion: "1.0"
-  versionedName: "OneDevsOS 1.0"
-  shortVersionedName: "OneDevsOS 1.0"
+  versionedName: "OneDevsOS 1.0 AlbertEinstein"
   bootloaderEntryName: "OneDevsOS"
-  productUrl: "https://onedevsofficial@proton.me"
-  supportUrl: "https://onedevsofficial@proton.me"
-  knownIssuesUrl: "https://onedevsofficial@proton.me"
-  releaseNotesUrl: "https://onedevs@proton.me"
 images:
   productLogo: "logo.png"
   productIcon: "logo.png"
+  productWelcome: "logo.png"     # importante
 style:
-  sidebarBackground: "#2c3e50"
-  sidebarText: "#ecf0f1"
-  sidebarTextSelect: "#3498db"
+  sidebarBackground: "#1e2a44"
+  sidebarText: "#ffffff"
+  sidebarTextSelect: "#00b0ff"
 EOF
+
   # NOTA: slideshow removido intencionalmente — calamares.slideshow QML
   # não está disponível no Calamares do Trixie e causa tela em branco
 
