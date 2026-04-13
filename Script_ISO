@@ -327,38 +327,39 @@ EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
   # ── Calamares: settings.conf ──────────────────────────────────────────────
-cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
+  cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
 modules-search: [ local, /usr/lib/calamares/modules ]
+instances:
+- id: remove-live
+  module: shellprocess
+  config: shellprocess@remove-live.conf
 sequence:
-  - show:
-    - welcome
-    - locale
-    - keyboard
-    - partition
-    - users
-    - summary
-  - exec:
-    - partition
-    - mount
-    - unpackfs
-    - machineid
-    - fstab
-    - locale
-    - keyboard
-    - users
-    - hwclock
-    - bootloader
-    - shellprocess@remove-live
-    - umount
-  - show:
-    - finished
-
+- show:
+  - welcome
+  - locale
+  - keyboard
+  - partition
+  - users
+  - summary
+- exec:
+  - partition
+  - mount
+  - unpackfs
+  - machineid
+  - fstab
+  - locale
+  - keyboard
+  - users
+  - hwclock
+  - bootloader
+  - shellprocess@remove-live
+  - umount
+- show:
+  - finished
 branding: onedevs
 prompt-install: true
 dont-chroot: false
-disable-cancel: false
-allow-cascade: true
 EOF
 
   # ── Calamares: partition.conf ─────────────────────────────────────────────
@@ -422,28 +423,71 @@ EOF
 
   # ── Calamares: branding SEM slideshow (resolve caixa vazia) ──────────────
   # O show.qml com calamares.slideshow quebra silenciosamente no Trixie
-
-cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
+  cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
 ---
 componentName: onedevs
 strings:
   productName: "OneDevsOS"
   shortProductName: "OneDevsOS"
   version: "1.0 AlbertEinstein"
-  versionedName: "OneDevsOS 1.0 AlbertEinstein"
+  shortVersion: "1.0"
+  versionedName: "OneDevsOS 1.0"
+  shortVersionedName: "OneDevsOS 1.0"
   bootloaderEntryName: "OneDevsOS"
+  productUrl: "https://onedevsofficial@proton.me"
+  supportUrl: "https://onedevsofficial@proton.me"
+  knownIssuesUrl: "https://onedevsofficial@proton.me"
+  releaseNotesUrl: "https://onedevs@proton.me"
 images:
   productLogo: "logo.png"
   productIcon: "logo.png"
-  productWelcome: "logo.png"     # importante
+  slideshow: "show.qml"
 style:
-  sidebarBackground: "#1e2a44"
-  sidebarText: "#ffffff"
-  sidebarTextSelect: "#00b0ff"
+  sidebarBackground: "#2c3e50"
+  sidebarText: "#ecf0f1"
+  sidebarTextSelect: "#3498db"
 EOF
 
-  # NOTA: slideshow removido intencionalmente — calamares.slideshow QML
-  # não está disponível no Calamares do Trixie e causa tela em branco
+  # QML sem import calamares.slideshow (que não existe no Trixie)
+  # Usa QtQuick puro — funciona em qualquer versão
+  cat > config/includes.chroot/usr/share/calamares/branding/onedevs/show.qml <<'EOF'
+import QtQuick 2.0
+
+Rectangle {
+  id: presentation
+  color: "#2c3e50"
+  anchors.fill: parent
+
+  Image {
+    id: logo
+    source: "logo.png"
+    anchors.centerIn: parent
+    anchors.verticalCenterOffset: -40
+    fillMode: Image.PreserveAspectFit
+    width: 200
+    height: 200
+  }
+
+  Text {
+    anchors.top: logo.bottom
+    anchors.topMargin: 20
+    anchors.horizontalCenter: parent.horizontalCenter
+    text: "OneDevsOS 1.0 AlbertEinstein"
+    font.pixelSize: 22
+    font.bold: true
+    color: "#ecf0f1"
+  }
+
+  Text {
+    anchors.bottom: parent.bottom
+    anchors.bottomMargin: 20
+    anchors.horizontalCenter: parent.horizontalCenter
+    text: "DevSecOps Edition — Instalando..."
+    font.pixelSize: 14
+    color: "#bdc3c7"
+  }
+}
+EOF
 
   # ── LightDM ───────────────────────────────────────────────────────────────
   cat > config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d/01_onedevs.conf <<'EOF'
