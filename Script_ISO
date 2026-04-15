@@ -420,9 +420,7 @@ allowWeakPasswords: true
 allowWeakPasswordsDefault: true
 userShell: /bin/bash
 EOF
-
-  # ── Calamares: branding SEM slideshow (resolve caixa vazia) ──────────────
-  # O show.qml com calamares.slideshow quebra silenciosamente no Trixie
+  # ── Calamares: branding (com slideshow apontando pro show.qml customizado) ─────
   cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
 ---
 componentName: onedevs
@@ -445,6 +443,9 @@ style:
   sidebarBackground: "#2c3e50"
   sidebarText: "#ecf0f1"
   sidebarTextSelect: "#3498db"
+# ←←← ESSA LINHA É A QUE ESTAVA FALTANDO
+slideshow: show.qml
+EOF
 
 EOF
 
