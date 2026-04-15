@@ -445,7 +445,6 @@ style:
   sidebarTextSelect: "#3498db"
 # ←←← ESSA LINHA É A QUE ESTAVA FALTANDO
 slideshow: show.qml
-EOF
 
 EOF
 
