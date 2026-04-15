@@ -419,6 +419,7 @@ passwordRequirements:
 allowWeakPasswords: true
 allowWeakPasswordsDefault: true
 userShell: /bin/bash
+
 EOF
   # ── Calamares: branding (com slideshow apontando pro show.qml customizado) ─────
   cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
