@@ -144,18 +144,9 @@ default-jdk default-jre
 golang-go
 nodejs npm
 rustc cargo
-ruby bundler
-geany
-vim neovim
 git
 make cmake autoconf automake
 gdb
-
-# Servidores
-apache2
-nginx
-php php-cli
-mariadb-server
 
 # Bootloader (apenas EFI — grub-pc excluído por conflito)
 grub-efi-amd64
@@ -183,38 +174,6 @@ tripwire
 debsums
 gpg
 logcheck
-
-# Documentação
-doxygen
-man-db
-mkdocs
-pandoc
-
-# Utilitários
-tmux
-htop
-ranger
-synaptic
-keepassxc
-curl wget
-rsync
-net-tools
-bind9-dnsutils
-traceroute
-gparted
-cups
-bluez blueman
-xdg-utils
-gvfs
-udisks2
-gdebi
-flatpak
-fonts-noto fonts-noto-cjk
-polkitd pkexec
-snapd
-
-#internet
-chromium
 
 # Instalador (sem calamares-settings-debian — usamos config própria)
 calamares
@@ -358,31 +317,33 @@ EOF
   cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
 modules-search: [ local, /usr/lib/calamares/modules ]
+instances:
+- id: remove-live
+  module: shellprocess
+  config: shellprocess@remove-live.conf
 sequence:
-  - show:
-    - welcome
-    - locale
-    - keyboard
-    - partition
-    - users
-    - summary
-  - exec:
-    - partition
-    - mount
-    - unpackfs
-    - machineid
-    - fstab
-    - locale
-    - keyboard
-    - localecfg
-    - users
-    - displaymanager
-    - networkcfg
-    - hwclock
-    - bootloader
-    - umount
-  - show:
-    - finished
+- show:
+  - welcome
+  - locale
+  - keyboard
+  - partition
+  - users
+  - summary
+- exec:
+  - partition
+  - mount
+  - unpackfs
+  - machineid
+  - fstab
+  - locale
+  - keyboard
+  - users
+  - hwclock
+  - bootloader
+  - shellprocess@remove-live
+  - umount
+- show:
+  - finished
 branding: onedevs
 prompt-install: true
 dont-chroot: false
@@ -466,7 +427,7 @@ strings:
 images:
   productLogo: "logo.png"
   productIcon: "logo.png"
-  slideshow: "show.qml"
+slideshow: "show.qml"
 style:
   sidebarBackground: "#2c3e50"
   sidebarText: "#ecf0f1"
@@ -476,23 +437,38 @@ EOF
   # ── Calamares: slideshow (imagens locais) ─────────────────────────────────
   cat > config/includes.chroot/usr/share/calamares/branding/onedevs/show.qml <<'EOF'
 import QtQuick 2.0
-import calamares.slideshow 1.0
-Presentation {
-  id: presentation
-  Slide {
-    Image {
-      anchors.centerIn: parent
-      source: "logo.png"
-      fillMode: Image.PreserveAspectFit
-      width: 200; height: 200
-    }
-    Text {
-      anchors.centerIn: parent
-      anchors.verticalCenterOffset: 120
-      text: "Bem-vindo ao OneDevsOS - DevSecOps Edition"
-      font.pixelSize: 22
-      color: "#ecf0f1"
-    }
+
+Rectangle {
+  color: "#2c3e50"
+  anchors.fill: parent
+
+  Image {
+    id: logo
+    source: "logo.png"
+    anchors.centerIn: parent
+    anchors.verticalCenterOffset: -40
+    fillMode: Image.PreserveAspectFit
+    width: 200
+    height: 200
+  }
+
+  Text {
+    anchors.top: logo.bottom
+    anchors.topMargin: 20
+    anchors.horizontalCenter: parent.horizontalCenter
+    text: "OneDevsOS 1.0 AlbertEinstein"
+    font.pixelSize: 22
+    font.bold: true
+    color: "#ecf0f1"
+  }
+
+  Text {
+    anchors.bottom: parent.bottom
+    anchors.bottomMargin: 20
+    anchors.horizontalCenter: parent.horizontalCenter
+    text: "DevSecOps Edition — Instalando..."
+    font.pixelSize: 14
+    color: "#bdc3c7"
   }
 }
 EOF
@@ -575,61 +551,6 @@ EOF
   </action>
 </policyconfig>
 EOF
-
-  # ── Calamares: unpackfs.conf (CRÍTICO — localização do squashfs live) ──────
-  cat > config/includes.chroot/etc/calamares/modules/unpackfs.conf <<'EOF'
----
-unpack:
-  - source: /run/live/rootfs/filesystem.squashfs
-    sourcefs: squashfs
-    destination: ""
-EOF
-
-  # ── Calamares: mount.conf ─────────────────────────────────────────────────
-  cat > config/includes.chroot/etc/calamares/modules/mount.conf <<'EOF'
----
-extraMounts:
-  - device: proc
-    fs: proc
-    mountPoint: /proc
-  - device: sys
-    fs: sysfs
-    mountPoint: /sys
-  - device: /dev
-    fs: devtmpfs
-    mountPoint: /dev
-    options: bind
-  - device: /run
-    fs: tmpfs
-    mountPoint: /run
-    options: bind
-extraMountsEfi:
-  - device: efivarfs
-    fs: efivarfs
-    mountPoint: /sys/firmware/efi/efivars
-EOF
-
-  # ── Calamares: shellprocess remove-live ──────────────────────────────────
-  cat > config/includes.chroot/etc/calamares/modules/shellprocess@remove-live.conf <<'EOF'
----
-dontChroot: false
-timeout: 30
-script:
-  - "-": /etc/calamares/scripts/remove-live-user.sh
-EOF
-
-  mkdir -p config/includes.chroot/etc/calamares/scripts
-  cat > config/includes.chroot/etc/calamares/scripts/remove-live-user.sh <<'EOF'
-#!/bin/bash
-set -e
-echo "[OneDevsOS] Limpando ambiente live..."
-id -u dev >/dev/null 2>&1 && userdel -r dev 2>/dev/null || true
-rm -f /etc/sudoers.d/dev
-passwd -l root 2>/dev/null || true
-sed -i 's/^autologin-user=.*//' /etc/lightdm/lightdm.conf 2>/dev/null || true
-echo "[OneDevsOS] Sistema pronto."
-EOF
-  chmod +x config/includes.chroot/etc/calamares/scripts/remove-live-user.sh
 
   log "Arquivos do live-build gerados/atualizados."
 } # end generate_livebuild_files
