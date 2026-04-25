@@ -1,0 +1,45 @@
+name: Build OneDevsOS ISO
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    
+    env:
+      ISO_NAME: "onedevsos-alberteinstein-1.0-amd64.iso"
+      FOLDER_ID: "1DFmwsZE9mg2PAwCHkWP3b9_YMvWlWrxN"
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Autenticar Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build da ISO
+        run: |
+          chmod +x Script_ISO
+          ./Script_ISO
+
+      - name: Upload para Google Drive
+        if: success()
+        run: |
+          echo " Enviando para Google Drive..."
+          gsutil cp ${{ env.ISO_NAME }} "gs://drive/${{ env.FOLDER_ID }}/"
+          echo " Upload concluído!"
+
+      - name: Resumo
+        run: |
+          echo "## 📊 Build Concluído" >> $GITHUB_STEP_SUMMARY
+          echo "- **ISO**: ${{ env.ISO_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Drive**: [Abrir pasta](https://drive.google.com/drive/folders/${{ env.FOLDER_ID }})" >> $GITHUB_STEP_SUMMARY
