@@ -40,6 +40,6 @@ jobs:
 
       - name: Resumo
         run: |
-          echo "## 📊 Build Concluído" >> $GITHUB_STEP_SUMMARY
+          echo "##  Build Concluído" >> $GITHUB_STEP_SUMMARY
           echo "- **ISO**: ${{ env.ISO_NAME }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Drive**: [Abrir pasta](https://drive.google.com/drive/folders/${{ env.FOLDER_ID }})" >> $GITHUB_STEP_SUMMARY
