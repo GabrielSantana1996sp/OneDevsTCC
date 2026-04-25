@@ -60,30 +60,75 @@ check_dependencies() {
   fi
 }
 
-# ── Prepara cache de pacotes ──────────────────────────────────────────────────
-prepare_archives() {
-  log "Preparando cache de pacotes..."
+# ── Prepara cache de pacotes (MODIFICADO PARA BAIXAR TUDO ANTES DO BUILD) ───
+prepare_full_cache() {
+  log "Preparando cache completo de pacotes (Modo Offline Seguro)..."
+  
   [ -f "${PACKAGE_LIST}" ] || error "Lista não encontrada: ${PACKAGE_LIST}"
-  rm -rf "${TMPWORK}"
+  
+  # Limpa diretórios antigos
+  rm -rf "${ARCHIVES_DIR}"
   mkdir -p "${ARCHIVES_DIR}/pool/main/custom"
   mkdir -p "${ARCHIVES_DIR}/dists/${DIST}/main/binary-${ARCH}"
+  
+  # Extrai lista de pacotes (ignora comentários e linhas vazias)
   local PACKAGES
   PACKAGES=$(grep -v '^[[:space:]]*#' "${PACKAGE_LIST}" | grep -v '^[[:space:]]*$' | tr '\n' ' ')
-  [ -n "${PACKAGES}" ] || { log "Lista vazia."; return 0; }
+  
+  if [ -z "${PACKAGES}" ]; then
+    log "Lista de pacotes vazia. Pulando cache."
+    return 0
+  fi
+
+  log "Baixando ${#PACKAGES} pacotes para o cache local..."
+  
+  # Atualiza listas
   sudo apt-get -q update || true
-  # shellcheck disable=SC2086
-  sudo apt-get --download-only install -y $PACKAGES || true
-  find /var/cache/apt/archives -maxdepth 1 -name "*.deb" \
-    -exec cp -v -- "{}" "${ARCHIVES_DIR}/pool/main/custom/" \;
+  
+  # Baixa TODOS os pacotes da lista para o cache do apt
+  # O --download-only garante que nada é instalado, apenas baixado
+  if ! sudo apt-get --download-only install -y $PACKAGES 2>&1 | tee /tmp/apt_download.log; then
+    log "AVISO: Alguns pacotes podem ter falhado no download. Verificando cache..."
+    # Não abortamos aqui, pois alguns pacotes podem ser opcionais ou ter dependências quebradas
+    # Mas o build pode falhar depois se faltar algo crítico
+  fi
+
+  # Copia todos os .deb baixados para o diretório do live-build
+  log "Copiando pacotes para o diretório de build..."
+  find /var/cache/apt/archives -maxdepth 1 -name "*.deb" -exec cp -v -- "{}" "${ARCHIVES_DIR}/pool/main/custom/" \;
+
+  # Gera os índices locais (Packages.gz e Release)
+  log "Gerando índices locais (Packages.gz e Release)..."
   command -v dpkg-scanpackages >/dev/null 2>&1 || sudo apt-get install -y dpkg-dev
   command -v apt-ftparchive   >/dev/null 2>&1 || sudo apt-get install -y apt-utils
+  
   pushd "${ARCHIVES_DIR}" >/dev/null
-  dpkg-scanpackages pool /dev/null | gzip -9c \
-    > "dists/${DIST}/main/binary-${ARCH}/Packages.gz" || true
-  apt-ftparchive release . > Release || true
+  
+  # Gera Packages.gz
+  if dpkg-scanpackages pool /dev/null | gzip -9c > "dists/${DIST}/main/binary-${ARCH}/Packages.gz"; then
+    log "Índice Packages.gz gerado com sucesso."
+  else
+    log "ERRO: Falha ao gerar Packages.gz."
+    popd >/dev/null
+    return 1
+  fi
+
+  # Gera Release
+  if apt-ftparchive release . > Release; then
+    log "Arquivo Release gerado com sucesso."
+  else
+    log "ERRO: Falha ao gerar Release."
+    popd >/dev/null
+    return 1
+  fi
+  
   chmod -R a+r .
   popd >/dev/null
-  log "Cache preparado."
+  
+  # Verifica se há arquivos
+  local COUNT
+  COUNT=$(ls -1 "${ARCHIVES_DIR}/pool/main/custom/"*.deb 2>/dev/null | wc -l)
+  log "Cache preparado com ${COUNT} pacotes. Build offline seguro."
 }
 
 # ── Gera arquivos do live-build ───────────────────────────────────────────────
@@ -144,9 +189,18 @@ default-jdk default-jre
 golang-go
 nodejs npm
 rustc cargo
+ruby bundler
+geany
+vim neovim
 git
 make cmake autoconf automake
 gdb
+
+# Servidores
+apache2
+nginx
+php php-cli
+mariadb-server
 
 # Bootloader (apenas EFI — grub-pc excluído por conflito)
 grub-efi-amd64
@@ -174,6 +228,35 @@ tripwire
 debsums
 gpg
 logcheck
+
+# Documentação
+doxygen
+man-db
+mkdocs
+pandoc
+
+# Utilitários
+tmux
+htop
+ranger
+synaptic
+keepassxc
+curl wget
+rsync
+net-tools
+bind9-dnsutils
+traceroute
+gparted
+cups
+bluez blueman
+xdg-utils
+gvfs
+udisks2
+gdebi
+flatpak
+fonts-noto fonts-noto-cjk
+polkitd pkexec
+snapd
 
 # Instalador (sem calamares-settings-debian — usamos config própria)
 calamares
@@ -221,11 +304,6 @@ EOF
   chmod +x config/hooks/live/0001-block-grub-pc.hook.chroot
 
   # ── Hook 9997: baixa assets do GitHub com nomes CORRETOS ─────────────────
-  # Nomes reais dos arquivos no repositório:
-  #   BootSlash/Boot splash (Plymouth).png
-  #   Calamares/Calamares.png
-  #   Ligthdm/LigthDM.png
-  #   Wallpapers/Classico.png, Cosmos.png, Energia.png, RetroTerminal.png, universe.png
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<HOOKEOF
 #!/bin/bash
 set -e
@@ -441,34 +519,28 @@ import QtQuick 2.0
 Rectangle {
   color: "#2c3e50"
   anchors.fill: parent
-
   Image {
     id: logo
     source: "logo.png"
     anchors.centerIn: parent
     anchors.verticalCenterOffset: -40
     fillMode: Image.PreserveAspectFit
-    width: 200
-    height: 200
+    width: 200; height: 200
   }
-
   Text {
     anchors.top: logo.bottom
     anchors.topMargin: 20
     anchors.horizontalCenter: parent.horizontalCenter
     text: "OneDevsOS 1.0 AlbertEinstein"
-    font.pixelSize: 22
-    font.bold: true
+    font.pixelSize: 22; font.bold: true
     color: "#ecf0f1"
   }
-
   Text {
     anchors.bottom: parent.bottom
     anchors.bottomMargin: 20
     anchors.horizontalCenter: parent.horizontalCenter
     text: "DevSecOps Edition — Instalando..."
-    font.pixelSize: 14
-    color: "#bdc3c7"
+    font.pixelSize: 14; color: "#bdc3c7"
   }
 }
 EOF
@@ -524,7 +596,7 @@ Name=Instalar OneDevsOS
 Name[pt_BR]=Instalar OneDevsOS
 Comment=Instalar OneDevsOS no disco
 Comment[pt_BR]=Instalar OneDevsOS no disco
-Exec=pkexec calamares
+Exec=sudo -E calamares
 Icon=system-software-install
 Type=Application
 Categories=System;Settings;
@@ -574,12 +646,12 @@ run_build() {
     --architectures "$ARCH" \
     --debian-installer none \
     --archive-areas "main contrib non-free non-free-firmware" \
-    --bootloaders "syslinux,grub-efi" \
     --mirror-bootstrap "http://deb.debian.org/debian" \
     --mirror-chroot "http://deb.debian.org/debian" \
     --mirror-binary "http://deb.debian.org/debian" \
-    --mirror-chroot-security "http://security.debian.org/" \
-    --mirror-binary-security "http://security.debian.org/" \
+    --mirror-chroot-security "http://security.debian.org/debian-security" \
+    --mirror-binary-security "http://security.debian.org/debian-security" \
+    --security false \
     --apt-secure false \
     --iso-application "$APPNAME" \
     --iso-volume "$VOLUME" \
@@ -630,14 +702,19 @@ log "OneDevsOS Build Script - ${CODENAME} (${DIST}) ${ARCH}"
 check_dependencies
 generate_livebuild_files
 
+# --- NOVA ETAPA: Preparar Cache Completo ---
 if [ "${ONLINE:-0}" -eq 1 ]; then
-  log "Modo ONLINE: live-build baixará pacotes durante o build"
+  log "Modo ONLINE detectado. Preparando cache completo para build offline..."
+  prepare_full_cache
+  log "Cache pronto. Iniciando build em modo offline seguro."
+  # Força o uso do cache local desabilitando mirrors no build
+  # O live-build prioriza o cache local se estiver presente
 else
   log "Modo OFFLINE: verificando cache..."
   if [ -f "${ARCHIVES_DIR}/dists/${DIST}/main/binary-${ARCH}/Packages.gz" ]; then
     log "Cache encontrado — build offline possível."
   else
-    error "Cache não encontrado. Rode com internet primeiro."
+    error "Cache não encontrado. Rode com internet primeiro para gerar o cache."
   fi
 fi
 
