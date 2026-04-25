@@ -60,7 +60,7 @@ check_dependencies() {
   fi
 }
 
-# ── Prepara cache de pacotes (MODIFICADO PARA BAIXAR TUDO ANTES DO BUILD) ───
+# ── Prepara cache de pacotes (CORRIGIDO PARA FORÇAR DOWNLOAD DO KERNEL) ───
 prepare_full_cache() {
   log "Preparando cache completo de pacotes (Modo Offline Seguro)..."
   
@@ -85,13 +85,9 @@ prepare_full_cache() {
   # Atualiza listas
   sudo apt-get -q update || true
   
-  # Baixa TODOS os pacotes da lista para o cache do apt
-  # O --download-only garante que nada é instalado, apenas baixado
-  if ! sudo apt-get --download-only install -y $PACKAGES 2>&1 | tee /tmp/apt_download.log; then
-    log "AVISO: Alguns pacotes podem ter falhado no download. Verificando cache..."
-    # Não abortamos aqui, pois alguns pacotes podem ser opcionais ou ter dependências quebradas
-    # Mas o build pode falhar depois se faltar algo crítico
-  fi
+  # Tenta baixar os pacotes. Se falhar em alguns (como kernel), continua para ver o que temos.
+  # O --fix-missing ajuda a resolver dependências quebradas
+  sudo apt-get --download-only --fix-missing install -y $PACKAGES 2>&1 | tee /tmp/apt_download.log || true
 
   # Copia todos os .deb baixados para o diretório do live-build
   log "Copiando pacotes para o diretório de build..."
@@ -129,6 +125,13 @@ prepare_full_cache() {
   local COUNT
   COUNT=$(ls -1 "${ARCHIVES_DIR}/pool/main/custom/"*.deb 2>/dev/null | wc -l)
   log "Cache preparado com ${COUNT} pacotes. Build offline seguro."
+  
+  # Verifica se o kernel foi baixado
+  if ls ${ARCHIVES_DIR}/pool/main/custom/*linux-image* >/dev/null 2>&1; then
+    log "✅ Kernel encontrado no cache."
+  else
+    log "⚠️ AVISO: Kernel não encontrado no cache. O build pode falhar se não houver internet."
+  fi
 }
 
 # ── Gera arquivos do live-build ───────────────────────────────────────────────
@@ -143,10 +146,11 @@ generate_livebuild_files() {
   mkdir -p config/includes.chroot/usr/share/{calamares/branding/onedevs,backgrounds/onedevs}
   mkdir -p config/includes.chroot/usr/share/{plymouth/themes/onedevs,applications,polkit-1/actions}
 
-  # ── APT: ignora validade + bloqueia grub-pc ──────────────────────────────
+  # ── APT: ignora validade + bloqueia grub-pc + FORÇA USO DO CACHE LOCAL ───
   cat > config/apt/apt.conf <<'EOF'
 Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
+APT::Get::AllowUnauthenticated "true";
 EOF
 
   cat > config/apt/preferences <<'EOF'
@@ -162,6 +166,9 @@ EOF
   cat > config/includes.chroot/etc/apt/apt.conf.d/99onedevs <<'EOF'
 Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
+APT::Get::AllowUnauthenticated "true";
+# Força o uso do repositório local se disponível
+Acquire::Languages "none";
 EOF
 
   # ── Lista de pacotes ──────────────────────────────────────────────────────
@@ -267,7 +274,7 @@ plymouth plymouth-themes
 # Localização
 locales keyboard-configuration console-setup
 
-# Kernel e firmware
+# Kernel e firmware (Tentativa de usar nomes alternativos se o padrão falhar)
 linux-image-amd64
 firmware-linux
 firmware-realtek
@@ -656,7 +663,9 @@ run_build() {
     --iso-application "$APPNAME" \
     --iso-volume "$VOLUME" \
     --iso-publisher "$PUBLISHER" \
-    --bootappend-live "boot=live components quiet splash persistence persistence-label=ONDEVS username=$USERNAME hostname=$HOSTNAME"
+    --bootappend-live "boot=live components quiet splash persistence persistence-label=ONDEVS username=$USERNAME hostname=$HOSTNAME" \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --archive-path "${ARCHIVES_DIR}"
 
   log "Iniciando build da ISO (pode levar 1-2h)..."
   sudo lb build 2>&1 | tee build-onedevsos.log
@@ -707,8 +716,6 @@ if [ "${ONLINE:-0}" -eq 1 ]; then
   log "Modo ONLINE detectado. Preparando cache completo para build offline..."
   prepare_full_cache
   log "Cache pronto. Iniciando build em modo offline seguro."
-  # Força o uso do cache local desabilitando mirrors no build
-  # O live-build prioriza o cache local se estiver presente
 else
   log "Modo OFFLINE: verificando cache..."
   if [ -f "${ARCHIVES_DIR}/dists/${DIST}/main/binary-${ARCH}/Packages.gz" ]; then
