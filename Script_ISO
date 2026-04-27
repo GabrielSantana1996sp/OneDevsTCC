@@ -128,9 +128,9 @@ prepare_full_cache() {
   
   # Verifica se o kernel foi baixado
   if ls ${ARCHIVES_DIR}/pool/main/custom/*linux-image* >/dev/null 2>&1; then
-    log "✅ Kernel encontrado no cache."
+    log " Kernel encontrado no cache."
   else
-    log "⚠️ AVISO: Kernel não encontrado no cache. O build pode falhar se não houver internet."
+    log " AVISO: Kernel não encontrado no cache. O build pode falhar se não houver internet."
   fi
 }
 
@@ -202,12 +202,6 @@ vim neovim
 git
 make cmake autoconf automake
 gdb
-
-# Servidores
-apache2
-nginx
-php php-cli
-mariadb-server
 
 # Bootloader (apenas EFI — grub-pc excluído por conflito)
 grub-efi-amd64
@@ -387,7 +381,7 @@ systemctl enable snapd.socket   || true
 systemctl enable snapd.service  || true
 systemctl enable lightdm        || true
 systemctl enable NetworkManager || true
-systemctl enable cups           || true
+systemctl enable nftables       || true
 if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
   plymouth-set-default-theme onedevs || true
   update-initramfs -u || true
