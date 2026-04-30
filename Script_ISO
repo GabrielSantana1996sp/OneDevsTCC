@@ -381,7 +381,6 @@ systemctl enable snapd.socket   || true
 systemctl enable snapd.service  || true
 systemctl enable lightdm        || true
 systemctl enable NetworkManager || true
-systemctl enable nftables       || true
 if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
   plymouth-set-default-theme onedevs || true
   update-initramfs -u || true
