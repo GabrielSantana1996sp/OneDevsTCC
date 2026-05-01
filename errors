@@ -1,1 +1,17 @@
-
+dpkg-scanpackages: informação: Escreveu 1012 entradas no ficheiro Packages de resultado.
+[2026-05-01 13:38:08] Índice Packages.gz gerado com sucesso.
+[2026-05-01 13:38:09] Arquivo Release gerado com sucesso.
+[2026-05-01 13:38:09] Cache preparado com 1012 pacotes. Build offline seguro.
+[2026-05-01 13:38:09]  Kernel encontrado no cache.
+[2026-05-01 13:38:09] Cache pronto. Iniciando build em modo offline seguro.
+[2026-05-01 13:38:09] Sincronizando relógio (evita erro 'not valid yet' do APT)...
+[2026-05-01 13:38:12] Horário: sex 01 mai 2026 13:38:12 -03
+[2026-05-01 13:38:12] Limpando ambiente anterior...
+[2026-05-01 13:38:12] lb clean --purge
+P: Cleaning chroot
+[2026-05-01 13:38:13] Executando lb config...
+[2026-05-01 13:38:13] lb config --mode debian --distribution trixie --binary-images iso-hybrid --architectures amd64 --debian-installer none --archive-areas main contrib non-free non-free-firmware --mirror-bootstrap http://deb.debian.org/debian --mirror-chroot http://deb.debian.org/debian --mirror-binary http://deb.debian.org/debian --mirror-chroot-security http://security.debian.org/debian-security --mirror-binary-security http://security.debian.org/debian-security --security false --apt-secure false --iso-application OneDevsOS - AlbertEinstein --iso-volume ONEDEVS_AlbertEinstein_1.0 --iso-publisher OneDevsOS Project (AlbertEinstein) --bootappend-live boot=live components quiet splash persistence persistence-label=ONDEVS username=dev hostname=onedevs --archive-areas main contrib non-free non-free-firmware --archive-path /home/gsm/OneDevsOs/config/archives
+lb config: opção não reconhecida “--archive-path”
+E: invalid arguments
+gsm@gsm-standardpc:~/OneDevsOs$ 
+___
