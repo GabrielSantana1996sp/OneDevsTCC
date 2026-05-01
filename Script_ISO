@@ -459,6 +459,16 @@ encrypt:
   luksHash: sha512
 EOF
 
+  # ── Calamares: UNPACKFS CONFIG (CORREÇÃO DO ERRO) ────────────────────────
+  cat > config/includes.chroot/etc/calamares/modules/unpackfs.conf <<'EOF'
+---
+unpackfs:
+  - source: "/live/image/live-root.squashfs"
+    target: "/"
+    filesystem: "squashfs"
+    options: []
+EOF
+
   # ── Calamares: users.conf ─────────────────────────────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/users.conf <<'EOF'
 ---
