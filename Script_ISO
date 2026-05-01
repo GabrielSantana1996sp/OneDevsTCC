@@ -658,7 +658,7 @@ run_build() {
     --iso-publisher "$PUBLISHER" \
     --bootappend-live "boot=live components quiet splash persistence persistence-label=ONDEVS username=$USERNAME hostname=$HOSTNAME" \
     --archive-areas "main contrib non-free non-free-firmware" \
-    ## Linha --archive-path removida
+    # Fim do comando lb config (sem --archive-path)
 
   log "Iniciando build da ISO (pode levar 1-2h)..."
   sudo lb build 2>&1 | tee build-onedevsos.log
