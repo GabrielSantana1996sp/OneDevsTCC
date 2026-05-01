@@ -15,3 +15,12 @@ lb config: opção não reconhecida “--archive-path”
 E: invalid arguments
 gsm@gsm-standardpc:~/OneDevsOs$ 
 ___
+
+dev@onedevs:~$ sudo -E calamares
+qt.qpa.theme.dbus: Session DBus not running.
+qt.qpa.theme.dbus: Application will not react to setting changes.
+ Check your DBus installation.
+chcon: failed to get security context of '/': No data available
+19:41:27 [1]: void Calamares::ViewManager::onInstallationFailed(const QString&, const QString&)
+    ERROR: Installation failed: "Configuração incorreta do unpackfs" 
+___
