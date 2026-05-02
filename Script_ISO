@@ -379,6 +379,8 @@ if ! id -u dev >/dev/null 2>&1; then
 fi
 systemctl enable snapd.socket   || true
 systemctl enable snapd.service  || true
+systemctl enable dbus.service   || true
+systemctl start dbus            || true
 systemctl enable lightdm        || true
 systemctl enable NetworkManager || true
 if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
@@ -428,36 +430,33 @@ dont-chroot: false
 EOF
 
   # ── Calamares: partition.conf ─────────────────────────────────────────────
-  cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
+# Substitua todo o conteúdo de partition.conf por isto:
 ---
 defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
 allowManualPartitioning: true
-erase-ram15:
-  filesystem: ext4
-  mountPoint: /
-  swap:
-    size: "ram:15%"
-    min: 512MiB
-    max: 8GiB
-erase-scaled:
-  filesystem: ext4
-  mountPoint: /
-  swap:
-    sizes:
-      - { ram: 4GiB,   size: "ram:50%"     }
-      - { ram: 8GiB,   size: "ram:25%"     }
-      - { ram: 16GiB,  size: "ram:12.5%"   }
-      - { ram: 32GiB,  size: "ram:6.25%"   }
-      - { ram: 64GiB,  size: "ram:3.125%"  }
-      - { ram: 128GiB, size: "ram:1.5625%" }
-    fallback: 2GiB
+
+# Modo de particionamento automático simplificado
+# O Calamares vai apagar TUDO e criar uma partição única
+automaticLayout:
+  - type: "erase"
+    filesystem: "ext4"
+    mountPoint: "/"
+    # Swap opcional: apenas se houver RAM suficiente
+    swap:
+      enabled: true
+      size: "ram:15%"
+      min: "512MiB"
+      max: "4GiB"  # Reduzido para evitar falhas em VMs com pouca RAM
+
+# Configuração de criptografia (LUKS)
 encrypt:
   enabled: true
-  luksCipher: aes-xts-plain64
-  luksKeySize: 512
-  luksHash: sha512
-EOF
+  luksCipher: "aes-xts-plain64"
+  luksKeySize: 512  
+  luksHash: "sha512"  
+  luksPBKDF: "argon2id"  # Método moderno de derivação de chave
+  luksIterations: 2  # Reduzido para testes (aumente para produção)
 
   # ── Calamares: UNPACKFS CONFIG (CORREÇÃO DO ERRO) ────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/unpackfs.conf <<'EOF'
