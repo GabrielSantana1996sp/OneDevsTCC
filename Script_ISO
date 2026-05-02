@@ -430,34 +430,33 @@ dont-chroot: false
 EOF
 
   # ── Calamares: partition.conf ─────────────────────────────────────────────
-# Substitua todo o conteúdo de partition.conf por isto:
+  cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
 ---
 defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
 allowManualPartitioning: true
 
 # Modo de particionamento automático simplificado
-# O Calamares vai apagar TUDO e criar uma partição única
 automaticLayout:
   - type: "erase"
     filesystem: "ext4"
     mountPoint: "/"
-    # Swap opcional: apenas se houver RAM suficiente
     swap:
       enabled: true
       size: "ram:15%"
       min: "512MiB"
-      max: "4GiB"  # Reduzido para evitar falhas em VMs com pouca RAM
+      max: "4GiB"
 
 # Configuração de criptografia (LUKS)
 encrypt:
   enabled: true
   luksCipher: "aes-xts-plain64"
-  luksKeySize: 512  
-  luksHash: "sha512"  
-  luksPBKDF: "argon2id"  # Método moderno de derivação de chave
-  luksIterations: 2  # Reduzido para testes (aumente para produção)
-
+  luksKeySize: 512
+  luksHash: "sha512"
+  luksPBKDF: "argon2id"
+  luksIterations: 2
+EOF
+  
   # ── Calamares: UNPACKFS CONFIG (CORREÇÃO DO ERRO) ────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/unpackfs.conf <<'EOF'
 ---
