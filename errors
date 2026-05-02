@@ -24,3 +24,33 @@ chcon: failed to get security context of '/': No data available
 19:41:27 [1]: void Calamares::ViewManager::onInstallationFailed(const QString&, const QString&)
     ERROR: Installation failed: "Configuração incorreta do unpackfs" 
 ___
+
+dev@onedevs:~$ sudo -E calamares
+qt.qpa.theme.dbus: Session DBus not running.
+qt.qpa.theme.dbus: Application will not react to setting changes.
+ Check your DBus installation.
+14:32:54 [1]: void Calamares::ViewManager::onInstallationFailed(const QString&, const QString&)
+    ERROR: Installation failed: "The installer failed to create partition on disk 'vda'." 
+
+
+Create a new partition (49,97 GiB, luks) on ‘/dev/vda’
+
+
+Job: Create new partition on device ‘/dev/vda’
+
+
+Command: sfdisk --force --append /dev/vda
+
+
+Command: sfdisk --list --output Device,UUID /dev/vda
+
+
+Job: Set the label on partition ‘/dev/vda1’ to "root"
+
+
+Command: sfdisk --part-label /dev/vda 1 root
+
+
+Job: Create file system ‘luks’ on partition ‘/dev/vda1’
+
+
