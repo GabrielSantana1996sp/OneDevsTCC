@@ -175,7 +175,7 @@ EOF
   if [ ! -f config/package-lists/onedevs.list.chroot ]; then
     cat > config/package-lists/onedevs.list.chroot <<'EOF'
 # Sistema Base
-live-boot live-config live-config-systemd
+live-boot live-config live-config-systemd parted
 
 # Desktop XFCE
 xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
@@ -229,12 +229,6 @@ tripwire
 debsums
 gpg
 logcheck
-
-# Documentação
-doxygen
-man-db
-mkdocs
-pandoc
 
 # Utilitários
 tmux
@@ -396,6 +390,7 @@ EOF
   # ── Calamares: settings.conf (YAML correto) ───────────────────────────────
   cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
+backend: "libparted"       # <---Inclusão para evitar erro na instalação 
 modules-search: [ local, /usr/lib/calamares/modules ]
 instances:
 - id: remove-live
