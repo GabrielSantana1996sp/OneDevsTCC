@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-iso:
-    runs-on: ubuntu-latest  # Runner base do GitHub
+    runs-on: ubuntu-latest
     
     timeout-minutes: 120
     
@@ -28,14 +28,18 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Build da ISO (em Container Debian Trixie)
-        # Roda o script dentro de um container Debian fresco
         run: |
           docker run --rm -v $PWD:/workdir -w /workdir debian:trixie-slim bash -c "
-            apt-get update && apt-get install -y sudo curl git
+            apt-get update && apt-get install -y sudo curl git live-build debootstrap xorriso squashfs-tools genisoimage
             chmod +x Script_ISO
+            
+            # Define variável de ambiente para indicar que estamos em CI
+            export CI=true
+            
+            # Executa o script
             ./Script_ISO
           "
-          
+
       - name: Verificar ISO Gerada
         run: |
           if [ ! -f "${{ env.ISO_NAME }}" ]; then
@@ -48,13 +52,12 @@ jobs:
         if: success()
         run: |
           echo " Enviando para Google Drive..."
-          # ATENÇÃO: gsutil é para Google Cloud Storage (GCS), não Google Drive.
-          # Se você realmente quer Google Drive, precisa usar a API do Drive ou rclone.
-          # Exemplo hipotético se você estiver usando GCS:
-          # gsutil cp ${{ env.ISO_NAME }} "gs://seu-bucket/${{ env.DRIVE_FOLDER_ID }}/"
+          # NOTA: gsutil é para Google Cloud Storage (GCS), não Google Drive.
+          # Se você quer Google Drive pessoal, precisa usar rclone ou a API do Drive.
+          # Exemplo com rclone (se configurado):
+          # rclone copy ${{ env.ISO_NAME }} gdrive:${{ env.DRIVE_FOLDER_ID }}
           
-          echo " Aviso: O comando gsutil acima não funciona para Google Drive pessoal."
-          echo "Para Google Drive, use a ação 'google-github-actions/upload-drive' ou rclone."
+          echo " Aviso: O upload real para Google Drive pessoal requer configuração adicional (rclone/API)."
 
       - name: Resumo
         run: |
