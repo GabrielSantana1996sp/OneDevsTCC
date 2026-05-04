@@ -32,11 +32,7 @@ jobs:
           docker run --rm -v $PWD:/workdir -w /workdir debian:trixie-slim bash -c "
             apt-get update && apt-get install -y sudo curl git live-build debootstrap xorriso squashfs-tools genisoimage
             chmod +x Script_ISO
-            
-            # Define variável de ambiente para indicar que estamos em CI
             export CI=true
-            
-            # Executa o script
             ./Script_ISO
           "
 
@@ -52,12 +48,9 @@ jobs:
         if: success()
         run: |
           echo " Enviando para Google Drive..."
-          # NOTA: gsutil é para Google Cloud Storage (GCS), não Google Drive.
-          # Se você quer Google Drive pessoal, precisa usar rclone ou a API do Drive.
-          # Exemplo com rclone (se configurado):
-          # rclone copy ${{ env.ISO_NAME }} gdrive:${{ env.DRIVE_FOLDER_ID }}
-          
-          echo " Aviso: O upload real para Google Drive pessoal requer configuração adicional (rclone/API)."
+          # NOTA: gsutil é para Google Cloud Storage (GCS), não Google Drive pessoal.
+          # Para Google Drive pessoal, configure rclone ou use a API do Drive.
+          echo " Aviso: Upload real para Google Drive pessoal requer rclone/API."
 
       - name: Resumo
         run: |
