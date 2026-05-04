@@ -708,8 +708,9 @@ check_dependencies
 generate_livebuild_files
 
 # --- NOVA ETAPA: Preparar Cache Completo ---
-if [ "${ONLINE:-0}" -eq 1 ]; then
-  log "Modo ONLINE detectado. Preparando cache completo para build offline..."
+# Em CI (GitHub Actions), sempre usa modo online para evitar erro de cache
+if [ "${ONLINE:-0}" -eq 1 ] || [ -n "${CI:-}" ]; then
+  log "Modo ONLINE detectado (ou CI). Preparando cache completo para build offline..."
   prepare_full_cache
   log "Cache pronto. Iniciando build em modo offline seguro."
 else
