@@ -252,6 +252,7 @@ flatpak
 fonts-noto fonts-noto-cjk
 polkitd pkexec
 snapd
+chromium
 
 # Instalador (sem calamares-settings-debian — usamos config própria)
 calamares
@@ -264,10 +265,10 @@ locales keyboard-configuration console-setup
 
 # Kernel e firmware (Tentativa de usar nomes alternativos se o padrão falhar)
 linux-image-amd64
-# firmware-linux-generic      <-- REMOVA OU COMENTE
-# firmware-realtek            <-- REMOVA OU COMENTE
-# firmware-iwlwifi            <-- REMOVA OU COMENTE
-# firmware-misc-nonfree       <-- REMOVA OU COMENTE
+firmware-linux-generic      
+firmware-realtek            
+firmware-iwlwifi            
+firmware-misc-nonfree       
 
 # Xorg
 xserver-xorg
