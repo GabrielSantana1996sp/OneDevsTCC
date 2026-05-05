@@ -265,7 +265,7 @@ locales keyboard-configuration console-setup
 
 # Kernel e firmware (Tentativa de usar nomes alternativos se o padrão falhar)
 linux-image-amd64
-firmware-linux-generic      
+firmware-linux      
 firmware-realtek            
 firmware-iwlwifi            
 firmware-misc-nonfree       
