@@ -175,7 +175,7 @@ EOF
   if [ ! -f config/package-lists/onedevs.list.chroot ]; then
     cat > config/package-lists/onedevs.list.chroot <<'EOF'
 # Sistema Base
-live-boot live-config live-config-systemd parted
+live-boot live-config live-config-systemd parted cryptsetup
 
 # Desktop XFCE
 xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
@@ -284,6 +284,130 @@ EOF
 !grub-pc-bin
 EOF
 
+  # ── Hook 0000: PRÉ-PARTICIONAMENTO (CRÍTICO - CRIA PARTIÇÕES E LUKS) ───────
+  cat > config/hooks/live/0000-pre-partition.hook.chroot <<'HOOKEOF'
+#!/bin/bash
+set -e
+
+echo "=== INICIANDO PRÉ-PARTICIONAMENTO PERSONALIZADO ==="
+
+# Detectar disco principal
+DISK=""
+for d in /dev/sd[a-z] /dev/nvme[0-9]*n[0-9]*; do
+  if [ -b "$d" ]; then
+    DISK="$d"
+    break
+  fi
+done
+
+if [ -z "$DISK" ]; then
+  echo "ERRO: Nenhum disco de instalação encontrado."
+  exit 1
+fi
+
+echo "Disco alvo: $DISK"
+
+# 1. Criar tabela GPT
+echo "Criando tabela GPT..."
+parted -s "$DISK" mklabel gpt
+
+# 2. Criar Partição EFI (1GB)
+echo "Criando partição EFI (1GB)..."
+parted -s "$DISK" mkpart primary fat32 1MiB 1025MiB
+parted -s "$DISK" set 1 boot on
+parted -s "$DISK" set 1 esp on
+
+# 3. Criar Partição Raiz (20GB)
+echo "Criando partição Raiz (20GB)..."
+parted -s "$DISK" mkpart primary ext4 1025MiB 21GiB
+
+# 4. Criar Partição /var (5GB)
+echo "Criando partição /var (5GB)..."
+parted -s "$DISK" mkpart primary ext4 21GiB 26GiB
+
+# 5. Criar Partição Swap (4GB inicial, ajustaremos depois)
+echo "Criando partição Swap (4GB inicial)..."
+parted -s "$DISK" mkpart primary linux-swap 26GiB 30GiB
+
+# 6. Criar Partição /home (Restante)
+echo "Criando partição /home (Restante)..."
+parted -s "$DISK" mkpart primary ext4 30GiB 100%
+
+# Aguardar criação
+sleep 2
+
+# 7. Criar LUKS nas partições (exceto EFI)
+# NOTA: Senha padrão para teste. Em produção, peça ao usuário.
+PASS="onedevs_live"
+
+echo "Configurando criptografia LUKS..."
+
+# Função para criar e abrir LUKS
+setup_luks() {
+  local PART=$1
+  local NAME=$2
+  echo "Criptografando $PART como $NAME..."
+  echo "$PASS" | cryptsetup luksFormat --batch-mode --type luks2 --pbkdf argon2id "$PART" -
+  echo "$PASS" | cryptsetup open "$PART" luks-$NAME
+}
+
+# Criptografar Raiz (partição 3)
+setup_luks "${DISK}3" "root"
+# Criptografar /var (partição 4)
+setup_luks "${DISK}4" "var"
+# Criptografar Swap (partição 5)
+setup_luks "${DISK}5" "swap"
+# Criptografar /home (partição 6)
+setup_luks "${DISK}6" "home"
+
+# 8. Formatar partições
+echo "Formatando partições..."
+mkfs.vfat -F 32 -n "EFI" "${DISK}1"
+mkfs.ext4 -L "root_enc" "/dev/mapper/luks-root"
+mkfs.ext4 -L "var_enc" "/dev/mapper/luks-var"
+mkfs.ext4 -L "home_enc" "/dev/mapper/luks-home"
+
+# 9. Configurar Swap Dinâmica (15% da RAM)
+echo "Calculando e configurando Swap dinâmica (15% da RAM)..."
+RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+SWAP_SIZE_KB=$((RAM_KB * 15 / 100))
+MIN_SWAP=524288   # 512 MiB
+MAX_SWAP=8388608  # 8 GiB
+
+if [ "$SWAP_SIZE_KB" -lt "$MIN_SWAP" ]; then
+  SWAP_SIZE_KB=$MIN_SWAP
+elif [ "$SWAP_SIZE_KB" -gt "$MAX_SWAP" ]; then
+  SWAP_SIZE_KB=$MAX_SWAP
+fi
+
+SWAP_SIZE_MB=$((SWAP_SIZE_KB / 1024))
+echo "Tamanho alvo da Swap: ${SWAP_SIZE_MB} MiB"
+
+# Ativar swap existente
+mkswap "/dev/mapper/luks-swap"
+swapon "/dev/mapper/luks-swap"
+
+# Verificar se precisamos de swapfile adicional
+CURRENT_SWAP=$(swapon --show --bytes --noheadings | awk '{sum+=$2} END {print sum+0}')
+if [ "$CURRENT_SWAP" -lt "$SWAP_SIZE_KB" ]; then
+  DIFF=$((SWAP_SIZE_KB - CURRENT_SWAP))
+  DIFF_MB=$((DIFF / 1024))
+  echo "Criando swapfile adicional de ${DIFF_MB} MiB..."
+  mkdir -p /mnt/home_temp
+  mount "/dev/mapper/luks-home" /mnt/home_temp
+  dd if=/dev/zero of=/mnt/home_temp/swapfile bs=1M count=$DIFF_MB status=progress
+  chmod 600 /mnt/home_temp/swapfile
+  mkswap /mnt/home_temp/swapfile
+  swapon /mnt/home_temp/swapfile
+  umount /mnt/home_temp
+  rmdir /mnt/home_temp
+  echo "/swapfile none swap sw 0 0" >> /etc/fstab
+fi
+
+echo "=== PRÉ-PARTICIONAMENTO CONCLUÍDO ==="
+HOOKEOF
+  chmod +x config/hooks/live/0000-pre-partition.hook.chroot
+
   # ── Hook 0001: bloqueia grub-pc no chroot antes da instalação ─────────────
   cat > config/hooks/live/0001-block-grub-pc.hook.chroot <<'EOF'
 #!/bin/bash
@@ -363,7 +487,7 @@ fi
 EOF
   chmod +x config/hooks/live/9998-onedevs-external.hook.chroot
 
-  # ── Hook 9999: configura usuário, serviços E swap dinâmica ───────────────
+  # ── Hook 9999: configura usuário e serviços ───────────────────────────────
   cat > config/hooks/live/9999-onedevs-config.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
@@ -393,42 +517,11 @@ fi
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
 
-#  AJUSTE DE SWAP DINÂMICA (15% da RAM)
-echo "Ajustando Swap para 15% da RAM..."
-RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
-SWAP_SIZE_KB=$((RAM_KB * 15 / 100))
-MIN_SWAP=524288   # 512 MiB
-MAX_SWAP=8388608  # 8 GiB
-
-if [ "$SWAP_SIZE_KB" -lt "$MIN_SWAP" ]; then
-  SWAP_SIZE_KB=$MIN_SWAP
-elif [ "$SWAP_SIZE_KB" -gt "$MAX_SWAP" ]; then
-  SWAP_SIZE_KB=$MAX_SWAP
-fi
-
-SWAP_SIZE_MB=$((SWAP_SIZE_KB / 1024))
-echo "Swap alvo: ${SWAP_SIZE_MB} MiB"
-
-# Verificar swap atual
-CURRENT_SWAP=$(swapon --show --bytes --noheadings | awk '{sum+=$2} END {print sum+0}')
-
-if [ "$CURRENT_SWAP" -lt "$SWAP_SIZE_KB" ]; then
-  DIFF=$((SWAP_SIZE_KB - CURRENT_SWAP))
-  DIFF_MB=$((DIFF / 1024))
-  echo "Criando swapfile adicional de ${DIFF_MB} MiB..."
-  dd if=/dev/zero of=/swapfile bs=1M count=$DIFF_MB status=progress
-  chmod 600 /swapfile
-  mkswap /swapfile
-  swapon /swapfile
-  echo "/swapfile none swap sw 0 0" >> /etc/fstab
-fi
-
-echo "Swap configurada."
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
 EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
-# ── Calamares: settings.conf (YAML correto) ───────────────────────────────
+  # ── Calamares: settings.conf (YAML correto) ───────────────────────────────
   cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
 backend: "libparted"
@@ -465,67 +558,24 @@ prompt-install: true
 dont-chroot: false
 EOF
 
-  # ── Calamares: partition.conf (FINAL - COM CRIPTOGRAFIA) ─────────────────
+  # ── Calamares: partition.conf (SIMPLIFICADO - APENAS MONTAGEM) ───────────
   cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
 ---
-# Backend de particionamento
 backend: libparted
 
-# Particionamento automático
+# Desativar particionamento automático do Calamares
+# O particionamento real foi feito pelo hook 0000
 autoLayout:
-  enabled: true
-  layout: default
+  enabled: false
 
 # Configurações Globais
 defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
-allowManualPartitioning: false
+allowManualPartitioning: true
 
-# Criptografia LUKS (ATIVADA)
+# Criptografia: O Calamares detectará o LUKS existente
 encrypt:
   enabled: true
-  luksCipher: "aes-xts-plain64"
-  luksKeySize: 512
-  luksHash: "sha512"
-  luksPBKDF: "argon2id"
-  luksIterations: 2
-
-# Layout de partições (formato CORRETO do Calamares)
-# Nota: Calamares não suporta operações detalhadas em YAML.
-# Usaremos o autoLayout padrão e ajustaremos com hook pós-instalação.
-partitionOperations:
-  - type: create_partition_table
-    table_type: gpt
-  - type: create_partition
-    start: 1MiB
-    end: 1025MiB
-    filesystem: fat32
-    mount_point: /boot/efi
-    flags: [boot, esp]
-  - type: create_partition
-    start: 1025MiB
-    end: 21GiB
-    filesystem: ext4
-    mount_point: /
-    encrypted: true
-  - type: create_partition
-    start: 21GiB
-    end: 26GiB
-    filesystem: ext4
-    mount_point: /var
-    encrypted: true
-  - type: create_partition
-    start: 26GiB
-    end: 30GiB
-    filesystem: swap
-    mount_point: swap
-    encrypted: true
-  - type: create_partition
-    start: end
-    end: -1
-    filesystem: ext4
-    mount_point: /home
-    encrypted: true
 EOF
 
   # ── Calamares: UNPACKFS CONFIG (CORREÇÃO DO ERRO) ────────────────────────
@@ -736,10 +786,9 @@ run_build() {
     --iso-volume "$VOLUME" \
     --iso-publisher "$PUBLISHER" \
     --bootappend-live "boot=live components quiet splash persistence persistence-label=ONDEVS username=$USERNAME hostname=$HOSTNAME" \
-    --archive-areas "main contrib non-free non-free-firmware" \
-    # Fim do comando lb config (sem --archive-path)
+    --archive-areas "main contrib non-free non-free-firmware"
 
-  log "Iniciando build da ISO (pode levar 1-2h)..."
+    log "Iniciando build da ISO (pode levar 1-2h)..."
   sudo lb build 2>&1 | tee build-onedevsos.log
   local BUILD_EXIT=${PIPESTATUS[0]:-0}
 
