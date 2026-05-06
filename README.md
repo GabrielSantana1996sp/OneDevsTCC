@@ -46,7 +46,7 @@ sudo apt-get update && sudo apt-get install -y \
 2. Execute o script principal:
    ```bash
    sudo lb clean --purge
-   sudo ./Script_ISO
+   sudo ./onedevs-build.sh
    ```
 
 3. O processo irá:
