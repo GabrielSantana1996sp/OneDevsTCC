@@ -60,18 +60,16 @@ check_dependencies() {
   fi
 }
 
-# ── Prepara cache de pacotes (CORRIGIDO PARA FORÇAR DOWNLOAD DO KERNEL) ───
+# ── Prepara cache de pacotes ────────────────────────────────────────────────
 prepare_full_cache() {
   log "Preparando cache completo de pacotes (Modo Offline Seguro)..."
   
   [ -f "${PACKAGE_LIST}" ] || error "Lista não encontrada: ${PACKAGE_LIST}"
   
-  # Limpa diretórios antigos
   rm -rf "${ARCHIVES_DIR}"
   mkdir -p "${ARCHIVES_DIR}/pool/main/custom"
   mkdir -p "${ARCHIVES_DIR}/dists/${DIST}/main/binary-${ARCH}"
   
-  # Extrai lista de pacotes (ignora comentários e linhas vazias)
   local PACKAGES
   PACKAGES=$(grep -v '^[[:space:]]*#' "${PACKAGE_LIST}" | grep -v '^[[:space:]]*$' | tr '\n' ' ')
   
@@ -81,26 +79,18 @@ prepare_full_cache() {
   fi
 
   log "Baixando ${#PACKAGES} pacotes para o cache local..."
-  
-  # Atualiza listas
   sudo apt-get -q update || true
-  
-  # Tenta baixar os pacotes. Se falhar em alguns (como kernel), continua para ver o que temos.
-  # O --fix-missing ajuda a resolver dependências quebradas
   sudo apt-get --download-only --fix-missing install -y $PACKAGES 2>&1 | tee /tmp/apt_download.log || true
 
-  # Copia todos os .deb baixados para o diretório do live-build
   log "Copiando pacotes para o diretório de build..."
   find /var/cache/apt/archives -maxdepth 1 -name "*.deb" -exec cp -v -- "{}" "${ARCHIVES_DIR}/pool/main/custom/" \;
 
-  # Gera os índices locais (Packages.gz e Release)
   log "Gerando índices locais (Packages.gz e Release)..."
   command -v dpkg-scanpackages >/dev/null 2>&1 || sudo apt-get install -y dpkg-dev
   command -v apt-ftparchive   >/dev/null 2>&1 || sudo apt-get install -y apt-utils
   
   pushd "${ARCHIVES_DIR}" >/dev/null
   
-  # Gera Packages.gz
   if dpkg-scanpackages pool /dev/null | gzip -9c > "dists/${DIST}/main/binary-${ARCH}/Packages.gz"; then
     log "Índice Packages.gz gerado com sucesso."
   else
@@ -109,7 +99,6 @@ prepare_full_cache() {
     return 1
   fi
 
-  # Gera Release
   if apt-ftparchive release . > Release; then
     log "Arquivo Release gerado com sucesso."
   else
@@ -121,12 +110,10 @@ prepare_full_cache() {
   chmod -R a+r .
   popd >/dev/null
   
-  # Verifica se há arquivos
   local COUNT
   COUNT=$(ls -1 "${ARCHIVES_DIR}/pool/main/custom/"*.deb 2>/dev/null | wc -l)
   log "Cache preparado com ${COUNT} pacotes. Build offline seguro."
   
-  # Verifica se o kernel foi baixado
   if ls ${ARCHIVES_DIR}/pool/main/custom/*linux-image* >/dev/null 2>&1; then
     log " Kernel encontrado no cache."
   else
@@ -138,7 +125,6 @@ prepare_full_cache() {
 generate_livebuild_files() {
   log "Gerando arquivos do live-build..."
 
-  # Diretórios
   mkdir -p config/{package-lists,hooks/live,apt,archives}
   mkdir -p config/includes.chroot/etc/{calamares/modules,apt/apt.conf.d}
   mkdir -p config/includes.chroot/etc/{lightdm/lightdm-gtk-greeter.conf.d,sysctl.d}
@@ -146,7 +132,7 @@ generate_livebuild_files() {
   mkdir -p config/includes.chroot/usr/share/{calamares/branding/onedevs,backgrounds/onedevs}
   mkdir -p config/includes.chroot/usr/share/{plymouth/themes/onedevs,applications,polkit-1/actions}
 
-  # ── APT: ignora validade + bloqueia grub-pc + FORÇA USO DO CACHE LOCAL ───
+  # ── APT ────────────────────────────────────────────────────────────────────
   cat > config/apt/apt.conf <<'EOF'
 Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
@@ -167,7 +153,6 @@ EOF
 Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
 APT::Get::AllowUnauthenticated "true";
-# Força o uso do repositório local se disponível
 Acquire::Languages "none";
 EOF
 
@@ -203,7 +188,7 @@ git
 make cmake autoconf automake
 gdb
 
-# Bootloader (apenas EFI — grub-pc excluído por conflito)
+# Bootloader (apenas EFI)
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
@@ -216,7 +201,7 @@ ansible
 docker.io
 systemd-container
 
-# Segurança (DevSecOps)
+# Segurança
 apparmor
 nftables
 fail2ban
@@ -254,7 +239,7 @@ polkitd pkexec
 snapd
 chromium
 
-# Instalador (sem calamares-settings-debian — usamos config própria)
+# Instalador
 calamares
 
 # Plymouth
@@ -263,12 +248,12 @@ plymouth plymouth-themes
 # Localização
 locales keyboard-configuration console-setup
 
-# Kernel e firmware (Tentativa de usar nomes alternativos se o padrão falhar)
+# Kernel e firmware
 linux-image-amd64
-firmware-linux      
-firmware-realtek            
-firmware-iwlwifi            
-firmware-misc-nonfree       
+firmware-linux
+firmware-realtek
+firmware-iwlwifi
+firmware-misc-nonfree
 
 # Xorg
 xserver-xorg
@@ -278,137 +263,12 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
   fi
 
-  # ── Exclusão explícita do grub-pc ─────────────────────────────────────────
   cat > config/package-lists/exclude.list.chroot <<'EOF'
 !grub-pc
 !grub-pc-bin
 EOF
 
-  # ── Hook 0000: PRÉ-PARTICIONAMENTO (CRÍTICO - CRIA PARTIÇÕES E LUKS) ───────
-  cat > config/hooks/live/0000-pre-partition.hook.chroot <<'HOOKEOF'
-#!/bin/bash
-set -e
-
-echo "=== INICIANDO PRÉ-PARTICIONAMENTO PERSONALIZADO ==="
-
-# Detectar disco principal
-DISK=""
-for d in /dev/sd[a-z] /dev/nvme[0-9]*n[0-9]*; do
-  if [ -b "$d" ]; then
-    DISK="$d"
-    break
-  fi
-done
-
-if [ -z "$DISK" ]; then
-  echo "ERRO: Nenhum disco de instalação encontrado."
-  exit 1
-fi
-
-echo "Disco alvo: $DISK"
-
-# 1. Criar tabela GPT
-echo "Criando tabela GPT..."
-parted -s "$DISK" mklabel gpt
-
-# 2. Criar Partição EFI (1GB)
-echo "Criando partição EFI (1GB)..."
-parted -s "$DISK" mkpart primary fat32 1MiB 1025MiB
-parted -s "$DISK" set 1 boot on
-parted -s "$DISK" set 1 esp on
-
-# 3. Criar Partição Raiz (20GB)
-echo "Criando partição Raiz (20GB)..."
-parted -s "$DISK" mkpart primary ext4 1025MiB 21GiB
-
-# 4. Criar Partição /var (5GB)
-echo "Criando partição /var (5GB)..."
-parted -s "$DISK" mkpart primary ext4 21GiB 26GiB
-
-# 5. Criar Partição Swap (4GB inicial, ajustaremos depois)
-echo "Criando partição Swap (4GB inicial)..."
-parted -s "$DISK" mkpart primary linux-swap 26GiB 30GiB
-
-# 6. Criar Partição /home (Restante)
-echo "Criando partição /home (Restante)..."
-parted -s "$DISK" mkpart primary ext4 30GiB 100%
-
-# Aguardar criação
-sleep 2
-
-# 7. Criar LUKS nas partições (exceto EFI)
-# NOTA: Senha padrão para teste. Em produção, peça ao usuário.
-PASS="onedevs_live"
-
-echo "Configurando criptografia LUKS..."
-
-# Função para criar e abrir LUKS
-setup_luks() {
-  local PART=$1
-  local NAME=$2
-  echo "Criptografando $PART como $NAME..."
-  echo "$PASS" | cryptsetup luksFormat --batch-mode --type luks2 --pbkdf argon2id "$PART" -
-  echo "$PASS" | cryptsetup open "$PART" luks-$NAME
-}
-
-# Criptografar Raiz (partição 3)
-setup_luks "${DISK}3" "root"
-# Criptografar /var (partição 4)
-setup_luks "${DISK}4" "var"
-# Criptografar Swap (partição 5)
-setup_luks "${DISK}5" "swap"
-# Criptografar /home (partição 6)
-setup_luks "${DISK}6" "home"
-
-# 8. Formatar partições
-echo "Formatando partições..."
-mkfs.vfat -F 32 -n "EFI" "${DISK}1"
-mkfs.ext4 -L "root_enc" "/dev/mapper/luks-root"
-mkfs.ext4 -L "var_enc" "/dev/mapper/luks-var"
-mkfs.ext4 -L "home_enc" "/dev/mapper/luks-home"
-
-# 9. Configurar Swap Dinâmica (15% da RAM)
-echo "Calculando e configurando Swap dinâmica (15% da RAM)..."
-RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
-SWAP_SIZE_KB=$((RAM_KB * 15 / 100))
-MIN_SWAP=524288   # 512 MiB
-MAX_SWAP=8388608  # 8 GiB
-
-if [ "$SWAP_SIZE_KB" -lt "$MIN_SWAP" ]; then
-  SWAP_SIZE_KB=$MIN_SWAP
-elif [ "$SWAP_SIZE_KB" -gt "$MAX_SWAP" ]; then
-  SWAP_SIZE_KB=$MAX_SWAP
-fi
-
-SWAP_SIZE_MB=$((SWAP_SIZE_KB / 1024))
-echo "Tamanho alvo da Swap: ${SWAP_SIZE_MB} MiB"
-
-# Ativar swap existente
-mkswap "/dev/mapper/luks-swap"
-swapon "/dev/mapper/luks-swap"
-
-# Verificar se precisamos de swapfile adicional
-CURRENT_SWAP=$(swapon --show --bytes --noheadings | awk '{sum+=$2} END {print sum+0}')
-if [ "$CURRENT_SWAP" -lt "$SWAP_SIZE_KB" ]; then
-  DIFF=$((SWAP_SIZE_KB - CURRENT_SWAP))
-  DIFF_MB=$((DIFF / 1024))
-  echo "Criando swapfile adicional de ${DIFF_MB} MiB..."
-  mkdir -p /mnt/home_temp
-  mount "/dev/mapper/luks-home" /mnt/home_temp
-  dd if=/dev/zero of=/mnt/home_temp/swapfile bs=1M count=$DIFF_MB status=progress
-  chmod 600 /mnt/home_temp/swapfile
-  mkswap /mnt/home_temp/swapfile
-  swapon /mnt/home_temp/swapfile
-  umount /mnt/home_temp
-  rmdir /mnt/home_temp
-  echo "/swapfile none swap sw 0 0" >> /etc/fstab
-fi
-
-echo "=== PRÉ-PARTICIONAMENTO CONCLUÍDO ==="
-HOOKEOF
-  chmod +x config/hooks/live/0000-pre-partition.hook.chroot
-
-  # ── Hook 0001: bloqueia grub-pc no chroot antes da instalação ─────────────
+  # ── Hook 0001: bloqueia grub-pc ───────────────────────────────────────────
   cat > config/hooks/live/0001-block-grub-pc.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
@@ -423,7 +283,7 @@ echo "grub-pc bloqueado."
 EOF
   chmod +x config/hooks/live/0001-block-grub-pc.hook.chroot
 
-  # ── Hook 9997: baixa assets do GitHub com nomes CORRETOS ─────────────────
+  # ── Hook 9997: baixa assets do GitHub ─────────────────────────────────────
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<HOOKEOF
 #!/bin/bash
 set -e
@@ -446,23 +306,19 @@ dl() {
   fi
 }
 
-# Wallpapers
 dl "\${RAW}/Wallpapers/Classico.png"     /usr/share/backgrounds/onedevs/Classico.png     "Classico"
 dl "\${RAW}/Wallpapers/Cosmos.png"       /usr/share/backgrounds/onedevs/Cosmos.png       "Cosmos"
 dl "\${RAW}/Wallpapers/Energia.png"      /usr/share/backgrounds/onedevs/Energia.png      "Energia"
 dl "\${RAW}/Wallpapers/RetroTerminal.png" /usr/share/backgrounds/onedevs/RetroTerminal.png "RetroTerminal"
 dl "\${RAW}/Wallpapers/universe.png"     /usr/share/backgrounds/onedevs/universe.png     "universe"
 
-# Wallpaper padrão do LightDM = Classico
 cp /usr/share/backgrounds/onedevs/Classico.png /usr/share/backgrounds/onedevs/wallpaper.png
 
-# Logo do Calamares
 dl "\${RAW}/Calamares/Calamares.png" \
    /usr/share/calamares/branding/onedevs/logo.png "logo Calamares"
 cp /usr/share/calamares/branding/onedevs/logo.png \
    /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
 
-# Boot splash Plymouth
 dl "\${RAW}/BootSlash/Boot%20splash%20(Plymouth).png" \
    /usr/share/plymouth/themes/onedevs/boot.png "boot splash"
 
@@ -493,13 +349,11 @@ EOF
 set -e
 echo "Configurando usuário e serviços..."
 
-# Criar usuário
 if ! id -u dev >/dev/null 2>&1; then
   useradd -m -s /bin/bash -G sudo,netdev,plugdev,audio,video dev
   echo "dev:live" | chpasswd
 fi
 
-# Habilitar serviços
 systemctl enable snapd.socket   || true
 systemctl enable snapd.service  || true
 systemctl enable dbus.service   || true
@@ -507,21 +361,109 @@ systemctl start dbus            || true
 systemctl enable lightdm        || true
 systemctl enable NetworkManager || true
 
-# Plymouth
 if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
   plymouth-set-default-theme onedevs || true
   update-initramfs -u || true
 fi
 
-# Sudo sem senha
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
-
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
 EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
-  # ── Calamares: settings.conf (YAML correto) ───────────────────────────────
+  # ── Calamares: MODULE PRE_PARTITION (PARA RODAR NA INSTALAÇÃO) ────────────
+  cat > config/includes.chroot/etc/calamares/modules/pre_partition.sh <<'SCRIPT'
+#!/bin/bash
+set -e
+
+echo "=== Módulo Calamares: Pré-Particionamento Personalizado ==="
+
+DISK=""
+for d in /dev/sd[a-z] /dev/nvme[0-9]*n[0-9]*; do
+  if [ -b "$d" ]; then
+    DISK="$d"
+    break
+  fi
+done
+
+if [ -z "$DISK" ]; then
+  echo "ERRO: Nenhum disco encontrado para instalação."
+  exit 1
+fi
+
+echo "Disco alvo: $DISK"
+
+parted -s "$DISK" mklabel gpt
+parted -s "$DISK" mkpart primary fat32 1MiB 1025MiB
+parted -s "$DISK" set 1 boot on
+parted -s "$DISK" set 1 esp on
+parted -s "$DISK" mkpart primary ext4 1025MiB 21GiB
+parted -s "$DISK" mkpart primary ext4 21GiB 26GiB
+parted -s "$DISK" mkpart primary linux-swap 26GiB 30GiB
+parted -s "$DISK" mkpart primary ext4 30GiB 100%
+
+sleep 2
+
+PASS="onedevs_live"
+
+setup_luks() {
+  local PART=$1
+  local NAME=$2
+  echo "Criptografando $PART..."
+  echo "$PASS" | cryptsetup luksFormat --batch-mode --type luks2 --pbkdf argon2id "$PART" -
+  echo "$PASS" | cryptsetup open "$PART" luks-$NAME
+}
+
+setup_luks "${DISK}3" "root"
+setup_luks "${DISK}4" "var"
+setup_luks "${DISK}5" "swap"
+setup_luks "${DISK}6" "home"
+
+mkfs.vfat -F 32 -n "EFI" "${DISK}1"
+mkfs.ext4 -L "root_enc" "/dev/mapper/luks-root"
+mkfs.ext4 -L "var_enc" "/dev/mapper/luks-var"
+mkfs.ext4 -L "home_enc" "/dev/mapper/luks-home"
+
+RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+SWAP_SIZE_KB=$((RAM_KB * 15 / 100))
+MIN_SWAP=524288
+MAX_SWAP=8388608
+
+if [ "$SWAP_SIZE_KB" -lt "$MIN_SWAP" ]; then SWAP_SIZE_KB=$MIN_SWAP; elif [ "$SWAP_SIZE_KB" -gt "$MAX_SWAP" ]; then SWAP_SIZE_KB=$MAX_SWAP; fi
+SWAP_SIZE_MB=$((SWAP_SIZE_KB / 1024))
+
+mkswap "/dev/mapper/luks-swap"
+swapon "/dev/mapper/luks-swap"
+
+CURRENT_SWAP=$(swapon --show --bytes --noheadings | awk '{sum+=$2} END {print sum+0}')
+if [ "$CURRENT_SWAP" -lt "$SWAP_SIZE_KB" ]; then
+  DIFF=$((SWAP_SIZE_KB - CURRENT_SWAP))
+  DIFF_MB=$((DIFF / 1024))
+  mkdir -p /mnt/home_temp
+  mount "/dev/mapper/luks-home" /mnt/home_temp
+  dd if=/dev/zero of=/mnt/home_temp/swapfile bs=1M count=$DIFF_MB status=progress
+  chmod 600 /mnt/home_temp/swapfile
+  mkswap /mnt/home_temp/swapfile
+  swapon /mnt/home_temp/swapfile
+  umount /mnt/home_temp
+  rmdir /mnt/home_temp
+  echo "/swapfile none swap sw 0 0" >> /etc/fstab
+fi
+
+echo "=== Pré-Particionamento Concluído ==="
+SCRIPT
+  chmod +x config/includes.chroot/etc/calamares/modules/pre_partition.sh
+
+  # ── Calamares: Configuração do Script Customizado ─────────────────────────
+  cat > config/includes.chroot/etc/calamares/modules/shellprocess@pre_partition.conf <<'EOF'
+---
+command: "/etc/calamares/modules/pre_partition.sh"
+workingDirectory: "/"
+environment: []
+EOF
+
+  # ── Calamares: settings.conf (ATUALIZADO) ─────────────────────────────────
   cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
 backend: "libparted"
@@ -539,6 +481,7 @@ sequence:
   - users
   - summary
 - exec:
+  - shellprocess@pre_partition.conf
   - partition
   - mount
   - unpackfs
@@ -558,27 +501,20 @@ prompt-install: true
 dont-chroot: false
 EOF
 
-  # ── Calamares: partition.conf (SIMPLIFICADO - APENAS MONTAGEM) ───────────
+  # ── Calamares: partition.conf (APENAS MONTAGEM) ───────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
 ---
 backend: libparted
-
-# Desativar particionamento automático do Calamares
-# O particionamento real foi feito pelo hook 0000
 autoLayout:
   enabled: false
-
-# Configurações Globais
 defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
 allowManualPartitioning: true
-
-# Criptografia: O Calamares detectará o LUKS existente
 encrypt:
   enabled: true
 EOF
 
-  # ── Calamares: UNPACKFS CONFIG (CORREÇÃO DO ERRO) ────────────────────────
+  # ── Calamares: UNPACKFS CONFIG ────────────────────────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/unpackfs.conf <<'EOF'
 ---
 unpackfs:
@@ -615,7 +551,7 @@ allowWeakPasswordsDefault: true
 userShell: /bin/bash
 EOF
 
-  # ── Calamares: branding.desc (path CORRETO: /usr/share/calamares/) ────────
+  # ── Calamares: branding.desc ──────────────────────────────────────────────
   cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
 ---
 componentName: onedevs
@@ -641,7 +577,7 @@ style:
   sidebarTextSelect: "#3498db"
 EOF
 
-  # ── Calamares: slideshow (imagens locais) ─────────────────────────────────
+  # ── Calamares: slideshow ──────────────────────────────────────────────────
   cat > config/includes.chroot/usr/share/calamares/branding/onedevs/show.qml <<'EOF'
 import QtQuick 2.0
 
@@ -674,7 +610,7 @@ Rectangle {
 }
 EOF
 
-  # ── LightDM: wallpaper local ──────────────────────────────────────────────
+  # ── LightDM: wallpaper ────────────────────────────────────────────────────
   cat > config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d/01_onedevs.conf <<'EOF'
 [greeter]
 background=/usr/share/backgrounds/onedevs/wallpaper.png
@@ -688,7 +624,7 @@ xft-rgba=rgb
 indicators=~host;~spacer;~clock;~spacer;~session;~power
 EOF
 
-  # ── Plymouth: tema com imagem local ──────────────────────────────────────
+  # ── Plymouth: tema ────────────────────────────────────────────────────────
   cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.plymouth <<'EOF'
 [Plymouth Theme]
 Name=OneDevsOS
@@ -718,7 +654,7 @@ fun message_callback(text) {
 Plymouth.SetMessageFunction(message_callback);
 EOF
 
-  # ── Desktop: atalho do instalador ────────────────────────────────────────
+  # ── Desktop: atalho do instalador ─────────────────────────────────────────
   cat > config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop <<'EOF'
 [Desktop Entry]
 Name=Instalar OneDevsOS
@@ -754,11 +690,11 @@ EOF
 EOF
 
   log "Arquivos do live-build gerados/atualizados."
-} # end generate_livebuild_files
+}
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 run_build() {
-  log "Sincronizando relógio (evita erro 'not valid yet' do APT)..."
+  log "Sincronizando relógio..."
   sudo timedatectl set-ntp true 2>/dev/null || true
   sleep 3
   command -v ntpdate >/dev/null 2>&1 && sudo ntpdate -u pool.ntp.org 2>/dev/null || true
@@ -788,7 +724,7 @@ run_build() {
     --bootappend-live "boot=live components quiet splash persistence persistence-label=ONDEVS username=$USERNAME hostname=$HOSTNAME" \
     --archive-areas "main contrib non-free non-free-firmware"
 
-    log "Iniciando build da ISO (pode levar 1-2h)..."
+  log "Iniciando build da ISO (pode levar 1-2h)..."
   sudo lb build 2>&1 | tee build-onedevsos.log
   local BUILD_EXIT=${PIPESTATUS[0]:-0}
 
@@ -832,10 +768,8 @@ log "OneDevsOS Build Script - ${CODENAME} (${DIST}) ${ARCH}"
 check_dependencies
 generate_livebuild_files
 
-# --- NOVA ETAPA: Preparar Cache Completo ---
-# Em CI (GitHub Actions), sempre usa modo online para evitar erro de cache
 if [ "${ONLINE:-0}" -eq 1 ] || [ -n "${CI:-}" ]; then
-  log "Modo ONLINE detectado (ou CI). Preparando cache completo para build offline..."
+  log "Modo ONLINE detectado. Preparando cache completo..."
   prepare_full_cache
   log "Cache pronto. Iniciando build em modo offline seguro."
 else
