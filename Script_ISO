@@ -363,35 +363,75 @@ fi
 EOF
   chmod +x config/hooks/live/9998-onedevs-external.hook.chroot
 
-  # ── Hook 9999: configura usuário e serviços ───────────────────────────────
+  # ── Hook 9999: configura usuário, serviços E swap dinâmica ───────────────
   cat > config/hooks/live/9999-onedevs-config.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
 echo "Configurando usuário e serviços..."
+
+# Criar usuário
 if ! id -u dev >/dev/null 2>&1; then
   useradd -m -s /bin/bash -G sudo,netdev,plugdev,audio,video dev
   echo "dev:live" | chpasswd
 fi
+
+# Habilitar serviços
 systemctl enable snapd.socket   || true
 systemctl enable snapd.service  || true
 systemctl enable dbus.service   || true
 systemctl start dbus            || true
 systemctl enable lightdm        || true
 systemctl enable NetworkManager || true
+
+# Plymouth
 if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
   plymouth-set-default-theme onedevs || true
   update-initramfs -u || true
 fi
+
+# Sudo sem senha
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
+
+#  AJUSTE DE SWAP DINÂMICA (15% da RAM)
+echo "Ajustando Swap para 15% da RAM..."
+RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+SWAP_SIZE_KB=$((RAM_KB * 15 / 100))
+MIN_SWAP=524288   # 512 MiB
+MAX_SWAP=8388608  # 8 GiB
+
+if [ "$SWAP_SIZE_KB" -lt "$MIN_SWAP" ]; then
+  SWAP_SIZE_KB=$MIN_SWAP
+elif [ "$SWAP_SIZE_KB" -gt "$MAX_SWAP" ]; then
+  SWAP_SIZE_KB=$MAX_SWAP
+fi
+
+SWAP_SIZE_MB=$((SWAP_SIZE_KB / 1024))
+echo "Swap alvo: ${SWAP_SIZE_MB} MiB"
+
+# Verificar swap atual
+CURRENT_SWAP=$(swapon --show --bytes --noheadings | awk '{sum+=$2} END {print sum+0}')
+
+if [ "$CURRENT_SWAP" -lt "$SWAP_SIZE_KB" ]; then
+  DIFF=$((SWAP_SIZE_KB - CURRENT_SWAP))
+  DIFF_MB=$((DIFF / 1024))
+  echo "Criando swapfile adicional de ${DIFF_MB} MiB..."
+  dd if=/dev/zero of=/swapfile bs=1M count=$DIFF_MB status=progress
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  echo "/swapfile none swap sw 0 0" >> /etc/fstab
+fi
+
+echo "Swap configurada."
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
 EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
-  # ── Calamares: settings.conf (YAML correto) ───────────────────────────────
+# ── Calamares: settings.conf (YAML correto) ───────────────────────────────
   cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
-backend: "libparted"       # <---Inclusão para evitar erro na instalação 
+backend: "libparted"
 modules-search: [ local, /usr/lib/calamares/modules ]
 instances:
 - id: remove-live
@@ -425,25 +465,23 @@ prompt-install: true
 dont-chroot: false
 EOF
 
-  # ── Calamares: partition.conf ─────────────────────────────────────────────
+  # ── Calamares: partition.conf (FINAL - COM CRIPTOGRAFIA) ─────────────────
   cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
 ---
+# Backend de particionamento
+backend: libparted
+
+# Particionamento automático
+autoLayout:
+  enabled: true
+  layout: default
+
+# Configurações Globais
 defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
-allowManualPartitioning: true
+allowManualPartitioning: false
 
-# Modo de particionamento automático simplificado
-automaticLayout:
-  - type: "erase"
-    filesystem: "ext4"
-    mountPoint: "/"
-    swap:
-      enabled: true
-      size: "ram:15%"
-      min: "512MiB"
-      max: "4GiB"
-
-# Configuração de criptografia (LUKS)
+# Criptografia LUKS (ATIVADA)
 encrypt:
   enabled: true
   luksCipher: "aes-xts-plain64"
@@ -451,8 +489,45 @@ encrypt:
   luksHash: "sha512"
   luksPBKDF: "argon2id"
   luksIterations: 2
+
+# Layout de partições (formato CORRETO do Calamares)
+# Nota: Calamares não suporta operações detalhadas em YAML.
+# Usaremos o autoLayout padrão e ajustaremos com hook pós-instalação.
+partitionOperations:
+  - type: create_partition_table
+    table_type: gpt
+  - type: create_partition
+    start: 1MiB
+    end: 1025MiB
+    filesystem: fat32
+    mount_point: /boot/efi
+    flags: [boot, esp]
+  - type: create_partition
+    start: 1025MiB
+    end: 21GiB
+    filesystem: ext4
+    mount_point: /
+    encrypted: true
+  - type: create_partition
+    start: 21GiB
+    end: 26GiB
+    filesystem: ext4
+    mount_point: /var
+    encrypted: true
+  - type: create_partition
+    start: 26GiB
+    end: 30GiB
+    filesystem: swap
+    mount_point: swap
+    encrypted: true
+  - type: create_partition
+    start: end
+    end: -1
+    filesystem: ext4
+    mount_point: /home
+    encrypted: true
 EOF
-  
+
   # ── Calamares: UNPACKFS CONFIG (CORREÇÃO DO ERRO) ────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/unpackfs.conf <<'EOF'
 ---
