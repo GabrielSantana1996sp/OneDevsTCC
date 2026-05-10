@@ -46,6 +46,7 @@ sudo apt-get update && sudo apt-get install -y \
 2. Execute o script principal:
    ```bash
    sudo lb clean --purge
+   rm -rf config/ .build/ .stage/
    sudo ./onedevs-build.sh
    ```
 
