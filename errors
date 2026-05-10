@@ -3074,3 +3074,19 @@ WARNING: [PYTHON JOB]: "No *unpack* key in job configuration."
 
 _____________
 _______________
+
+dev@onedevs:~$ sudo -E calamares -d
+qt.qpa.theme.dbus: Session DBus not running.
+qt.qpa.theme.dbus: Application will not react to setting changes.
+ Check your DBus installation.
+15:23:31 [6]: Calamares::Settings::Settings(const QString&, bool)
+    Using Calamares settings file at "/etc/calamares/settings.conf" 
+15:23:31 [2]: void Calamares::YAML::explainException(const YAML::Exception&, const QByteArray&, const QString&)
+    WARNING: YAML error  yaml-cpp: error at line 1, column 1: sequence key is missing in "/etc/calamares/settings.conf" . 
+15:23:31 [2]: void Calamares::YAML::explainException(const YAML::Exception&, const QByteArray&)
+    WARNING: offending YAML data: --- 
+15:23:31 [1]: static Calamares::Settings* Calamares::Settings::init(bool)
+    ERROR: FATAL: no sequence set. 
+dev@onedevs:~$ 
+___________
+____________
