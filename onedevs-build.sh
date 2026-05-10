@@ -23,9 +23,7 @@ ARCH="amd64"
 LIVEBUILD_DIR="$(pwd)"
 PACKAGE_LIST="${LIVEBUILD_DIR}/config/package-lists/onedevs.list.chroot"
 ARCHIVES_DIR="${LIVEBUILD_DIR}/config/archives"
-TMPWORK="/tmp/onedevs-archives-work"
 
-# URLs raw do GitHub (commit fixo para estabilidade)
 COMMIT="38f0fe21e88015f157a1cfccbd06fc67a5e9bb18"
 RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/${COMMIT}/IMG"
 
@@ -60,83 +58,22 @@ check_dependencies() {
   fi
 }
 
-# ── Prepara cache de pacotes ────────────────────────────────────────────────
-prepare_full_cache() {
-  log "Preparando cache completo de pacotes (Modo Offline Seguro)..."
-  
-  [ -f "${PACKAGE_LIST}" ] || error "Lista não encontrada: ${PACKAGE_LIST}"
-  
-  rm -rf "${ARCHIVES_DIR}"
-  mkdir -p "${ARCHIVES_DIR}/pool/main/custom"
-  mkdir -p "${ARCHIVES_DIR}/dists/${DIST}/main/binary-${ARCH}"
-  
-  local PACKAGES
-  PACKAGES=$(grep -v '^[[:space:]]*#' "${PACKAGE_LIST}" | grep -v '^[[:space:]]*$' | tr '\n' ' ')
-  
-  if [ -z "${PACKAGES}" ]; then
-    log "Lista de pacotes vazia. Pulando cache."
-    return 0
-  fi
-
-  log "Baixando ${#PACKAGES} pacotes para o cache local..."
-  sudo apt-get -q update || true
-  sudo apt-get --download-only --fix-missing install -y $PACKAGES 2>&1 | tee /tmp/apt_download.log || true
-
-  log "Copiando pacotes para o diretório de build..."
-  find /var/cache/apt/archives -maxdepth 1 -name "*.deb" -exec cp -v -- "{}" "${ARCHIVES_DIR}/pool/main/custom/" \;
-
-  log "Gerando índices locais (Packages.gz e Release)..."
-  command -v dpkg-scanpackages >/dev/null 2>&1 || sudo apt-get install -y dpkg-dev
-  command -v apt-ftparchive   >/dev/null 2>&1 || sudo apt-get install -y apt-utils
-  
-  pushd "${ARCHIVES_DIR}" >/dev/null
-  
-  if dpkg-scanpackages pool /dev/null | gzip -9c > "dists/${DIST}/main/binary-${ARCH}/Packages.gz"; then
-    log "Índice Packages.gz gerado com sucesso."
-  else
-    log "ERRO: Falha ao gerar Packages.gz."
-    popd >/dev/null
-    return 1
-  fi
-
-  if apt-ftparchive release . > Release; then
-    log "Arquivo Release gerado com sucesso."
-  else
-    log "ERRO: Falha ao gerar Release."
-    popd >/dev/null
-    return 1
-  fi
-  
-  chmod -R a+r .
-  popd >/dev/null
-  
-  local COUNT
-  COUNT=$(ls -1 "${ARCHIVES_DIR}/pool/main/custom/"*.deb 2>/dev/null | wc -l)
-  log "Cache preparado com ${COUNT} pacotes. Build offline seguro."
-  
-  if ls ${ARCHIVES_DIR}/pool/main/custom/*linux-image* >/dev/null 2>&1; then
-    log " Kernel encontrado no cache."
-  else
-    log " AVISO: Kernel não encontrado no cache. O build pode falhar se não houver internet."
-  fi
-}
-
 # ── Gera arquivos do live-build ───────────────────────────────────────────────
 generate_livebuild_files() {
   log "Gerando arquivos do live-build..."
 
   mkdir -p config/{package-lists,hooks/live,apt,archives}
-  mkdir -p config/includes.chroot/etc/{calamares/modules,apt/apt.conf.d}
+  mkdir -p config/includes.chroot/etc/{calamares/modules,calamares/scripts,apt/apt.conf.d}
   mkdir -p config/includes.chroot/etc/{lightdm/lightdm-gtk-greeter.conf.d,sysctl.d}
   mkdir -p config/includes.chroot/etc/skel/{Desktop,.config/autostart}
   mkdir -p config/includes.chroot/usr/share/{calamares/branding/onedevs,backgrounds/onedevs}
   mkdir -p config/includes.chroot/usr/share/{plymouth/themes/onedevs,applications,polkit-1/actions}
+  mkdir -p config/includes.chroot/usr/local/bin
 
-  # ── APT ────────────────────────────────────────────────────────────────────
+  # ── APT ───────────────────────────────────────────────────────────────────
   cat > config/apt/apt.conf <<'EOF'
 Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
-APT::Get::AllowUnauthenticated "true";
 EOF
 
   cat > config/apt/preferences <<'EOF'
@@ -152,15 +89,13 @@ EOF
   cat > config/includes.chroot/etc/apt/apt.conf.d/99onedevs <<'EOF'
 Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
-APT::Get::AllowUnauthenticated "true";
-Acquire::Languages "none";
 EOF
 
   # ── Lista de pacotes ──────────────────────────────────────────────────────
   if [ ! -f config/package-lists/onedevs.list.chroot ]; then
     cat > config/package-lists/onedevs.list.chroot <<'EOF'
 # Sistema Base
-live-boot live-config live-config-systemd parted cryptsetup initramfs-tools
+live-boot live-config live-config-systemd
 
 # Desktop XFCE
 xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
@@ -188,7 +123,7 @@ git
 make cmake autoconf automake
 gdb
 
-# Bootloader (apenas EFI)
+# Bootloader EFI
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
@@ -201,7 +136,7 @@ ansible
 docker.io
 systemd-container
 
-# Segurança
+# Segurança DevSecOps
 apparmor
 nftables
 fail2ban
@@ -272,7 +207,6 @@ EOF
   cat > config/hooks/live/0001-block-grub-pc.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-echo "=== Bloqueando grub-pc no chroot ==="
 mkdir -p /etc/apt/preferences.d
 cat > /etc/apt/preferences.d/block-grub-pc <<'PREF'
 Package: grub-pc grub-pc-bin
@@ -283,50 +217,28 @@ echo "grub-pc bloqueado."
 EOF
   chmod +x config/hooks/live/0001-block-grub-pc.hook.chroot
 
-  # ── Hook 9997: baixa assets do GitHub ─────────────────────────────────────
+  # ── Hook 9997: assets do GitHub ───────────────────────────────────────────
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<HOOKEOF
 #!/bin/bash
 set -e
-echo "=== Baixando assets do OneDevsOS do GitHub ==="
-
+echo "=== Baixando assets ==="
 COMMIT="${COMMIT}"
 RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/\${COMMIT}/IMG"
-
-mkdir -p /usr/share/backgrounds/onedevs
-mkdir -p /usr/share/calamares/branding/onedevs
-mkdir -p /etc/calamares/branding/onedevs
-mkdir -p /usr/share/plymouth/themes/onedevs
-
-dl() {
-  local url="\$1" dest="\$2" name="\$3"
-  if curl -fsSL --retry 3 --retry-delay 2 "\$url" -o "\$dest"; then
-    echo "OK: \$name ($(du -h "\$dest" 2>/dev/null | cut -f1))"
-  else
-    echo "AVISO: falha ao baixar \$name"
-  fi
-}
-
-dl "\${RAW}/Wallpapers/Classico.png"     /usr/share/backgrounds/onedevs/Classico.png     "Classico"
-dl "\${RAW}/Wallpapers/Cosmos.png"       /usr/share/backgrounds/onedevs/Cosmos.png       "Cosmos"
-dl "\${RAW}/Wallpapers/Energia.png"      /usr/share/backgrounds/onedevs/Energia.png      "Energia"
+mkdir -p /usr/share/backgrounds/onedevs /usr/share/calamares/branding/onedevs
+mkdir -p /etc/calamares/branding/onedevs /usr/share/plymouth/themes/onedevs
+dl() { curl -fsSL --retry 3 --retry-delay 2 "\$1" -o "\$2" && echo "OK: \$3" || echo "AVISO: falha \$3"; }
+dl "\${RAW}/Wallpapers/Classico.png"      /usr/share/backgrounds/onedevs/Classico.png      "Classico"
+dl "\${RAW}/Wallpapers/Cosmos.png"        /usr/share/backgrounds/onedevs/Cosmos.png        "Cosmos"
+dl "\${RAW}/Wallpapers/Energia.png"       /usr/share/backgrounds/onedevs/Energia.png       "Energia"
 dl "\${RAW}/Wallpapers/RetroTerminal.png" /usr/share/backgrounds/onedevs/RetroTerminal.png "RetroTerminal"
-dl "\${RAW}/Wallpapers/universe.png"     /usr/share/backgrounds/onedevs/universe.png     "universe"
-
-cp /usr/share/backgrounds/onedevs/Classico.png /usr/share/backgrounds/onedevs/wallpaper.png
-
-dl "\${RAW}/Calamares/Calamares.png" \
-   /usr/share/calamares/branding/onedevs/logo.png "logo Calamares"
-cp /usr/share/calamares/branding/onedevs/logo.png \
-   /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
-
-dl "\${RAW}/BootSlash/Boot%20splash%20(Plymouth).png" \
-   /usr/share/plymouth/themes/onedevs/boot.png "boot splash"
-
-echo "=== Listagem assets ==="
-ls -lh /usr/share/backgrounds/onedevs/         2>/dev/null || true
-ls -lh /usr/share/calamares/branding/onedevs/  2>/dev/null || true
-ls -lh /usr/share/plymouth/themes/onedevs/     2>/dev/null || true
-echo "=== Hook 9997 OK ==="
+dl "\${RAW}/Wallpapers/universe.png"      /usr/share/backgrounds/onedevs/universe.png      "universe"
+dl "\${RAW}/Ligthdm/LigthDM.png"         /usr/share/backgrounds/onedevs/wallpaper.png     "LightDM wallpaper"
+[ -s /usr/share/backgrounds/onedevs/wallpaper.png ] || \
+  cp /usr/share/backgrounds/onedevs/Classico.png /usr/share/backgrounds/onedevs/wallpaper.png 2>/dev/null || true
+dl "\${RAW}/Calamares/Calamares.png"      /usr/share/calamares/branding/onedevs/logo.png   "logo Calamares"
+cp /usr/share/calamares/branding/onedevs/logo.png /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
+dl "\${RAW}/BootSlash/Boot%20splash%20(Plymouth).png" /usr/share/plymouth/themes/onedevs/boot.png "boot splash"
+echo "=== Assets OK ==="
 HOOKEOF
   chmod +x config/hooks/live/9997-onedevs-assets.hook.chroot
 
@@ -334,151 +246,57 @@ HOOKEOF
   cat > config/hooks/live/9998-onedevs-external.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-echo "Instalando Nix dentro do chroot..."
+echo "Instalando Nix..."
 sh <(curl --proto '=https' --tlsv1.2 -sSf https://nixos.org/nix/install) --daemon || true
-if [ -f /etc/profile.d/nix.sh ]; then
-    echo ". /etc/profile.d/nix.sh" >> /home/dev/.bashrc
-    chown dev:dev /home/dev/.bashrc
-fi
+[ -f /etc/profile.d/nix.sh ] && echo ". /etc/profile.d/nix.sh" >> /home/dev/.bashrc && chown dev:dev /home/dev/.bashrc || true
 EOF
   chmod +x config/hooks/live/9998-onedevs-external.hook.chroot
 
-  # ── Hook 9999: configura usuário e serviços ───────────────────────────────
+  # ── Hook 9999: usuário e serviços ─────────────────────────────────────────
   cat > config/hooks/live/9999-onedevs-config.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
 echo "Configurando usuário e serviços..."
-
 if ! id -u dev >/dev/null 2>&1; then
   useradd -m -s /bin/bash -G sudo,netdev,plugdev,audio,video dev
   echo "dev:live" | chpasswd
 fi
-
-systemctl enable snapd.socket   || true
-systemctl enable snapd.service  || true
-systemctl enable dbus.service   || true
-systemctl start dbus            || true
-systemctl enable lightdm        || true
-systemctl enable NetworkManager || true
-
+systemctl enable lightdm NetworkManager snapd.socket snapd.service || true
 if [ -f /usr/share/plymouth/themes/onedevs/onedevs.plymouth ]; then
   plymouth-set-default-theme onedevs || true
   update-initramfs -u || true
 fi
-
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
+cat > /etc/os-release <<'OSRELEASE'
+NAME="OneDevsOS"
+VERSION="1.0 (AlbertEinstein)"
+ID=onedevs
+ID_LIKE=debian
+PRETTY_NAME="OneDevsOS 1.0 AlbertEinstein"
+VERSION_ID="1.0"
+VERSION_CODENAME=alberteinstein
+HOME_URL="https://onedevsofficial@proton.me"
+OSRELEASE
+cat > /etc/issue <<'ISSUE'
+OneDevsOS 1.0 AlbertEinstein - DevSecOps Edition
+Usuário: dev | Senha: live
+
+\l
+ISSUE
+echo "Configuração concluída."
 EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
-  # ── Calamares: MODULE PRE_PARTITION (PARA RODAR NA INSTALAÇÃO) ────────────
-  cat > config/includes.chroot/etc/calamares/modules/pre_partition.sh <<'SCRIPT'
-#!/bin/bash
-set -e
-
-echo "=== Módulo Calamares: Pré-Particionamento Personalizado ==="
-
-DISK=""
-for d in /dev/sd[a-z] /dev/nvme[0-9]*n[0-9]*; do
-  if [ -b "$d" ]; then
-    DISK="$d"
-    break
-  fi
-done
-
-if [ -z "$DISK" ]; then
-  echo "ERRO: Nenhum disco encontrado para instalação."
-  exit 1
-fi
-
-echo "Disco alvo: $DISK"
-
-parted -s "$DISK" mklabel gpt
-parted -s "$DISK" mkpart primary fat32 1MiB 1025MiB
-parted -s "$DISK" set 1 boot on
-parted -s "$DISK" set 1 esp on
-parted -s "$DISK" mkpart primary ext4 1025MiB 21GiB
-parted -s "$DISK" mkpart primary ext4 21GiB 26GiB
-parted -s "$DISK" mkpart primary linux-swap 26GiB 30GiB
-parted -s "$DISK" mkpart primary ext4 30GiB 100%
-
-sleep 2
-
-PASS="onedevs_live"
-
-setup_luks() {
-  local PART=$1
-  local NAME=$2
-  echo "Criptografando $PART..."
-  echo "$PASS" | cryptsetup luksFormat --batch-mode --type luks2 --pbkdf argon2id "$PART" -
-  echo "$PASS" | cryptsetup open "$PART" luks-$NAME
-}
-
-setup_luks "${DISK}3" "root"
-setup_luks "${DISK}4" "var"
-setup_luks "${DISK}5" "swap"
-setup_luks "${DISK}6" "home"
-
-mkfs.vfat -F 32 -n "EFI" "${DISK}1"
-mkfs.ext4 -L "root_enc" "/dev/mapper/luks-root"
-mkfs.ext4 -L "var_enc" "/dev/mapper/luks-var"
-mkfs.ext4 -L "home_enc" "/dev/mapper/luks-home"
-
-RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
-SWAP_SIZE_KB=$((RAM_KB * 15 / 100))
-MIN_SWAP=524288
-MAX_SWAP=8388608
-
-if [ "$SWAP_SIZE_KB" -lt "$MIN_SWAP" ]; then SWAP_SIZE_KB=$MIN_SWAP; elif [ "$SWAP_SIZE_KB" -gt "$MAX_SWAP" ]; then SWAP_SIZE_KB=$MAX_SWAP; fi
-SWAP_SIZE_MB=$((SWAP_SIZE_KB / 1024))
-
-mkswap "/dev/mapper/luks-swap"
-swapon "/dev/mapper/luks-swap"
-
-CURRENT_SWAP=$(swapon --show --bytes --noheadings | awk '{sum+=$2} END {print sum+0}')
-if [ "$CURRENT_SWAP" -lt "$SWAP_SIZE_KB" ]; then
-  DIFF=$((SWAP_SIZE_KB - CURRENT_SWAP))
-  DIFF_MB=$((DIFF / 1024))
-  mkdir -p /mnt/home_temp
-  mount "/dev/mapper/luks-home" /mnt/home_temp
-  dd if=/dev/zero of=/mnt/home_temp/swapfile bs=1M count=$DIFF_MB status=progress
-  chmod 600 /mnt/home_temp/swapfile
-  mkswap /mnt/home_temp/swapfile
-  swapon /mnt/home_temp/swapfile
-  umount /mnt/home_temp
-  rmdir /mnt/home_temp
-  echo "/swapfile none swap sw 0 0" >> /etc/fstab
-fi
-
-echo "=== Pré-Particionamento Concluído ==="
-SCRIPT
-  chmod +x config/includes.chroot/etc/calamares/modules/pre_partition.sh
-
-  # ── Calamares: Configuração do Script Customizado ─────────────────────────
-  cat > config/includes.chroot/etc/calamares/modules/shellprocess@pre_partition.conf <<'EOF'
----
-command: "/etc/calamares/modules/pre_partition.sh"
-workingDirectory: "/"
-environment: []
-EOF
-
-  # ── Calamares: grubcfg.conf (Habilitar Crypto no GRUB) ────────────────────
-  cat > config/includes.chroot/etc/calamares/modules/grubcfg.conf <<'EOF'
----
-defaults:
-  GRUB_ENABLE_CRYPTODISK: true
-  GRUB_CMDLINE_LINUX_DEFAULT: "quiet splash"
-  # Outras configurações padrão do GRUB podem ser adicionadas aqui
-EOF
-
-  # ── Calamares: settings.conf (ATUALIZADO) ─────────────────────────────────
+  # ── Calamares: settings.conf ──────────────────────────────────────────────
   cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
-# Configuration file for Calamares
----
-modules-search: [ local ]
-# YAML: list of lists of strings.
+modules-search: [ local, /usr/lib/calamares/modules ]
+instances:
+- id: remove-live
+  module: shellprocess
+  config: shellprocess@remove-live.conf
 sequence:
 - show:
   - welcome
@@ -490,88 +308,76 @@ sequence:
 - exec:
   - partition
   - mount
-  - luksbootkeyfile          # <--- CRIA A CHAVE DE DESBLOQUEIO
-  - initramfscfg             # <--- CONFIGURA O INITRAMFS (DEBIAN)
   - unpackfs
   - machineid
+  - fstab
   - locale
   - keyboard
-  - localecfg
-  - fstab
-  - initcpiocfg
-  - initcpio
   - users
-  - displaymanager
-  - networkcfg
   - hwclock
-  - services-systemd
-  - initramfs
   - bootloader
+  - shellprocess@remove-live
   - umount
 - show:
   - finished
-
-branding: default
-
-prompt-install: false
-
+branding: onedevs
+prompt-install: true
 dont-chroot: false
-
-oem-setup: false
-
-disable-cancel: false
-
-disable-cancel-during-exec: false
-
-hide-back-and-next-during-exec: false
-
-quit-at-end: false
-
 EOF
 
-  # ── Calamares: partition.conf (APENAS MONTAGEM) ───────────────────────────
+  # ── Calamares: partition.conf (SEM encrypt forçado) ───────────────────────
   cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
 ---
-efi:
-    mountPoint:         "/boot/efi"
-    recommendedSize:    300MiB
-    minimumSize:        32MiB
-    label:              "EFI"
-
+defaultFileSystemType: ext4
+defaultPartitionTableType: gpt
+allowManualPartitioning: true
 userSwapChoices:
-    - none      # Create no swap, use no swap
-    - small     # Up to 4GB
-    - suspend   # At least main memory size
-    - file      # To swap file instead of partition
-
-luksGeneration: luks1
-
-drawNestedPartitions:   false
-
-alwaysShowPartitionLabels: true
-
-initialPartitioningChoice: none
-
-initialSwapChoice: none
-
-defaultFileSystemType:  "ext4"
-
-essentialMounts: [ "live-*", "control", "ventoy" ]
-
-lvm:
-    enable: true
-
-
+  - none
+  - small
+  - suspend
+  - reuse
+  - file
+initialSwapChoice: small
+erase-ram15:
+  filesystem: ext4
+  mountPoint: /
+  swap:
+    size: "ram:15%"
+    min: 512MiB
+    max: 8GiB
 EOF
 
-  # ── Calamares: UNPACKFS CONFIG ────────────────────────────────────────────
+  # ── Calamares: unpackfs.conf (path correto do live-build) ─────────────────
   cat > config/includes.chroot/etc/calamares/modules/unpackfs.conf <<'EOF'
 ---
-unpackfs:
-  - source: "/live/image/live-root.squashfs"
-    target: "/"
-    filesystem: "squashfs"
-    options: []
+unpack:
+  - source: /run/live/rootfs/filesystem.squashfs
+    sourcefs: squashfs
+    destination: ""
+EOF
+
+  # ── Calamares: mount.conf ─────────────────────────────────────────────────
+  cat > config/includes.chroot/etc/calamares/modules/mount.conf <<'EOF'
+---
+extraMounts:
+  - device: proc
+    fs: proc
+    mountPoint: /proc
+  - device: sys
+    fs: sysfs
+    mountPoint: /sys
+  - device: /dev
+    fs: devtmpfs
+    mountPoint: /dev
+    options: bind
+  - device: /run
+    fs: tmpfs
+    mountPoint: /run
+    options: bind
+extraMountsEfi:
+  - device: efivarfs
+    fs: efivarfs
+    mountPoint: /sys/firmware/efi/efivars
 EOF
 
   # ── Calamares: users.conf ─────────────────────────────────────────────────
@@ -601,7 +407,33 @@ allowWeakPasswordsDefault: true
 userShell: /bin/bash
 EOF
 
-  # ── Calamares: branding.desc ──────────────────────────────────────────────
+  # ── Calamares: shellprocess remove-live ──────────────────────────────────
+  cat > config/includes.chroot/etc/calamares/modules/shellprocess@remove-live.conf <<'EOF'
+---
+dontChroot: false
+timeout: 30
+script:
+  - "-": /etc/calamares/scripts/remove-live-user.sh
+EOF
+
+  cat > config/includes.chroot/etc/calamares/scripts/remove-live-user.sh <<'EOF'
+#!/bin/bash
+set -e
+echo "[OneDevsOS] Limpando ambiente live..."
+id -u dev >/dev/null 2>&1 && userdel -r dev 2>/dev/null || true
+rm -f /etc/sudoers.d/dev
+passwd -l root 2>/dev/null || true
+sed -i 's/^autologin-user=.*//' /etc/lightdm/lightdm.conf 2>/dev/null || true
+cat > /etc/issue <<'ISSUE'
+OneDevsOS 1.0 AlbertEinstein - DevSecOps Edition
+
+\n \l
+ISSUE
+echo "[OneDevsOS] Sistema pronto."
+EOF
+  chmod +x config/includes.chroot/etc/calamares/scripts/remove-live-user.sh
+
+  # ── Calamares: branding ───────────────────────────────────────────────────
   cat > config/includes.chroot/usr/share/calamares/branding/onedevs/branding.desc <<'EOF'
 ---
 componentName: onedevs
@@ -627,7 +459,6 @@ style:
   sidebarTextSelect: "#3498db"
 EOF
 
-  # ── Calamares: slideshow ──────────────────────────────────────────────────
   cat > config/includes.chroot/usr/share/calamares/branding/onedevs/show.qml <<'EOF'
 import QtQuick 2.0
 
@@ -660,7 +491,7 @@ Rectangle {
 }
 EOF
 
-  # ── LightDM: wallpaper ────────────────────────────────────────────────────
+  # ── LightDM ───────────────────────────────────────────────────────────────
   cat > config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d/01_onedevs.conf <<'EOF'
 [greeter]
 background=/usr/share/backgrounds/onedevs/wallpaper.png
@@ -674,7 +505,7 @@ xft-rgba=rgb
 indicators=~host;~spacer;~clock;~spacer;~session;~power
 EOF
 
-  # ── Plymouth: tema ────────────────────────────────────────────────────────
+  # ── Plymouth ──────────────────────────────────────────────────────────────
   cat > config/includes.chroot/usr/share/plymouth/themes/onedevs/onedevs.plymouth <<'EOF'
 [Plymouth Theme]
 Name=OneDevsOS
@@ -704,14 +535,20 @@ fun message_callback(text) {
 Plymouth.SetMessageFunction(message_callback);
 EOF
 
-  # ── Desktop: atalho do instalador ─────────────────────────────────────────
+  # ── Desktop: wrapper + atalho ─────────────────────────────────────────────
+  cat > config/includes.chroot/usr/local/bin/onedevs-install <<'EOF'
+#!/bin/bash
+exec sudo -E calamares "$@"
+EOF
+  chmod +x config/includes.chroot/usr/local/bin/onedevs-install
+
   cat > config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop <<'EOF'
 [Desktop Entry]
 Name=Instalar OneDevsOS
 Name[pt_BR]=Instalar OneDevsOS
 Comment=Instalar OneDevsOS no disco
 Comment[pt_BR]=Instalar OneDevsOS no disco
-Exec=sudo -E calamares
+Exec=onedevs-install
 Icon=system-software-install
 Type=Application
 Categories=System;Settings;
@@ -720,7 +557,7 @@ StartupNotify=true
 EOF
   chmod +x config/includes.chroot/etc/skel/Desktop/Instalar-OneDevsOS.desktop
 
-  # ── Polkit: Calamares sem senha ───────────────────────────────────────────
+  # ── Polkit ────────────────────────────────────────────────────────────────
   cat > config/includes.chroot/usr/share/polkit-1/actions/org.onedevs.calamares.policy <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE policyconfig PUBLIC
@@ -740,7 +577,7 @@ EOF
 EOF
 
   log "Arquivos do live-build gerados/atualizados."
-}
+} # end generate_livebuild_files
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 run_build() {
@@ -761,6 +598,8 @@ run_build() {
     --architectures "$ARCH" \
     --debian-installer none \
     --archive-areas "main contrib non-free non-free-firmware" \
+    --linux-packages linux-image \
+    --linux-flavours amd64 \
     --mirror-bootstrap "http://deb.debian.org/debian" \
     --mirror-chroot "http://deb.debian.org/debian" \
     --mirror-binary "http://deb.debian.org/debian" \
@@ -771,8 +610,7 @@ run_build() {
     --iso-application "$APPNAME" \
     --iso-volume "$VOLUME" \
     --iso-publisher "$PUBLISHER" \
-    --bootappend-live "boot=live components quiet splash persistence persistence-label=ONDEVS username=$USERNAME hostname=$HOSTNAME" \
-    --archive-areas "main contrib non-free non-free-firmware"
+    --bootappend-live "boot=live components quiet splash persistence persistence-label=ONDEVS username=$USERNAME hostname=$HOSTNAME"
 
   log "Iniciando build da ISO (pode levar 1-2h)..."
   sudo lb build 2>&1 | tee build-onedevsos.log
@@ -818,16 +656,14 @@ log "OneDevsOS Build Script - ${CODENAME} (${DIST}) ${ARCH}"
 check_dependencies
 generate_livebuild_files
 
-if [ "${ONLINE:-0}" -eq 1 ] || [ -n "${CI:-}" ]; then
-  log "Modo ONLINE detectado. Preparando cache completo..."
-  prepare_full_cache
-  log "Cache pronto. Iniciando build em modo offline seguro."
+if [ "${ONLINE:-0}" -eq 1 ]; then
+  log "Modo ONLINE: live-build baixará pacotes do Debian durante o build"
 else
   log "Modo OFFLINE: verificando cache..."
   if [ -f "${ARCHIVES_DIR}/dists/${DIST}/main/binary-${ARCH}/Packages.gz" ]; then
     log "Cache encontrado — build offline possível."
   else
-    error "Cache não encontrado. Rode com internet primeiro para gerar o cache."
+    error "Cache não encontrado. Rode com internet primeiro."
   fi
 fi
 
