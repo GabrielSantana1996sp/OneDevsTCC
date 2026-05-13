@@ -141,14 +141,30 @@ apparmor
 nftables
 fail2ban
 clamav clamav-daemon
-gnupg
-auditd
-lynis
-aide
-tripwire
-debsums
-gpg
+gpg gnupg
 logcheck
+debsums
+tripwire
+lynis
+auditd
+
+# Pentest
+nmap
+wireshark
+masscan
+amap
+dnsutils
+tcpdump
+aircrack-ng
+hydra
+medusa
+john
+nikto
+sqlmap
+wapiti
+binwalk
+netcat
+ettercap
 
 # Utilitários
 tmux
