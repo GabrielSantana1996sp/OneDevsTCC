@@ -123,6 +123,17 @@ git
 make cmake autoconf automake
 gdb
 
+# Pentest
+nmap
+wireshark
+aircrack-ng
+medusa
+john
+nikto
+sqlmap
+binwalk
+netcat
+
 # Bootloader EFI
 grub-efi-amd64
 grub-efi-amd64-bin
