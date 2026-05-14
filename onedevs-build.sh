@@ -8,19 +8,16 @@
 # Atenção: este projeto pode incluir softwares de terceiros
 # licenciados sob GPL, MIT, BSD e outras licenças.
 # Cada componente mantém sua licença original.
-#
-# ================================================
-# OneDevsOS - Script de Build do Live ISO
-# ================================================
-set -euo pipefail # Modo seguro: erro em unset variables, pipefail e exit on error
- 
-# ── Configurações Globais ────────────────────────────────────────────────────────────────────
-DIST="trixie"                                 # Distribuição Debian base       
-CODENAME="AlbertEinstein"                     # Nome da versão/customização 
+
+set -euo pipefail
+
+# ── Config ────────────────────────────────────────────────────────────────────
+DIST="trixie"
+CODENAME="AlbertEinstein"
 APPNAME="OneDevsOS - ${CODENAME}"
 VOLUME="ONEDEVS_${CODENAME}_1.0"
 PUBLISHER="OneDevsOS Project (${CODENAME})"
-USERNAME="dev"                                # Usuário padrão da live
+USERNAME="dev"
 HOSTNAME="onedevs"
 ARCH="amd64"
 LIVEBUILD_DIR="$(pwd)"
@@ -97,7 +94,6 @@ EOF
   # ── Lista de pacotes ──────────────────────────────────────────────────────
   if [ ! -f config/package-lists/onedevs.list.chroot ]; then
     cat > config/package-lists/onedevs.list.chroot <<'EOF'
-
 # Sistema Base
 live-boot live-config live-config-systemd
 
@@ -145,30 +141,14 @@ apparmor
 nftables
 fail2ban
 clamav clamav-daemon
-gpg gnupg
-logcheck
-debsums
-tripwire
-lynis
+gnupg
 auditd
-
-# Pentest
-nmap
-wireshark
-masscan
-amap
-dnsutils
-tcpdump
-aircrack-ng
-hydra
-medusa
-john
-nikto
-sqlmap
-wapiti
-binwalk
-netcat
-ettercap
+lynis
+aide
+tripwire
+debsums
+gpg
+logcheck
 
 # Utilitários
 tmux
@@ -218,15 +198,12 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
   fi
 
-  # Exclusão de pacotes (evita grub-pc no live)
   cat > config/package-lists/exclude.list.chroot <<'EOF'
 !grub-pc
 !grub-pc-bin
 EOF
 
-  # ── Hook 0001: bloqueia grub-pc  ───────────────────────────────────────────
-
-  # Hook 0001: Bloqueia instalação do grub-pc
+  # ── Hook 0001: bloqueia grub-pc ───────────────────────────────────────────
   cat > config/hooks/live/0001-block-grub-pc.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
