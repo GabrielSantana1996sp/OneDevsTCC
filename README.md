@@ -1,5 +1,5 @@
 # OneDevsOS - AlbertEinstein
-# Uma distribuição Linux focada em desenvolvimento e segurança DevSecOps, baseada no Debian Trixie.
+- Uma distribuição Linux focada em desenvolvimento e segurança DevSecOps, baseada no Debian Trixie.
 
 # Descrição
 O OneDevsOS é uma distribuição Linux personalizada construída sobre o Debian Trixie, otimizada para desenvolvedores e profissionais de segurança. Inclui ferramentas de desenvolvimento, pentest, DevOps e segurança em um ambiente XFCE leve e personalizável.
