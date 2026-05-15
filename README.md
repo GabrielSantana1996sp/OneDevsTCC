@@ -1,77 +1,90 @@
-# OneDevsOS - AlbertEinstein 1.0
+# OneDevsOS - AlbertEinstein
+# Uma distribuição Linux focada em desenvolvimento e segurança DevSecOps, baseada no Debian Trixie.
 
-## Sobre o Projeto
-O **OneDevsOS** é uma distribuição Linux personalizada, construída sobre o Debian, voltada para desenvolvedores e entusiastas de tecnologia.  
-Ele oferece um ambiente completo com ferramentas de programação, DevOps, segurança, servidores e utilitários essenciais, além de um instalador gráfico moderno via **Calamares**.
+# Descrição
+O OneDevsOS é uma distribuição Linux personalizada construída sobre o Debian Trixie, otimizada para desenvolvedores e profissionais de segurança. Inclui ferramentas de desenvolvimento, pentest, DevOps e segurança em um ambiente XFCE leve e personalizável.
 
-Este projeto é licenciado sob **Apache License 2.0**, mas pode incluir softwares de terceiros sob GPL, MIT, BSD e outras licenças. Cada componente mantém sua licença original.
+Características Principais
+Base Debian Trixie: Estabilidade e vasta gama de pacotes
+Ambiente XFCE: Desktop leve e personalizável
+Ferramentas de Desenvolvimento: Python, Java, Go, Node.js, Rust, Ruby e mais
+Ferramentas de Pentest: Nmap, Wireshark, Aircrack-ng, John the Ripper, etc.
+Ferramentas DevSecOps: Docker, Podman, Ansible, AppArmor, Fail2ban, ClamAV
+Instalador Calamares: Interface gráfica amigável para instalação
+Nix Package Manager: Incluído para gerenciamento avançado de pacotes
+Requisitos do Sistema
+Processador: 64-bit (x86_64)
+Memória RAM: Mínimo 2GB, recomendado 4GB+
+Espaço em disco: Mínimo 20GB para instalação
+Sistema UEFI ou BIOS com suporte a inicialização
+Como Construir a ISO
+Pré-requisitos
+Debian Trixie ou derivado
+Conexão com internet (para primeira construção)
+Acesso sudo
+Instalação de Dependências
+O script de construção instalará automaticamente as dependências necessárias:
 
----
+debootstrap
+live-build
+xorriso
+squashfs-tools
+syslinux-common
+isolinux
+Construindo a ISO
+Clone este repositório:
+bash
+git clone https://github.com/GabrielSantana1996sp/OneDevsTCC.git
+cd OneDevsTCC
+Torne o script executável:
+bash
+chmod +x build.sh
+Execute o script de construção:
+bash
+sudo ./build.sh
+O processo de construção pode levar de 1 a 2 horas, dependendo da velocidade da sua conexão e do seu hardware.
 
-## Recursos Principais
-- **Base Debian (Trixie)**  
-- **Ambiente Desktop XFCE** leve e personalizável  
-- **Instalador gráfico Calamares** com suporte a:
-  - Particionamento automático e manual
-  - Criptografia LUKS
-  - Configuração de usuários e grupos
-- **Ferramentas de Desenvolvimento**: Python, Java, Go, Node.js, Rust, Ruby, C/C++, Git, Vim/Neovim, Geany  
-- **DevOps & Containers**: Docker, Podman, Ansible, Systemd-nspawn  
-- **Servidores e Bancos de Dados**: Apache, Nginx, PHP, MariaDB  
-- **Segurança**: AppArmor, Fail2ban, ClamAV, Auditd, Lynis, Tripwire  
-- **Utilitários**: tmux, htop, ranger, synaptic, KeepassXC, GParted, Bluetooth, CUPS  
-- **Boot Animado (Plymouth)** com tema OneDevsOS  
-- **Branding personalizado** (logo, wallpaper, ícones, slideshow de instalação)
+Opções de Construção
+Modo offline: O script detectará automaticamente se há conexão com internet
+Limpeza: Execute sudo ./build.sh clean para limpar o ambiente de construção
+Apenas geração de arquivos: Execute sudo ./build.sh generate_only para gerar apenas os arquivos de configuração
+Testando a ISO
+Você pode testar a ISO gerada usando QEMU:
 
----
+bash
+qemu-system-x86_64 -m 4096 -cdrom onedevsos-alberteinstein-1.0-amd64.iso -boot d -enable-kvm
+Instalação
+Inicie a partir da ISO gerada
+Clique no ícone "Instalar OneDevsOS" na área de trabalho
+Siga as instruções do instalador Calamares
+Após a instalação, remova a mídia e reinicie
+Configurações Padrão
+Usuário Live: dev / Senha: live
+Ambiente Desktop: XFCE
+Gerenciador de Login: LightDM
+Tema: OneDevsOS personalizado
+Estrutura do Projeto
+.
+├── build.sh              # Script principal de construção
+├── config/               # Arquivos de configuração do live-build
+│   ├── package-lists/    # Listas de pacotes a serem instalados
+│   ├── hooks/            # Scripts executados durante a construção
+│   ├── includes.chroot/  # Arquivos incluídos no sistema final
+│   └── apt/              # Configurações do APT
+└── README.md             # Este arquivo
+Licença
+Este projeto é licenciado sob a Licença Apache 2.0. Veja o arquivo LICENSE para mais detalhes.
 
-## Dependências
-Antes de iniciar a build, certifique-se de instalar os pacotes necessários:
+Contribuição
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou enviar pull requests.
 
-```bash
-sudo apt-get update && sudo apt-get install -y \
-  debootstrap live-build xorriso squashfs-tools \
-  syslinux-common isolinux dpkg-dev apt-utils
-```
+Contato
+E-mail: onedevsofficial@proton.me
+Projeto: https://github.com/GabrielSantana1996sp/OneDevsTCC
+Agradecimentos
+Este projeto é baseado em:
 
----
-
-## Como Construir a ISO
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/onedevs/onedevsos.git
-   cd onedevsos
-   ```
-
-2. Execute o script principal:
-   ```bash
-   sudo lb clean --purge
-   rm -rf config/ .build/ .stage/
-   sudo ./onedevs-build.sh
-   ```
-
-3. O processo irá:
-   - Verificar dependências
-   - Gerar arquivos de configuração do **live-build**
-   - Baixar pacotes necessários (modo online)
-   - Construir a ISO híbrida bootável
-
-4. Ao final, a ISO será gerada com o nome:
-   ```
-   onedevsos-alberteinstein-1.0-amd64.iso
-   ```
-
----
-
-##  Testando a ISO
-Você pode testar rapidamente em uma VM com QEMU:
-
-```bash
-qemu-system-x86_64 -m 2048 -cdrom onedevsos-alberteinstein-1.0-amd64.iso -boot d
-```
-
-## Licença
-Este projeto é distribuído sob a **Apache License 2.0**.  
-Softwares de terceiros incluídos mantêm suas licenças originais (GPL, MIT, BSD, etc.).
-
----
+Debian GNU/Linux
+Debian Live Build
+XFCE Desktop Environment
+Calamares Installer
