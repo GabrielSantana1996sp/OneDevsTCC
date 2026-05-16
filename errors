@@ -5344,3 +5344,13 @@ Command: fatlabel /dev/vda1 /bios
 _____
 _____
 _____
+
+onedevs@onedevs-standardpc:~/OneDevs$ sudo ./onedevs-build.sh
+[2026-05-16 16:48:51] Rede detectada: modo ONLINE
+./onedevs-build.sh: linha 637: erro de sintaxe próximo ao token inesperado `}'
+onedevs@onedevs-standardpc:~/OneDevs$ ^C
+onedevs@onedevs-standardpc:~/OneDevs$ 
+_____
+___
+___
+
