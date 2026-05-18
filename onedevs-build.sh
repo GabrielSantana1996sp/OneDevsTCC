@@ -128,13 +128,14 @@ john
 nikto
 sqlmap
 binwalk
+netcat
 
-# Bootloader EFI + BIOS (suporte dual: UEFI e legacy BIOS)
+# Bootloader UEFI (grub-efi — bare metal SSD moderno)
+# grub-pc e grub-efi-amd64 conflitam no Debian Trixie: não instale os dois.
+# Calamares usa grub-efi para instalar no SSD em modo UEFI.
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
-grub-pc
-grub-pc-bin
 shim-signed
 os-prober
 
@@ -207,24 +208,23 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
   fi
 
-  # grub-pc e grub-pc-bin são permitidos (suporte BIOS + UEFI dual)
+  # Nenhum pacote excluído — grub-efi é o único bootloader
 
-  # ── Hook 0001: configura grub para suporte dual BIOS + UEFI ──────────────
-  cat > config/hooks/live/0001-grub-dual.hook.chroot <<'EOF'
+  # ── Hook 0001: configura grub-efi (único bootloader — UEFI bare metal) ──
+  cat > config/hooks/live/0001-grub-efi-config.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-# Garante que grub-pc e grub-efi coexistam sem conflito
-# Calamares detecta automaticamente BIOS ou UEFI na instalação
-echo "Configurando suporte dual BIOS/UEFI para grub..."
+echo "Configurando grub-efi para instalação UEFI..."
 mkdir -p /etc/default/grub.d
 cat > /etc/default/grub.d/onedevs.cfg <<'GRUBCFG'
 GRUB_TIMEOUT=5
 GRUB_DISTRIBUTOR="OneDevsOS"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX=""
 GRUBCFG
-echo "Grub dual BIOS/UEFI configurado."
+echo "grub-efi configurado para UEFI."
 EOF
-  chmod +x config/hooks/live/0001-grub-dual.hook.chroot
+  chmod +x config/hooks/live/0001-grub-efi-config.hook.chroot
 
   # ── Hook 9997: assets do GitHub ───────────────────────────────────────────
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<HOOKEOF
@@ -334,7 +334,7 @@ prompt-install: true
 dont-chroot: false
 EOF
 
-  # ── Calamares: partition.conf (SEM encrypt forçado) ───────────────────────
+  # ── Calamares: partition.conf ─────────────────────────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
 ---
 defaultFileSystemType: ext4
@@ -342,13 +342,13 @@ defaultPartitionTableType: gpt
 allowManualPartitioning: true
 requiredStorage: 15.0
 
-# Partição EFI para UEFI bare metal
+# Partição EFI para UEFI bare metal SSD
 efiSystemPartitionSize: 512M
 efiSystemPartitionName: EFI
 efiSystemPartitionMountPoint: /boot/efi
 
 # Layout completo: EFI + /boot + / + swap + /home
-# "100%" na última entrada = usa todo espaço restante
+# "100%" na última entrada = usa todo espaço restante do disco
 partitionLayout:
   - name: "efi"
     size: "512M"
@@ -372,7 +372,6 @@ partitionLayout:
     mountPoint: "/home"
     filesystem: "ext4"
 
-# Swap como partição dedicada
 userSwapChoices:
   - none
   - small
@@ -381,7 +380,7 @@ userSwapChoices:
 initialSwapChoice: small
 EOF
 
-  # ── Calamares: bootloader.conf (suporta BIOS e UEFI) ─────────────────────
+  # ── Calamares: bootloader.conf (UEFI grub-efi) ───────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/bootloader.conf <<'EOF'
 ---
 efiBootLoader: grub
@@ -694,7 +693,9 @@ run_build() {
       ISO_NAME="onedevsos-${CODENAME_LC}-1.0-${ARCH}.iso"
       mv "${ISO_CANDIDATE}" "${ISO_NAME}" || true
       log "ISO: ${ISO_NAME} ($(du -h "${ISO_NAME}" | cut -f1))"
-      log "Testar: qemu-system-x86_64 -m 4096 -cdrom ${ISO_NAME} -boot d -enable-kvm"
+      log "Testar em UEFI: qemu-system-x86_64 -m 4096 -enable-kvm -bios /usr/share/ovmf/OVMF.fd -cdrom ${ISO_NAME} -boot d -hda disco.img"
+      log "  (instale ovmf: sudo apt install ovmf)"
+      log "  (crie disco: qemu-img create -f qcow2 disco.img 40G)"
     else
       log "ISO não encontrada; verifique build-onedevsos.log"
     fi
