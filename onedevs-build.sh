@@ -80,10 +80,6 @@ EOF
 Package: *
 Pin: release o=Debian
 Pin-Priority: 500
-
-Package: grub-pc grub-pc-bin
-Pin: release *
-Pin-Priority: -1
 EOF
 
   cat > config/includes.chroot/etc/apt/apt.conf.d/99onedevs <<'EOF'
@@ -134,10 +130,12 @@ sqlmap
 binwalk
 netcat
 
-# Bootloader EFI
+# Bootloader EFI + BIOS (suporte dual: UEFI e legacy BIOS)
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
+grub-pc
+grub-pc-bin
 shim-signed
 os-prober
 
@@ -162,6 +160,7 @@ gpg
 logcheck
 
 # Utilitários
+util-linux
 tmux
 htop
 ranger
@@ -209,24 +208,24 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
   fi
 
-  cat > config/package-lists/exclude.list.chroot <<'EOF'
-!grub-pc
-!grub-pc-bin
-EOF
+  # grub-pc e grub-pc-bin são permitidos (suporte BIOS + UEFI dual)
 
-  # ── Hook 0001: bloqueia grub-pc ───────────────────────────────────────────
-  cat > config/hooks/live/0001-block-grub-pc.hook.chroot <<'EOF'
+  # ── Hook 0001: configura grub para suporte dual BIOS + UEFI ──────────────
+  cat > config/hooks/live/0001-grub-dual.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-mkdir -p /etc/apt/preferences.d
-cat > /etc/apt/preferences.d/block-grub-pc <<'PREF'
-Package: grub-pc grub-pc-bin
-Pin: release *
-Pin-Priority: -1
-PREF
-echo "grub-pc bloqueado."
+# Garante que grub-pc e grub-efi coexistam sem conflito
+# Calamares detecta automaticamente BIOS ou UEFI na instalação
+echo "Configurando suporte dual BIOS/UEFI para grub..."
+mkdir -p /etc/default/grub.d
+cat > /etc/default/grub.d/onedevs.cfg <<'GRUBCFG'
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="OneDevsOS"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUBCFG
+echo "Grub dual BIOS/UEFI configurado."
 EOF
-  chmod +x config/hooks/live/0001-block-grub-pc.hook.chroot
+  chmod +x config/hooks/live/0001-grub-dual.hook.chroot
 
   # ── Hook 9997: assets do GitHub ───────────────────────────────────────────
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<HOOKEOF
@@ -342,23 +341,15 @@ EOF
 defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
 allowManualPartitioning: true
-requiredStorage: 30.0
+requiredStorage: 15.0
 
 # Partição EFI para UEFI bare metal
 efiSystemPartitionSize: 512M
 efiSystemPartitionName: EFI
 efiSystemPartitionMountPoint: /boot/efi
 
-# Swap: partição dedicada de 8GB
-userSwapChoices:
-  - none
-  - small
-  - suspend
-  - file
-initialSwapChoice: small
-
-# Layout automático completo ao escolher "Apagar disco"
-# EFI (512MB) + /boot (1GB) + / (30GB) + /home (restante) + swap (8GB)
+# Layout completo: EFI + /boot + / + swap + /home
+# "100%" na última entrada = usa todo espaço restante
 partitionLayout:
   - name: "efi"
     size: "512M"
@@ -371,19 +362,27 @@ partitionLayout:
     mountPoint: "/boot"
     filesystem: "ext4"
   - name: "root"
-    size: "30720M"
+    size: "20480M"
     mountPoint: "/"
     filesystem: "ext4"
   - name: "swap"
-    size: "8192M"
+    size: "4096M"
     filesystem: "linuxswap"
   - name: "home"
-    size: "fill"
+    size: "100%"
     mountPoint: "/home"
     filesystem: "ext4"
+
+# Swap como partição dedicada
+userSwapChoices:
+  - none
+  - small
+  - suspend
+  - file
+initialSwapChoice: small
 EOF
 
-  # ── Calamares: bootloader.conf (UEFI grub-efi bare metal) ────────────────
+  # ── Calamares: bootloader.conf (suporta BIOS e UEFI) ─────────────────────
   cat > config/includes.chroot/etc/calamares/modules/bootloader.conf <<'EOF'
 ---
 efiBootLoader: grub
