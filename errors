@@ -5353,4 +5353,651 @@ onedevs@onedevs-standardpc:~/OneDevs$
 _____
 ___
 ___
+dev@onedevs:~$ sudo -E calamares -d
+qt.qpa.theme.dbus: Session DBus not running.
+qt.qpa.theme.dbus: Application will not react to setting changes.
+ Check your DBus installation.
+01:49:23 [6]: Calamares::Settings::Settings(const QString&, bool)
+    Using Calamares settings file at "/etc/calamares/settings.conf" 
+    .. module-search entry non-existent "/usr/lib/calamares/modules" 
+    .. Required settings.conf key oem-setup is missing. 
+    .. Required settings.conf key disable-cancel is missing. 
+    .. Required settings.conf key disable-cancel-during-exec is missing. 
+    .. Required settings.conf key hide-back-and-next-during-exec is missing. 
+    .. Required settings.conf key quit-at-end is missing. 
+01:49:23 [6]: void Logger::setupLogfile()
+    Using log file: "/home/dev/.cache/calamares/session.log" 
+01:49:23 [6]: void CalamaresApplication::init()
+    Calamares version: 3.3.14 
+    .. Using Qt version: 6.8.2 
+    .. Build type: None 
+    .. Using PyBind11 
+    .. Using settings: "/etc/calamares/settings.conf" 
+    .. Using log file: "/home/dev/.cache/calamares/session.log" 
+    .. Languages: QList("ar", "as", "ast", "az", "az_AZ", "be", "bg", "bn", "ca", "ca@valencia", "cs_CZ", "da", "de", "el", "en", "en_GB", "eo", "es", "es_AR", "es_MX", "et", "eu", "fa", "fi_FI", "fr", "fur", "gl", "he", "hi", "hr", "hu", "id", "is", "it_IT", "ja", "ka", "ko", "lt", "ml", "mr", "nb", "nl", "oc", "pl", "pt_BR", "pt_PT", "ro", "ru", "si", "sk", "sl", "sq", "sr", "sr@latin", "sv", "tg", "th", "tr_TR", "uk", "vi", "zh_CN", "zh_TW") 
+01:49:23 [6]: bool Calamares::initQmlModulesDir()
+    Using Calamares QML directory "/usr/share/calamares/qml" 
+01:49:23 [6]: Calamares::Branding::Branding(const QString&, QObject*, qreal)
+    Using Calamares branding file at "/usr/share/calamares/branding/onedevs/branding.desc" 
+01:49:23 [2]: void Calamares::Branding::initSimpleSettings(const YAML::Node&)
+    WARNING: Branding module-setting *windowExpanding* interpreted as "normal" 
+01:49:23 [2]: void Calamares::Branding::initSimpleSettings(const YAML::Node&)
+    WARNING: Branding module-setting *windowPlacement* interpreted as "free" 
+01:49:23 [2]: void Calamares::flavorAndSide(const YAML::Node&, const char*, Branding::PanelFlavor&, Branding::PanelSide&)
+    WARNING: Branding setting for sidebar is missing, using "widget" "left" 
+01:49:23 [2]: void Calamares::flavorAndSide(const YAML::Node&, const char*, Branding::PanelFlavor&, Branding::PanelSide&)
+    WARNING: Branding setting for navigation is missing, using "widget" "bottom" 
+01:49:23 [2]: void Calamares::Branding::initSlideshowSettings(const YAML::Node&)
+    WARNING: Invalid or missing *slideshowAPI* in branding file. 
+01:49:23 [2]: Calamares::Branding::Branding(const QString&, QObject*, qreal)
+    WARNING: the branding component "/usr/share/calamares/branding/onedevs" does not ship translations. 
+01:49:23 [6]: Calamares::Branding::Branding(const QString&, QObject*, qreal)
+    Loaded branding component "onedevs" 
+01:49:23 [2]: bool Calamares::validateStyleEntries(const QMap<QString, QString>&)
+    WARNING: Unknown branding *style* entry "sidebarBackground" 
+WARNING:     ..  Unknown branding *style* entry "sidebarText" 
+WARNING:     ..  Unknown branding *style* entry "sidebarTextSelect" 
+    .. Loaded QRC translation "tz_" "en_US" 
+    .. Loaded QRC translation "calamares_" "en_US" 
+    .. STARTUP: initSettings, initQmlPath, initBranding done 
+    .. STARTUP: initModuleManager: module init started 
+01:49:24 [6]: void Calamares::ModuleManager::doInit()
+    Found 59 modules 
+01:49:24 [6]: void CalamaresApplication::initView()
+    STARTUP: initModuleManager: all modules init done 
+01:49:24 [6]: void CalamaresApplication::initView()
+    STARTUP: initJobQueue done 
+01:49:24 [6]: CalamaresWindow::CalamaresWindow(QWidget*)
+    Available desktop QSize(1280, 773) minimum size QSize(1024, 520) 
+    .. Proposed window size: 1024 520 
+01:49:25 [2]: QString Calamares::_stylesheet(const QDir&)
+    WARNING: The branding component "/usr/share/calamares/branding/onedevs" does not ship stylesheet.qss. 
+01:49:25 [6]: void CalamaresApplication::initView()
+    STARTUP: CalamaresWindow created; loadModules started 
+01:49:25 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "welcome" found anywhere at 
+     "/home/dev/src/modules/welcome/welcome.conf" 
+     "/etc/calamares/modules/welcome.conf" 
+     "/usr/share/calamares/modules/welcome.conf" 
+01:49:25 [6]: void Config::initLanguages()
+    Trying to match locale "en_US" 
+01:49:25 [6]: void Config::initLanguages()
+    Trying to match locale QLocale(English, Latin, United States) 
+01:49:25 [6]: void Config::setLocaleIndex(int)
+    Index 14 Selected locale "en" 
+    .. Loaded QRC translation "tz_" "en" 
+    .. Loaded QRC translation "calamares_" "en" 
+01:49:25 [2]: void Config::setConfigurationMap(const QVariantMap&)
+    WARNING: no valid requirements map found in welcome module configuration. 
+01:49:27 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "welcome@welcome" loading complete. 
+01:49:27 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "locale" found anywhere at 
+     "/home/dev/src/modules/locale/locale.conf" 
+     "/etc/calamares/modules/locale.conf" 
+     "/usr/share/calamares/modules/locale.conf" 
+01:49:27 [6]: QStringList loadLocales(const QString&)
+    Loading locales from "/usr/share/i18n/SUPPORTED" 
+    ..  Read 510 lines 
+    ..  After filtering 327 lines 
+01:49:27 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "locale@locale" loading complete. 
+01:49:27 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "keyboard" found anywhere at 
+     "/home/dev/src/modules/keyboard/keyboard.conf" 
+     "/etc/calamares/modules/keyboard.conf" 
+     "/usr/share/calamares/modules/keyboard.conf" 
+01:49:27 [6]: KeyboardModelsModel::KeyboardModelsModel(QObject*)
+    Loaded 180 keyboard models 
+01:49:27 [6]: KeyboardGroupsSwitchersModel::KeyboardGroupsSwitchersModel(QObject*)
+    Loaded 45 keyboard groups 
+01:49:27 [6]: KeyboardPage::KeyboardPage(Config*, QWidget*)
+    Variants now total= 0 selected= -1 
+01:49:27 [6]: KeyboardPage::KeyboardPage(Config*, QWidget*)
+    Groups now total= 45 selected= -1 
+    .. Loaded QRC translation "kb_" "en" 
+01:49:27 [6]: void Config::getCurrentKeyboardLayoutXkb(QString&, QString&, QString&)
+    QList("pc", "us", "inet(evdev)\"") 
+01:49:28 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "keyboard@keyboard" loading complete. 
+01:49:28 [6]: Calamares::Partition::InternalManager::InternalManager()
+    KPMCore backend starting .. 
+01:49:29 [6]: DEBUG (Qt): Loaded backend plugin:  "pmsfdiskbackendplugin"
+    .. Backend @0x564674753240 "pmsfdiskbackendplugin" "1" 
+01:49:29 [2]: void Config::fillConfigurationFSTypes(const QVariantMap&)
+    WARNING: Partition-module setting *luksGeneration* not found or invalid. Defaulting to luks1. 
+01:49:29 [1]: void PartitionLayout::init(FileSystem::Type, const QVariantList&)
+    ERROR: Partition layout entry # 4 is invalid, switching to default layout. 
+01:49:29 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "partition@partition" loading complete. 
+    .. minLength set to 4 
+01:49:29 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "users@users" loading complete. 
+01:49:29 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "summary@summary" loading complete. 
+01:49:29 [6]: void Calamares::ModuleManager::loadModules()
+    Module "partition@partition" already loaded. 
+01:49:30 [6]: Calamares::SlideshowQML::SlideshowQML(QWidget*)
+    QML import paths: 
+     "/usr/share/calamares/qml" 
+     "/usr/bin" 
+     "qrc:/qt-project.org/imports" 
+     "qrc:/qt/qml" 
+     "/usr/lib/x86_64-linux-gnu/qt6/qml" 
+01:49:30 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "machineid" found anywhere at 
+     "/home/dev/src/modules/machineid/machineid.conf" 
+     "/etc/calamares/modules/machineid.conf" 
+     "/usr/share/calamares/modules/machineid.conf" 
+01:49:30 [6]: virtual void Calamares::CppJobModule::loadSelf()
+    CppJobModule "machineid@machineid" loading complete. 
+01:49:30 [6]: void Calamares::ModuleManager::loadModules()
+    Module "locale@locale" already loaded. 
+01:49:30 [6]: void Calamares::ModuleManager::loadModules()
+    Module "keyboard@keyboard" already loaded. 
+01:49:30 [6]: void Calamares::ModuleManager::loadModules()
+    Module "users@users" already loaded. 
+01:49:30 [2]: Calamares::CommandLine::CommandLine(const QVariantMap&)
+    WARNING: Bad CommandLine element QMap(("-", QVariant(QString, "/etc/calamares/scripts/remove-live-user.sh"))) 
+01:49:30 [6]: virtual void ShellProcessJob::setConfigurationMap(const QVariantMap&)
+    ShellProcessJob: "script" contains no commands for "shellprocess@remove-live" 
+01:49:30 [6]: virtual void Calamares::CppJobModule::loadSelf()
+    CppJobModule "shellprocess@remove-live" loading complete. 
+01:49:30 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "umount" found anywhere at 
+     "/home/dev/src/modules/umount/umount.conf" 
+     "/etc/calamares/modules/umount.conf" 
+     "/usr/share/calamares/modules/umount.conf" 
+01:49:30 [6]: virtual void Calamares::CppJobModule::loadSelf()
+    CppJobModule "umount@umount" loading complete. 
+01:49:30 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "finished" found anywhere at 
+     "/home/dev/src/modules/finished/finished.conf" 
+     "/etc/calamares/modules/finished.conf" 
+     "/usr/share/calamares/modules/finished.conf" 
+01:49:30 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "finished@finished" loading complete. 
+01:49:30 [6]: void applyXkb(const BasicLayoutInfo&, AdditionalLayoutInfo&)
+    xkbmap selection changed to:  "us" - "" 
+    .. Loaded QRC translation "kb_" "en" 
+01:49:31 [6]: void CalamaresApplication::initViewSteps()
+    STARTUP: loadModules for all modules done 
+01:49:31 [6]: void Calamares::ModuleManager::checkRequirements()
+    Checking module requirements .. 
+01:49:31 [6]: DEBUG (Qt): smartctl initialization failed for  "/dev/vda" :  No such file or directory
+01:49:31 [6]: DEBUG (Qt): error during smart output parsing for  "/dev/vda" :  No such file or directory
+01:49:31 [2]: WARNING (Qt): unknown file system type  ""  on  "/dev/vda"
+01:49:31 [6]: QList<Device*> PartUtils::getDevices(DeviceType)
+    Removing unsuitable devices: 1 candidates. 
+    .. Running QList("blkid", "/dev/vda") 
+    .. Target cmd: QList("blkid", "/dev/vda") Exit code: 2 (no output) 
+    .. there are 1 devices left. 
+01:49:31 [6]: void PartitionCoreModule::doInit()
+    LIST OF DETECTED DEVICES: 
+    .. node	capacity	name	prettyName 
+    .. "/dev/vda" 26843545600 DevName$cc8cf4ea DevNamePretty$3f2b3a72 
+    .. 1 devices detected. 
+01:49:32 [6]: void CalamaresApplication::initViewSteps()
+    STARTUP: Window now visible and ProgressTreeView populated 
+    .. 8 view steps loaded. 
+01:49:33 [6]: void Calamares::RequirementsChecker::reportProgress()
+    Remaining modules: 7 
+     "partition" 
+     "shellprocess" 
+     "summary" 
+     "umount" 
+     "unpackfs" 
+     "users" 
+     "welcome" 
+01:49:34 [6]: void Calamares::RequirementsChecker::reportProgress()
+    Remaining modules: 7 
+     "partition" 
+     "shellprocess" 
+     "summary" 
+     "umount" 
+     "unpackfs" 
+     "users" 
+     "welcome" 
+01:49:35 [6]: void Calamares::RequirementsChecker::reportProgress()
+    Remaining modules: 7 
+     "partition" 
+     "shellprocess" 
+     "summary" 
+     "umount" 
+     "unpackfs" 
+     "users" 
+     "welcome" 
+01:49:37 [6]: void Calamares::RequirementsChecker::reportProgress()
+    Remaining modules: 7 
+     "partition" 
+     "shellprocess" 
+     "summary" 
+     "umount" 
+     "unpackfs" 
+     "users" 
+     "welcome" 
+01:49:38 [6]: void Calamares::RequirementsChecker::reportProgress()
+    Remaining modules: 7 
+     "partition" 
+     "shellprocess" 
+     "summary" 
+     "umount" 
+     "unpackfs" 
+     "users" 
+     "welcome" 
+01:49:38 [6]: OsproberEntryList PartUtils::runOsprober(DeviceModel*)
+    os-prober gave no output. 
+01:49:38 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x5646749ae060) without calling endResetModel first
+01:49:38 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x5646749ae060) without calling beginResetModel first
+01:49:38 [6]: void Calamares::RequirementsChecker::addCheckedRequirements(Calamares::Module*)
+    Got 1 requirement results from "partition" 
+01:49:38 [6]: Calamares::RequirementsList GeneralRequirements::checkRequirements()
+    GeneralRequirements output: 
+     storage :   -1073741824 
+     enoughStorage :   unchecked 
+     RAM :   -1073741824 
+     enoughRam :   unchecked 
+     hasPower :   unchecked 
+     hasInternet :   unchecked 
+     isRoot :   unchecked 
+01:49:38 [2]: void ChoicePage::updateActionDescriptionsTr()
+    WARNING: Invalid osprober count, labels and buttons not updated. 
+01:49:38 [6]: bool ChoicePage::calculateNextEnabled() const
+    No partitioning choice has been made yet 
+01:49:38 [6]: void ChoicePage::updateDeviceStatePreview()
+    Updating partitioning state widgets. 
+01:49:38 [6]: void ChoicePage::setupActions()
+    Setting up actions for "/dev/vda" with 0 entries. 
+01:49:38 [6]: void ChoicePage::updateActionDescriptionsTr()
+    Setting texts for 0 osprober entries 
+01:49:38 [6]: void ChoicePage::setupActions()
+    No partitions available for replace-action. 
+01:49:38 [6]: void ChoicePage::setupActions()
+    No partitions available for resize-action. 
+01:49:38 [6]: void ChoicePage::continueApplyDeviceChoice()
+    Previous device -1 new device 0 
+01:49:38 [6]: void ChoicePage::applyActionChoice(InstallChoice)
+    InstallChoice Config::NoChoice "none" 
+01:49:38 [6]: bool ChoicePage::calculateNextEnabled() const
+    No partitioning choice has been made yet 
+01:49:38 [6]: void ChoicePage::updateActionChoicePreview(InstallChoice)
+    Updating partitioning preview widgets. 
+01:49:38 [6]: bool ChoicePage::calculateNextEnabled() const
+    No partitioning choice has been made yet 
+01:49:38 [6]: bool ChoicePage::calculateNextEnabled() const
+    No partitioning choice has been made yet 
+01:49:38 [6]: void Calamares::RequirementsChecker::finished()
+    All requirements have been checked. 
+01:49:38 [6]: void Calamares::RequirementsModel::describe() const
+    Requirements model has 1 items 
+    .. requirement 0 "partitions" satisfied? true mandatory? true 
+01:49:41 [6]: void Config::setLocaleIndex(int)
+    Index 44 Selected locale "pt_BR" 
+    .. No translation for "tz_" "pt_BR" using default (en) 
+    .. Loaded QRC translation "calamares_" "pt_BR" 
+    .. No translation for "kb_" "pt_BR" using default (en) 
+01:49:41 [6]: bool ChoicePage::calculateNextEnabled() const
+    No partitioning choice has been made yet 
+01:49:41 [6]: void ChoicePage::updateActionDescriptionsTr()
+    Setting texts for 0 osprober entries 
+01:49:44 [6]: static LocaleConfiguration LocaleConfiguration::fromLanguageAndLocation(const QString&, const QStringList&, const QString&)
+    Mapping "pt_BR" in "US" to locale. 
+    .. Got best match for "pt_BR" as "pt_BR.UTF-8" 
+01:49:45 [2]: WARNING (Qt): QString::arg: Argument missing: Configure timezone para 1, America/New York
+01:49:45 [2]: WARNING (Qt): QString::arg: Argument missing: Configure timezone para 1, America/New York
+21:49:45 [6]: static LocaleConfiguration LocaleConfiguration::fromLanguageAndLocation(const QString&, const QStringList&, const QString&)
+    Mapping "pt_BR" in "US" to locale. 
+    .. Got best match for "pt_BR" as "pt_BR.UTF-8" 
+21:49:45 [6]: static LocaleConfiguration LocaleConfiguration::fromLanguageAndLocation(const QString&, const QStringList&, const QString&)
+    Mapping "pt_BR" in "US" to locale. 
+    .. Got best match for "pt_BR" as "pt_BR.UTF-8" 
+21:49:47 [6]: static LocaleConfiguration LocaleConfiguration::fromLanguageAndLocation(const QString&, const QStringList&, const QString&)
+    Mapping "pt_BR" in "BR" to locale. 
+    .. Got best match for "pt_BR" as "pt_BR.UTF-8" 
+21:49:47 [2]: WARNING (Qt): QString::arg: Argument missing: Configure timezone para 1, America/Sao Paulo
+22:49:49 [6]: void Config::guessLocaleKeyboardLayout()
+    Got locale language "pt_BR.UTF-8" 
+    .. looking for locale part "BR" 
+    .. matched "br" 
+22:49:50 [6]: void guessLayout(const QStringList&, KeyboardLayoutModel*, KeyboardVariantsModel*)
+    Next level: "pt" 
+22:49:50 [6]: void applyXkb(const BasicLayoutInfo&, AdditionalLayoutInfo&)
+    xkbmap selection changed to:  "br" - "" 
+22:49:51 [6]: void applyXkb(const BasicLayoutInfo&, AdditionalLayoutInfo&)
+    xkbmap selection changed to:  "br" - "nodeadkeys" 
+22:49:54 [6]: void ChoicePage::applyActionChoice(InstallChoice)
+    InstallChoice Config::Erase "erase" 
+22:49:54 [6]: PartitionTable* CreatePartitionTableJob::createTable()
+    CreatePartitionTableJob::createTable trying to make table for device "/dev/vda" 
+22:49:54 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x5646749ae060) without calling endResetModel first
+22:49:54 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x5646749ae060) without calling beginResetModel first
+22:49:54 [6]: quint64 swapSuggestion(quint64, Config::SwapChoice)
+    Suggested swap size: 2 GiB 
+22:49:54 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x5646749ae060) without calling endResetModel first
+22:49:54 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x5646749ae060) without calling beginResetModel first
+22:49:54 [6]: void PartitionCoreModule::dumpQueue() const
+    # Queue: 
+    .. ## Device: "/dev/vda" 
+    .. - CreatePartitionTableJob 
+    .. - CreatePartitionJob 
+    .. - SetPartFlagsJob 
+22:49:54 [6]: void ChoicePage::updateActionChoicePreview(InstallChoice)
+    Updating partitioning preview widgets. 
+22:50:01 [6]: void PartitionCoreModule::setBootLoaderInstallPath(const QString&)
+    PCM::setBootLoaderInstallPath "/" 
+22:50:04 [6]: void PartitionCoreModule::setBootLoaderInstallPath(const QString&)
+    PCM::setBootLoaderInstallPath "/dev/vda" 
+22:50:05 [6]: void PartitionCoreModule::setBootLoaderInstallPath(const QString&)
+    PCM::setBootLoaderInstallPath "/dev/vda" 
+22:50:45 [2]: WARNING (Qt): QString::arg: Argument missing: Configure timezone para 1, America/Sao Paulo
+22:50:45 [2]: WARNING (Qt): QString::arg: Argument missing: modelo teclado foi configurado para 1, Generic 105-key PC
+22:50:45 [2]: WARNING (Qt): QObject::setParent: Cannot set parent, new parent is in a different thread
+22:50:45 [6]: virtual QString PartitionViewStep::prettyStatus() const
+    Summary for Partition 1 Config::Erase 
+22:50:45 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+22:50:45 [6]: QVariantList FillGlobalStorageJob::createPartitionList() const
+    Building partition information map 
+    .. partitions on "/dev/vda" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "root" 
+     partition-uuid (partuuid) :   "PartUUID$c4cd9cc" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$5d35bdb2" 
+     claimed :   "true" 
+22:50:45 [2]: WARNING (Qt): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+22:50:45 [2]: WARNING (Qt): QObject::setParent: Cannot set parent, new parent is in a different thread
+22:50:45 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+22:50:45 [6]: QVariantList FillGlobalStorageJob::createPartitionList() const
+    Building partition information map 
+    .. partitions on "/dev/vda" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "root" 
+     partition-uuid (partuuid) :   "PartUUID$c4cd9cc" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$5d35bdb2" 
+     claimed :   "true" 
+22:50:45 [6]: void ensureSize(QWidget*, QScrollArea*, Calamares::ViewStep*)
+    Summary widget is larger than viewport, enlarge by 135 to QSize(834, 623) 
+22:50:53 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+22:50:53 [6]: void Calamares::JobThread::finalize()
+    There are 24 jobs, total weight 23 
+    .. Job 1 "Gerenciando configurações de auto-montagem…" +wt 0.125 tot.wt 0.125 
+    .. Job 2 "Limpando todas as montagens temporárias…" +wt 0.125 tot.wt 0.25 
+    .. Job 3 "Limpar as montagens para as operações nas partições em /dev/vda" +wt 0.125 tot.wt 0.375 
+    .. Job 4 "Criando nova tabela de partições gpt em /dev/vda…" +wt 0.125 tot.wt 0.5 
+    .. Job 5 "Criar nova partição de 25598MiB em /dev/vda (vda) com entradas root" +wt 0.125 tot.wt 0.625 
+    .. Job 6 "Definir marcadores na partição ext4 de 25598MiB" +wt 0.125 tot.wt 0.75 
+    .. Job 7 "Definir informações da partição" +wt 0.125 tot.wt 0.875 
+    .. Job 8 "Gerenciando configurações de auto-montagem…" +wt 0.125 tot.wt 1 
+    .. Job 9 "mount" +wt 1 tot.wt 2 
+    .. Job 10 "unpackfs" +wt 12 tot.wt 14 
+    .. Job 11 "Gerar machine-id." +wt 1 tot.wt 15 
+    .. Job 12 "fstab" +wt 1 tot.wt 16 
+    .. Job 13 "Definindo fuso horário para America/Sao_Paulo…" +wt 1 tot.wt 17 
+    .. Job 14 "Definindo modelo de teclado para pc105, leiaute como br-nodeadkeys…" +wt 1 tot.wt 18 
+    .. Job 15 "Configurando usuários <pre>sudo</pre>…" +wt 0.166667 tot.wt 18.1667 
+    .. Job 16 "Preparando grupos…" +wt 0.166667 tot.wt 18.3333 
+    .. Job 17 "Criar usuário gsm" +wt 0.166667 tot.wt 18.5 
+    .. Job 18 "Definir senha para usuário gsm" +wt 0.166667 tot.wt 18.6667 
+    .. Job 19 "Definir senha para usuário root" +wt 0.166667 tot.wt 18.8333 
+    .. Job 20 "Definir nome da máquina gsm" +wt 0.166667 tot.wt 19 
+    .. Job 21 "hwclock" +wt 1 tot.wt 20 
+    .. Job 22 "bootloader" +wt 1 tot.wt 21 
+    .. Job 23 "Executando processos de shell…" +wt 1 tot.wt 22 
+    .. Job 24 "Desmontando sistema de arquivos…" +wt 1 tot.wt 23 
+22:50:53 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Gerenciando configurações de auto-montagem…" ( 1 / 24 ) 
+22:50:53 [6]: virtual Calamares::JobResult AutoMountManagementJob::exec()
+    Set automount to disable 
+22:50:53 [6]: void Calamares::Partition::querySolidAutoMount(QDBusConnection&, AutoMountInfo&)
+    Solid not available: "Not connected to D-Bus server" 
+22:50:53 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Limpando todas as montagens temporárias…" ( 2 / 24 ) 
+22:50:53 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Limpar as montagens para as operações nas partições em /dev/vda" ( 3 / 24 ) 
+22:50:54 [2]: QStringList getLVMVolumes()
+    WARNING: this system does not seem to have LVM2 tools. 
+22:50:54 [2]: QStringList getPVGroups(const QString&)
+    WARNING: this system does not seem to have LVM2 tools. 
+22:50:54 [6]: QStringList getPartitionsForDevice(const QString&)
+    Reading from "/proc/partitions" looking for "vda" 
+22:50:54 [6]: virtual Calamares::JobResult ClearMountsJob::exec()
+    ClearMountsJob finished. Here's what was done: 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+22:50:54 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criando nova tabela de partições gpt em /dev/vda…" ( 4 / 24 ) 
+22:50:54 [6]: virtual Calamares::JobResult CreatePartitionTableJob::exec()
+    Creating new partition table of type "gpt" , uncommitted partitions: 
+    .. "New Partition" 
+    .. Running QList("lsblk") 
+    .. Finished. Exit code: 0 output:
+NAME  MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+loop0   7:0    0  2.9G  1 loop /run/live/rootfs/filesystem.squashfs
+sr0    11:0    1    3G  0 rom  /run/live/medium
+vda   254:0    0   25G  0 disk
+    .. lsblk output:
+ NAME  MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+loop0   7:0    0  2.9G  1 loop /run/live/rootfs/filesystem.squashfs
+sr0    11:0    1    3G  0 rom  /run/live/medium
+vda   254:0    0   25G  0 disk
+    .. Running QList("mount") 
+    .. Finished. Exit code: 0 output:
+sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+udev on /dev type devtmpfs (rw,nosuid,relatime,size=1935796k,nr_inodes=483949,mode=755,inode64)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=600,ptmxmode=000)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=401596k,mode=755,inode64)
+/dev/sr0 on /run/live/medium type iso9660 (ro,noatime,nojoliet,check=s,map=n,blocksize=2048,iocharset=utf8)
+/dev/loop0 on /run/live/rootfs/filesystem.squashfs type squashfs (ro,noatime,errors=continue)
+tmpfs on /run/live/overlay type tmpfs (rw,noatime,size=2007980k,mode=755,inode64)
+overlay on / type overlay (rw,noatime,lowerdir=/run/live/rootfs/filesystem.squashfs/,upperdir=/run/live/overlay/rw,workdir=/run/live/overlay/work,redirect_dir=on,uuid=on)
+securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,inode64)
+cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
+pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
+systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=40,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=756)
+hugetlbfs on /dev/hugepages type hugetlbfs (rw,nosuid,nodev,relatime,pagesize=2M)
+debugfs on /sys/kernel/debug type debugfs (rw,nosuid,nodev,noexec,relatime)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k,inode64)
+tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/credentials/systemd-journald.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+fusectl on /sys/fs/fuse/connections type fusectl (rw,nosuid,nodev,noexec,relatime)
+configfs on /sys/kernel/config type configfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /tmp type tmpfs (rw,nosuid,nodev,relatime,inode64)
+binfmt_misc on /proc/sys/fs/binfmt_misc type binfmt_misc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/credentials/getty@tty1.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+tmpfs on /run/user/1000 type tmpfs (rw,nosuid,nodev,relatime,size=401592k,nr_inodes=100398,mode=700,uid=1000,gid=1000,inode64)
+    .. mount output:
+ sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+udev on /dev type devtmpfs (rw,nosuid,relatime,size=1935796k,nr_inodes=483949,mode=755,inode64)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=600,ptmxmode=000)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=401596k,mode=755,inode64)
+/dev/sr0 on /run/live/medium type iso9660 (ro,noatime,nojoliet,check=s,map=n,blocksize=2048,iocharset=utf8)
+/dev/loop0 on /run/live/rootfs/filesystem.squashfs type squashfs (ro,noatime,errors=continue)
+tmpfs on /run/live/overlay type tmpfs (rw,noatime,size=2007980k,mode=755,inode64)
+overlay on / type overlay (rw,noatime,lowerdir=/run/live/rootfs/filesystem.squashfs/,upperdir=/run/live/overlay/rw,workdir=/run/live/overlay/work,redirect_dir=on,uuid=on)
+securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,inode64)
+cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
+pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
+systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=40,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=756)
+hugetlbfs on /dev/hugepages type hugetlbfs (rw,nosuid,nodev,relatime,pagesize=2M)
+debugfs on /sys/kernel/debug type debugfs (rw,nosuid,nodev,noexec,relatime)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k,inode64)
+tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/credentials/systemd-journald.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+fusectl on /sys/fs/fuse/connections type fusectl (rw,nosuid,nodev,noexec,relatime)
+configfs on /sys/kernel/config type configfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /tmp type tmpfs (rw,nosuid,nodev,relatime,inode64)
+binfmt_misc on /proc/sys/fs/binfmt_misc type binfmt_misc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/credentials/getty@tty1.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+tmpfs on /run/user/1000 type tmpfs (rw,nosuid,nodev,relatime,size=401592k,nr_inodes=100398,mode=700,uid=1000,gid=1000,inode64)
+22:50:54 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criar nova partição de 25598MiB em /dev/vda (vda) com entradas root" ( 5 / 24 ) 
+22:50:58 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definir marcadores na partição /dev/vda1" ( 6 / 24 ) 
+22:50:58 [6]: virtual Calamares::JobResult SetPartFlagsJob::exec()
+    Setting flags on "/dev/vda" partition "/dev/vda1" 
+     "boot" 
+22:50:59 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definir informações da partição" ( 7 / 24 ) 
+22:50:59 [6]: QVariantList FillGlobalStorageJob::createPartitionList() const
+    Building partition information map 
+    .. partitions on "/dev/vda" 
+    ..  mapping for "/dev/vda1" "/dev/vda1" 
+     partlabel :   "root" 
+     partition-uuid (partuuid) :   "PartUUID$3560a034" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$7687ef2c" 
+     claimed :   "true" 
+22:50:59 [6]: virtual Calamares::JobResult FillGlobalStorageJob::exec()
+    Saving partition information map to GlobalStorage["partitions"] 
+22:50:59 [6]: virtual Calamares::JobResult FillGlobalStorageJob::exec()
+    FillGlobalStorageJob writing bootLoader path: QVariant(QVariantMap, QMap(("installPath", QVariant(QString, "/dev/vda")))) 
+22:50:59 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Gerenciando configurações de auto-montagem…" ( 8 / 24 ) 
+22:50:59 [6]: virtual Calamares::JobResult AutoMountManagementJob::exec()
+    Restore automount settings 
+22:50:59 [6]: virtual void Calamares::JobThread::run()
+    Starting job "mount" ( 9 / 24 ) 
+[PYTHON JOB]: Found gettext "pt_BR" in "/usr/share/locale/pt_BR" 
+chcon: failed to get security context of '/': No data available
+    .. Running QList("mount", "-t", "ext4", "-o", "defaults", "/dev/vda1", "/tmp/calamares-root-x1due9a4/") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+chcon: failed to get security context of '/proc': Operation not supported
+    .. Running QList("mount", "-t", "proc", "-o", "defaults", "proc", "/tmp/calamares-root-x1due9a4/proc") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+chcon: failed to get security context of '/sys': No data available
+    .. Running QList("mount", "-t", "sysfs", "-o", "defaults", "sys", "/tmp/calamares-root-x1due9a4/sys") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+22:51:00 [6]: virtual void Calamares::JobThread::run()
+    Starting job "unpackfs" ( 10 / 24 ) 
+[PYTHON JOB]: Found gettext "pt_BR" in "/usr/share/locale/pt_BR" 
+    .. Running QList("mount", "-t", "squashfs", "-o", "loop", "/run/live/medium/live/filesystem.squashfs", "/tmp/tmpdhp77sgu/filesystem") 
+    .. Finished. Exit code: 0 output:
+mount: /tmp/tmpdhp77sgu/filesystem: WARNING: source write-protected, mounted read-only.
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+    .. Running QList("unsquashfs", "-l", "/run/live/medium/live/filesystem.squashfs") 
+    .. Running QList("rsync", "-aHAXSr", "--filter=-x trusted.overlay.*", "--exclude", "/proc/", "--exclude", "/sys/", "--progress", "/tmp/tmpdhp77sgu/filesystem/", "/tmp/calamares-root-x1due9a4") 
+23:04:55 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Gerar machine-id." ( 11 / 24 ) 
+23:04:55 [6]: virtual void Calamares::JobThread::run()
+    Starting job "fstab" ( 12 / 24 ) 
+[PYTHON JOB]: Found gettext "pt_BR" in "/usr/share/locale/pt_BR" 
+23:04:56 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definindo fuso horário para America/Sao_Paulo…" ( 13 / 24 ) 
+    .. Running QList("rm", "-f", "/etc/localtime") 
+    .. Running QList("ln", "-s", "/usr/share/zoneinfo/America/Sao_Paulo", "/etc/localtime") 
+23:04:56 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definindo modelo de teclado para pc105, leiaute como br-nodeadkeys…" ( 14 / 24 ) 
+23:04:56 [6]: virtual Calamares::JobResult SetKeyboardLayoutJob::exec()
+    Executing SetKeyboardLayoutJob 
+23:04:56 [6]: bool SetKeyboardLayoutJob::writeVConsoleData(const QString&, const QString&) const
+    Writing vconsole data to "/tmp/calamares-root-x1due9a4/etc/vconsole.conf" 
+23:04:56 [6]: QString SetKeyboardLayoutJob::findConvertedKeymap(const QString&) const
+    Looking for converted keymap in "" 
+23:04:56 [6]: QString findLegacyKeymap(const QString&, const QString&, const QString&)
+    Looking for legacy keymap "br" "pc105" "nodeadkeys" in QRC 
+    .. Found legacy keymap "br-abnt2" with score 10 
+    .. Written KEYMAP= "br-abnt2" to vconsole.conf 0 
+23:04:56 [6]: bool SetKeyboardLayoutJob::writeX11Data(const QString&) const
+    Writing X11 configuration to "/tmp/calamares-root-x1due9a4/etc/X11/xorg.conf.d/00-keyboard.conf" 
+    .. Written XkbLayout "br" ; XkbModel "pc105" ; XkbVariant "nodeadkeys" to X.org file "/tmp/calamares-root-x1due9a4/etc/X11/xorg.conf.d/00-keyboard.conf" 0 
+23:04:56 [6]: bool SetKeyboardLayoutJob::writeDefaultKeyboardData(const QString&) const
+    Writing default keyboard data to "/tmp/calamares-root-x1due9a4/etc/default/keyboard" 
+    .. Written XKBMODEL "pc105" ; XKBLAYOUT "br" ; XKBVARIANT "nodeadkeys" to /etc/default/keyboard file "/tmp/calamares-root-x1due9a4/etc/default/keyboard" 0 
+23:04:56 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Configurando usuários <pre>sudo</pre>…" ( 15 / 24 ) 
+23:04:56 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Preparando grupos…" ( 16 / 24 ) 
+    .. Running QList("groupadd", "network") 
+    .. Running QList("groupadd", "storage") 
+    .. Running QList("groupadd", "wheel") 
+    .. Running QList("groupadd", "autologin") 
+23:04:56 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criar usuário gsm" ( 17 / 24 ) 
+23:04:56 [6]: virtual Calamares::JobResult CreateUserJob::exec()
+    [CREATEUSER]: creating user 
+    .. Running QList("useradd", "-m", "-U", "-s", "/bin/bash", "-c", "gsm", "gsm") 
+    .. Running "usermod" "-aG" "users,lp,video,network,storage,wheel,audio,sudo,netdev,plugdev,autologin" "gsm" 
+    .. Running QList("chown", "-R", "gsm:gsm", "/home/gsm") 
+23:04:57 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definir senha para usuário gsm" ( 18 / 24 ) 
+    .. Running "usermod" "-p" "$y$j9T$Q8IdoKTi514Rw6QVCl/d00$JhFXsDqV4osD2FChsFxEo/Avr/4P7sIQ8HLBMh/v9n4" "gsm" 
+23:04:57 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definir senha para usuário root" ( 19 / 24 ) 
+    .. Running "usermod" "-p" "$y$j9T$oTghGSTM.sUA9njYb1wuu0$vLZ0MaMt4f163nIUZ5w.0yQEYQnwgxao5zLCrgkvM9D" "root" 
+23:04:57 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definir nome da máquina gsm" ( 20 / 24 ) 
+23:04:57 [6]: virtual void Calamares::JobThread::run()
+    Starting job "hwclock" ( 21 / 24 ) 
+[PYTHON JOB]: Found gettext "pt_BR" in "/usr/share/locale/pt_BR" 
+    .. Running QList("hwclock", "--systohc", "--utc") 
+    .. Target cmd: QList("hwclock", "--systohc", "--utc") Exit code: 127 output:
+chroot: failed to run command 'hwclock': No such file or directory
+[PYTHON JOB]: "Hwclock returned error code 127" 
+[PYTHON JOB]: "  .. RTC method failed, trying ISA bus method." 
+    .. Running QList("hwclock", "--systohc", "--utc", "--directisa") 
+    .. Target cmd: QList("hwclock", "--systohc", "--utc", "--directisa") Exit code: 127 output:
+chroot: failed to run command 'hwclock': No such file or directory
+[PYTHON JOB]: "Hwclock returned error code 127" 
+[PYTHON JOB]: "  .. ISA bus method failed." 
+[PYTHON JOB]: "BIOS or Kernel BUG: Setting hwclock failed." 
+23:04:57 [6]: virtual void Calamares::JobThread::run()
+    Starting job "bootloader" ( 22 / 24 ) 
+/usr/lib/x86_64-linux-gnu/calamares/modules/bootloader/main.py:392: SyntaxWarning: invalid escape sequence '\$'
+  prefix, generator_name = re.match("(.*)\${([^}]*)}$", name).groups()
+[PYTHON JOB]: Found gettext "pt_BR" in "/usr/share/locale/pt_BR" 
+[PYTHON JOB]: "Bootloader: grub (bios)" 
+    .. Running QList("grub-install", "--target=i386-pc", "--recheck", "--force", "/dev/vda") 
+    .. Target cmd: QList("grub-install", "--target=i386-pc", "--recheck", "--force", "/dev/vda") Exit code: 1 output:
+grub-install: error: /usr/lib/grub/i386-pc/modinfo.sh doesn't exist. Please specify --target or --directory.
+WARNING: [PYTHON JOB]: "Command 'grub-install --target=i386-pc --recheck --force /dev/vda' returned non-zero exit status 1." 
+[PYTHON JOB]: "stdout:grub-install: error: /usr/lib/grub/i386-pc/modinfo.sh doesn't exist. Please specify --target or --directory." 
+[PYTHON JOB]: "stderr:None" 
+23:04:57 [6]: virtual void Calamares::JobThread::run()
+    Skipping non-emergency job "Executando processos de shell…" 
+    ..  Skipping non-emergency job "Desmontando sistema de arquivos…" 
+23:04:57 [1]: void Calamares::ViewManager::onInstallationFailed(const QString&, const QString&)
+    ERROR: Installation failed: "Erro de instalação do carregador de inicialização" 
+    .. - message: "Erro de instalação do carregador de inicialização" 
+    .. - details: O carregador de inicialização não pôde ser instalado. O comando de instalação <pre>grub-install --target=i386-pc --recheck --force /dev/vda</pre> retornou o código de erro 1.
+23:04:57 [6]: void Calamares::ViewManager::onInstallationFailed(const QString&, const QString&)
+    Calamares will quit when the dialog closes. 
+23:04:57 [6]: void Config::doNotify(bool, bool)
+    Notification not sent; completion: failed 
+23:04:58 [6]: void {anonymous}::PowerManagementInterface::uninhibitSleep()
+    Sleep was never inhibited. 
+
+
+O carregador de inicialização não pôde ser instalado. O comando de instalação <pre>grub-install --target=i386-pc --recheck --force /dev/vda</pre> retornou o código de erro 1.
+___
+___
+____
+
 
