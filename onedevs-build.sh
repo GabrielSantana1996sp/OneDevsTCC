@@ -128,7 +128,7 @@ john
 nikto
 sqlmap
 binwalk
-netcat
+#netcat nao tem no apt trixie
 
 # Bootloader UEFI (grub-efi — bare metal SSD moderno)
 # grub-pc e grub-efi-amd64 conflitam no Debian Trixie: não instale os dois.
