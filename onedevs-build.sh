@@ -128,7 +128,6 @@ john
 nikto
 sqlmap
 binwalk
-netcat
 
 # Bootloader EFI + BIOS (suporte dual: UEFI e legacy BIOS)
 grub-efi-amd64
