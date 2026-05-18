@@ -5999,5 +5999,34 @@ O carregador de inicialização não pôde ser instalado. O comando de instalaç
 ___
 ___
 ____
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ grub-efi-amd64 : Conflicts: grub-pc but 2.12-9+deb13u2 is to be installed
+ grub-pc : Conflicts: grub-efi-amd64 but 2.12-9+deb13u2 is to be installed
+E: Unable to correct problems, you have held broken packages.
+E: The following information from --solver 3.0 may provide additional context:
+   Unable to satisfy dependencies. Reached two conflicting decisions:
+   1. grub-pc:amd64 is not selected for install because:
+      1. grub-efi-amd64:amd64=2.12-9+deb13u2 is selected for install
+      2. grub-pc:amd64 Conflicts grub-efi-amd64
+   2. grub-pc:amd64=2.12-9+deb13u2 is selected for install
+E: An unexpected failure occurred, exiting...
+P: Begin unmounting filesystems...
+P: Saving caches...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+debian@debian-standardpc:~/OneDevs$
+)))
+_____
+)))))
+__________
+__________
+)))))))))
 
 
