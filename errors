@@ -6022,11 +6022,1587 @@ Reading package lists...
 Building dependency tree...
 Reading state information...
 debian@debian-standardpc:~/OneDevs$
-)))
-_____
-)))))
-__________
-__________
-)))))))))
+______
+_______
+________
 
+________
+_______
+_______
+dev@onedevs:~/Desktop$ sudo -E calamares -d
+qt.qpa.theme.dbus: Session DBus not running.
+qt.qpa.theme.dbus: Application will not react to setting changes.
+ Check your DBus installation.
+22:45:58 [6]: Calamares::Settings::Settings(const QString&, bool)
+    Using Calamares settings file at "/etc/calamares/settings.conf" 
+    .. module-search entry non-existent "/usr/lib/calamares/modules" 
+    .. Required settings.conf key oem-setup is missing. 
+    .. Required settings.conf key disable-cancel is missing. 
+    .. Required settings.conf key disable-cancel-during-exec is missing. 
+    .. Required settings.conf key hide-back-and-next-during-exec is missing. 
+    .. Required settings.conf key quit-at-end is missing. 
+22:45:58 [6]: void Logger::setupLogfile()
+    Using log file: "/home/dev/.cache/calamares/session.log" 
+22:45:58 [6]: void CalamaresApplication::init()
+    Calamares version: 3.3.14 
+    .. Using Qt version: 6.8.2 
+    .. Build type: None 
+    .. Using PyBind11 
+    .. Using settings: "/etc/calamares/settings.conf" 
+    .. Using log file: "/home/dev/.cache/calamares/session.log" 
+    .. Languages: QList("ar", "as", "ast", "az", "az_AZ", "be", "bg", "bn", "ca", "ca@valencia", "cs_CZ", "da", "de", "el", "en", "en_GB", "eo", "es", "es_AR", "es_MX", "et", "eu", "fa", "fi_FI", "fr", "fur", "gl", "he", "hi", "hr", "hu", "id", "is", "it_IT", "ja", "ka", "ko", "lt", "ml", "mr", "nb", "nl", "oc", "pl", "pt_BR", "pt_PT", "ro", "ru", "si", "sk", "sl", "sq", "sr", "sr@latin", "sv", "tg", "th", "tr_TR", "uk", "vi", "zh_CN", "zh_TW") 
+22:45:58 [6]: bool Calamares::initQmlModulesDir()
+    Using Calamares QML directory "/usr/share/calamares/qml" 
+22:45:58 [6]: Calamares::Branding::Branding(const QString&, QObject*, qreal)
+    Using Calamares branding file at "/usr/share/calamares/branding/onedevs/branding.desc" 
+22:45:58 [2]: void Calamares::Branding::initSimpleSettings(const YAML::Node&)
+    WARNING: Branding module-setting *windowExpanding* interpreted as "normal" 
+22:45:58 [2]: void Calamares::Branding::initSimpleSettings(const YAML::Node&)
+    WARNING: Branding module-setting *windowPlacement* interpreted as "free" 
+22:45:58 [2]: void Calamares::flavorAndSide(const YAML::Node&, const char*, Branding::PanelFlavor&, Branding::PanelSide&)
+    WARNING: Branding setting for sidebar is missing, using "widget" "left" 
+22:45:58 [2]: void Calamares::flavorAndSide(const YAML::Node&, const char*, Branding::PanelFlavor&, Branding::PanelSide&)
+    WARNING: Branding setting for navigation is missing, using "widget" "bottom" 
+22:45:58 [2]: void Calamares::Branding::initSlideshowSettings(const YAML::Node&)
+    WARNING: Invalid or missing *slideshowAPI* in branding file. 
+22:45:58 [2]: Calamares::Branding::Branding(const QString&, QObject*, qreal)
+    WARNING: the branding component "/usr/share/calamares/branding/onedevs" does not ship translations. 
+22:45:58 [6]: Calamares::Branding::Branding(const QString&, QObject*, qreal)
+    Loaded branding component "onedevs" 
+22:45:58 [2]: bool Calamares::validateStyleEntries(const QMap<QString, QString>&)
+    WARNING: Unknown branding *style* entry "sidebarBackground" 
+WARNING:     ..  Unknown branding *style* entry "sidebarText" 
+WARNING:     ..  Unknown branding *style* entry "sidebarTextSelect" 
+    .. Loaded QRC translation "tz_" "en_US" 
+    .. Loaded QRC translation "calamares_" "en_US" 
+    .. STARTUP: initSettings, initQmlPath, initBranding done 
+    .. STARTUP: initModuleManager: module init started 
+22:45:58 [6]: void Calamares::ModuleManager::doInit()
+    Found 59 modules 
+22:45:58 [6]: void CalamaresApplication::initView()
+    STARTUP: initModuleManager: all modules init done 
+22:45:58 [6]: void CalamaresApplication::initView()
+    STARTUP: initJobQueue done 
+22:45:59 [6]: CalamaresWindow::CalamaresWindow(QWidget*)
+    Available desktop QSize(1280, 773) minimum size QSize(1024, 520) 
+    .. Proposed window size: 1024 520 
+22:45:59 [2]: QString Calamares::_stylesheet(const QDir&)
+    WARNING: The branding component "/usr/share/calamares/branding/onedevs" does not ship stylesheet.qss. 
+22:45:59 [6]: void CalamaresApplication::initView()
+    STARTUP: CalamaresWindow created; loadModules started 
+22:45:59 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "welcome" found anywhere at 
+     "/home/dev/Desktop/src/modules/welcome/welcome.conf" 
+     "/etc/calamares/modules/welcome.conf" 
+     "/usr/share/calamares/modules/welcome.conf" 
+22:45:59 [6]: void Config::initLanguages()
+    Trying to match locale "en_US" 
+22:45:59 [6]: void Config::initLanguages()
+    Trying to match locale QLocale(English, Latin, United States) 
+22:45:59 [6]: void Config::setLocaleIndex(int)
+    Index 14 Selected locale "en" 
+    .. Loaded QRC translation "tz_" "en" 
+    .. Loaded QRC translation "calamares_" "en" 
+22:45:59 [2]: void Config::setConfigurationMap(const QVariantMap&)
+    WARNING: no valid requirements map found in welcome module configuration. 
+22:46:01 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "welcome@welcome" loading complete. 
+22:46:01 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "locale" found anywhere at 
+     "/home/dev/Desktop/src/modules/locale/locale.conf" 
+     "/etc/calamares/modules/locale.conf" 
+     "/usr/share/calamares/modules/locale.conf" 
+22:46:01 [6]: QStringList loadLocales(const QString&)
+    Loading locales from "/usr/share/i18n/SUPPORTED" 
+    ..  Read 510 lines 
+    ..  After filtering 327 lines 
+22:46:01 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "locale@locale" loading complete. 
+22:46:01 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "keyboard" found anywhere at 
+     "/home/dev/Desktop/src/modules/keyboard/keyboard.conf" 
+     "/etc/calamares/modules/keyboard.conf" 
+     "/usr/share/calamares/modules/keyboard.conf" 
+22:46:01 [6]: KeyboardModelsModel::KeyboardModelsModel(QObject*)
+    Loaded 180 keyboard models 
+22:46:01 [6]: KeyboardGroupsSwitchersModel::KeyboardGroupsSwitchersModel(QObject*)
+    Loaded 45 keyboard groups 
+22:46:01 [6]: KeyboardPage::KeyboardPage(Config*, QWidget*)
+    Variants now total= 0 selected= -1 
+22:46:01 [6]: KeyboardPage::KeyboardPage(Config*, QWidget*)
+    Groups now total= 45 selected= -1 
+    .. Loaded QRC translation "kb_" "en" 
+22:46:01 [6]: void Config::getCurrentKeyboardLayoutXkb(QString&, QString&, QString&)
+    QList("pc", "us", "inet(evdev)\"") 
+22:46:02 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "keyboard@keyboard" loading complete. 
+22:46:02 [6]: Calamares::Partition::InternalManager::InternalManager()
+    KPMCore backend starting .. 
+22:46:02 [6]: DEBUG (Qt): Loaded backend plugin:  "pmsfdiskbackendplugin"
+    .. Backend @0x557d2243de90 "pmsfdiskbackendplugin" "1" 
+22:46:02 [2]: void Config::fillConfigurationFSTypes(const QVariantMap&)
+    WARNING: Partition-module setting *luksGeneration* not found or invalid. Defaulting to luks1. 
+22:46:02 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "partition@partition" loading complete. 
+    .. minLength set to 4 
+22:46:03 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "users@users" loading complete. 
+22:46:03 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "summary@summary" loading complete. 
+22:46:03 [6]: void Calamares::ModuleManager::loadModules()
+    Module "partition@partition" already loaded. 
+22:46:03 [6]: Calamares::SlideshowQML::SlideshowQML(QWidget*)
+    QML import paths: 
+     "/usr/share/calamares/qml" 
+     "/usr/bin" 
+     "qrc:/qt-project.org/imports" 
+     "qrc:/qt/qml" 
+     "/usr/lib/x86_64-linux-gnu/qt6/qml" 
+22:46:04 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "machineid" found anywhere at 
+     "/home/dev/Desktop/src/modules/machineid/machineid.conf" 
+     "/etc/calamares/modules/machineid.conf" 
+     "/usr/share/calamares/modules/machineid.conf" 
+22:46:04 [6]: virtual void Calamares::CppJobModule::loadSelf()
+    CppJobModule "machineid@machineid" loading complete. 
+22:46:04 [6]: void Calamares::ModuleManager::loadModules()
+    Module "locale@locale" already loaded. 
+22:46:04 [6]: void Calamares::ModuleManager::loadModules()
+    Module "keyboard@keyboard" already loaded. 
+22:46:04 [6]: void Calamares::ModuleManager::loadModules()
+    Module "users@users" already loaded. 
+22:46:04 [2]: Calamares::CommandLine::CommandLine(const QVariantMap&)
+    WARNING: Bad CommandLine element QMap(("-", QVariant(QString, "/etc/calamares/scripts/remove-live-user.sh"))) 
+22:46:04 [6]: virtual void ShellProcessJob::setConfigurationMap(const QVariantMap&)
+    ShellProcessJob: "script" contains no commands for "shellprocess@remove-live" 
+22:46:04 [6]: virtual void Calamares::CppJobModule::loadSelf()
+    CppJobModule "shellprocess@remove-live" loading complete. 
+22:46:04 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "umount" found anywhere at 
+     "/home/dev/Desktop/src/modules/umount/umount.conf" 
+     "/etc/calamares/modules/umount.conf" 
+     "/usr/share/calamares/modules/umount.conf" 
+22:46:04 [6]: virtual void Calamares::CppJobModule::loadSelf()
+    CppJobModule "umount@umount" loading complete. 
+22:46:04 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+    WARNING: No config file for "finished" found anywhere at 
+     "/home/dev/Desktop/src/modules/finished/finished.conf" 
+     "/etc/calamares/modules/finished.conf" 
+     "/usr/share/calamares/modules/finished.conf" 
+22:46:04 [6]: virtual void Calamares::ViewModule::loadSelf()
+    ViewModule "finished@finished" loading complete. 
+22:46:04 [6]: void applyXkb(const BasicLayoutInfo&, AdditionalLayoutInfo&)
+    xkbmap selection changed to:  "us" - "" 
+    .. Loaded QRC translation "kb_" "en" 
+22:46:04 [6]: void CalamaresApplication::initViewSteps()
+    STARTUP: loadModules for all modules done 
+22:46:04 [6]: void Calamares::ModuleManager::checkRequirements()
+    Checking module requirements .. 
+22:46:05 [6]: DEBUG (Qt): smartctl initialization failed for  "/dev/vda" :  No such file or directory
+22:46:05 [6]: DEBUG (Qt): error during smart output parsing for  "/dev/vda" :  No such file or directory
+22:46:05 [2]: WARNING (Qt): unknown file system type  ""  on  "/dev/vda"
+22:46:05 [6]: QList<Device*> PartUtils::getDevices(DeviceType)
+    Removing unsuitable devices: 1 candidates. 
+    .. Running QList("blkid", "/dev/vda") 
+    .. Target cmd: QList("blkid", "/dev/vda") Exit code: 2 (no output) 
+    .. there are 1 devices left. 
+22:46:05 [6]: void PartitionCoreModule::doInit()
+    LIST OF DETECTED DEVICES: 
+    .. node	capacity	name	prettyName 
+    .. "/dev/vda" 53687091200 DevName$cf4f03f DevNamePretty$107a47ad 
+    .. 1 devices detected. 
+22:46:05 [6]: void CalamaresApplication::initViewSteps()
+    STARTUP: Window now visible and ProgressTreeView populated 
+    .. 8 view steps loaded. 
+22:46:06 [6]: void Calamares::RequirementsChecker::reportProgress()
+    Remaining modules: 7 
+     "partition" 
+     "shellprocess" 
+     "summary" 
+     "umount" 
+     "unpackfs" 
+     "users" 
+     "welcome" 
+22:46:07 [6]: void Calamares::RequirementsChecker::reportProgress()
+    Remaining modules: 7 
+     "partition" 
+     "shellprocess" 
+     "summary" 
+     "umount" 
+     "unpackfs" 
+     "users" 
+     "welcome" 
+22:46:09 [6]: void Calamares::RequirementsChecker::reportProgress()
+    Remaining modules: 7 
+     "partition" 
+     "shellprocess" 
+     "summary" 
+     "umount" 
+     "unpackfs" 
+     "users" 
+     "welcome" 
+22:46:10 [6]: void Calamares::RequirementsChecker::reportProgress()
+    Remaining modules: 7 
+     "partition" 
+     "shellprocess" 
+     "summary" 
+     "umount" 
+     "unpackfs" 
+     "users" 
+     "welcome" 
+22:46:11 [6]: void Calamares::RequirementsChecker::reportProgress()
+    Remaining modules: 7 
+     "partition" 
+     "shellprocess" 
+     "summary" 
+     "umount" 
+     "unpackfs" 
+     "users" 
+     "welcome" 
+22:46:11 [6]: OsproberEntryList PartUtils::runOsprober(DeviceModel*)
+    os-prober gave no output. 
+22:46:11 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+22:46:11 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+22:46:11 [6]: Calamares::RequirementsList GeneralRequirements::checkRequirements()
+    GeneralRequirements output: 
+     storage :   -1073741824 
+     enoughStorage :   unchecked 
+     RAM :   -1073741824 
+     enoughRam :   unchecked 
+     hasPower :   unchecked 
+     hasInternet :   unchecked 
+     isRoot :   unchecked 
+22:46:11 [6]: void Calamares::RequirementsChecker::addCheckedRequirements(Calamares::Module*)
+    Got 1 requirement results from "partition" 
+22:46:11 [2]: void ChoicePage::updateActionDescriptionsTr()
+    WARNING: Invalid osprober count, labels and buttons not updated. 
+22:46:11 [6]: bool ChoicePage::calculateNextEnabled() const
+    No partitioning choice has been made yet 
+22:46:11 [6]: void ChoicePage::updateDeviceStatePreview()
+    Updating partitioning state widgets. 
+22:46:11 [6]: void ChoicePage::setupActions()
+    Setting up actions for "/dev/vda" with 0 entries. 
+22:46:11 [6]: void ChoicePage::updateActionDescriptionsTr()
+    Setting texts for 0 osprober entries 
+22:46:11 [6]: void ChoicePage::setupActions()
+    No partitions available for replace-action. 
+22:46:11 [6]: void ChoicePage::setupActions()
+    No partitions available for resize-action. 
+22:46:11 [6]: void ChoicePage::continueApplyDeviceChoice()
+    Previous device -1 new device 0 
+22:46:11 [6]: void ChoicePage::applyActionChoice(InstallChoice)
+    InstallChoice Config::NoChoice "none" 
+22:46:11 [6]: bool ChoicePage::calculateNextEnabled() const
+    No partitioning choice has been made yet 
+22:46:11 [6]: void ChoicePage::updateActionChoicePreview(InstallChoice)
+    Updating partitioning preview widgets. 
+22:46:11 [6]: bool ChoicePage::calculateNextEnabled() const
+    No partitioning choice has been made yet 
+22:46:11 [6]: bool ChoicePage::calculateNextEnabled() const
+    No partitioning choice has been made yet 
+22:46:11 [6]: void Calamares::RequirementsChecker::finished()
+    All requirements have been checked. 
+22:46:11 [6]: void Calamares::RequirementsModel::describe() const
+    Requirements model has 1 items 
+    .. requirement 0 "partitions" satisfied? true mandatory? true 
+22:46:21 [6]: void Config::setLocaleIndex(int)
+    Index 44 Selected locale "pt_BR" 
+    .. No translation for "tz_" "pt_BR" using default (en) 
+    .. Loaded QRC translation "calamares_" "pt_BR" 
+    .. No translation for "kb_" "pt_BR" using default (en) 
+22:46:21 [6]: bool ChoicePage::calculateNextEnabled() const
+    No partitioning choice has been made yet 
+22:46:21 [6]: void ChoicePage::updateActionDescriptionsTr()
+    Setting texts for 0 osprober entries 
+22:46:22 [6]: static LocaleConfiguration LocaleConfiguration::fromLanguageAndLocation(const QString&, const QStringList&, const QString&)
+    Mapping "pt_BR" in "US" to locale. 
+    .. Got best match for "pt_BR" as "pt_BR.UTF-8" 
+22:46:23 [2]: WARNING (Qt): QString::arg: Argument missing: Configure timezone para 1, America/New York
+22:46:23 [2]: WARNING (Qt): QString::arg: Argument missing: Configure timezone para 1, America/New York
+18:46:23 [6]: static LocaleConfiguration LocaleConfiguration::fromLanguageAndLocation(const QString&, const QStringList&, const QString&)
+    Mapping "pt_BR" in "US" to locale. 
+    .. Got best match for "pt_BR" as "pt_BR.UTF-8" 
+18:46:23 [6]: static LocaleConfiguration LocaleConfiguration::fromLanguageAndLocation(const QString&, const QStringList&, const QString&)
+    Mapping "pt_BR" in "US" to locale. 
+    .. Got best match for "pt_BR" as "pt_BR.UTF-8" 
+18:46:25 [6]: static LocaleConfiguration LocaleConfiguration::fromLanguageAndLocation(const QString&, const QStringList&, const QString&)
+    Mapping "pt_BR" in "BR" to locale. 
+    .. Got best match for "pt_BR" as "pt_BR.UTF-8" 
+18:46:25 [2]: WARNING (Qt): QString::arg: Argument missing: Configure timezone para 1, America/Sao Paulo
+19:46:27 [6]: void Config::guessLocaleKeyboardLayout()
+    Got locale language "pt_BR.UTF-8" 
+    .. looking for locale part "BR" 
+    .. matched "br" 
+19:46:27 [6]: void guessLayout(const QStringList&, KeyboardLayoutModel*, KeyboardVariantsModel*)
+    Next level: "pt" 
+19:46:27 [6]: void applyXkb(const BasicLayoutInfo&, AdditionalLayoutInfo&)
+    xkbmap selection changed to:  "br" - "" 
+19:46:29 [6]: void applyXkb(const BasicLayoutInfo&, AdditionalLayoutInfo&)
+    xkbmap selection changed to:  "br" - "nodeadkeys" 
+19:46:32 [6]: void ChoicePage::applyActionChoice(InstallChoice)
+    InstallChoice Config::Erase "erase" 
+19:46:32 [6]: PartitionTable* CreatePartitionTableJob::createTable()
+    CreatePartitionTableJob::createTable trying to make table for device "/dev/vda" 
+19:46:32 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:32 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:32 [6]: quint64 swapSuggestion(quint64, Config::SwapChoice)
+    Suggested swap size: 4 GiB 
+19:46:32 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:32 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:32 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:32 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:32 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:32 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:32 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:32 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:32 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:32 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:32 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:32 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:32 [6]: void PartitionCoreModule::dumpQueue() const
+    # Queue: 
+    .. ## Device: "/dev/vda" 
+    .. - CreatePartitionTableJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - SetPartFlagsJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+19:46:32 [6]: void ChoicePage::updateActionChoicePreview(InstallChoice)
+    Updating partitioning preview widgets. 
+19:46:41 [6]: void ChoicePage::applyActionChoice(InstallChoice)
+    InstallChoice Config::Manual "manual" 
+19:46:41 [6]: void ChoicePage::updateActionChoicePreview(InstallChoice)
+    Updating partitioning preview widgets. 
+19:46:41 [6]: DEBUG (Qt): smartctl initialization failed for  "/dev/vda" :  No such file or directory
+19:46:41 [6]: DEBUG (Qt): error during smart output parsing for  "/dev/vda" :  No such file or directory
+19:46:41 [2]: WARNING (Qt): unknown file system type  ""  on  "/dev/vda"
+19:46:41 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:41 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:41 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:41 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:44 [6]: void ChoicePage::applyActionChoice(InstallChoice)
+    InstallChoice Config::Erase "erase" 
+19:46:44 [6]: PartitionTable* CreatePartitionTableJob::createTable()
+    CreatePartitionTableJob::createTable trying to make table for device "/dev/vda" 
+19:46:44 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:44 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:44 [6]: quint64 swapSuggestion(quint64, Config::SwapChoice)
+    Suggested swap size: 4 GiB 
+19:46:44 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:44 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:44 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:44 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:44 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:44 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:44 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:44 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:44 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:44 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:44 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x557d22661ac0) without calling endResetModel first
+19:46:44 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x557d22661ac0) without calling beginResetModel first
+19:46:44 [6]: void PartitionCoreModule::dumpQueue() const
+    # Queue: 
+    .. ## Device: "/dev/vda" 
+    .. - CreatePartitionTableJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - SetPartFlagsJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+19:46:44 [6]: void ChoicePage::updateActionChoicePreview(InstallChoice)
+    Updating partitioning preview widgets. 
+19:46:46 [6]: void PartitionCoreModule::setBootLoaderInstallPath(const QString&)
+    PCM::setBootLoaderInstallPath "/dev/vda" 
+19:47:01 [2]: WARNING (Qt): QString::arg: Argument missing: Configure timezone para 1, America/Sao Paulo
+19:47:01 [2]: WARNING (Qt): QString::arg: Argument missing: modelo teclado foi configurado para 1, Generic 105-key PC
+19:47:01 [2]: WARNING (Qt): QObject::setParent: Cannot set parent, new parent is in a different thread
+19:47:01 [6]: virtual QString PartitionViewStep::prettyStatus() const
+    Summary for Partition 1 Config::Erase 
+19:47:01 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+19:47:01 [6]: QVariantList FillGlobalStorageJob::createPartitionList() const
+    Building partition information map 
+    .. partitions on "/dev/vda" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "efi" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "ESP" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "boot" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "root" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "swap" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "linuxswap" 
+     fsName :   "linuxswap" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "home" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/home" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "linuxswap" 
+     fsName :   "linuxswap" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+19:47:01 [2]: WARNING (Qt): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+19:47:01 [2]: WARNING (Qt): QObject::setParent: Cannot set parent, new parent is in a different thread
+19:47:01 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+19:47:02 [6]: QVariantList FillGlobalStorageJob::createPartitionList() const
+    Building partition information map 
+    .. partitions on "/dev/vda" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "efi" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "ESP" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "boot" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "root" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "swap" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "linuxswap" 
+     fsName :   "linuxswap" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "home" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/home" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "" 
+     partition-uuid (partuuid) :   "PartUUID$366936f1" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "linuxswap" 
+     fsName :   "linuxswap" 
+     filesystem-uuid (uuid) :   "FSUUID$a9284854" 
+     claimed :   "true" 
+19:47:02 [6]: void ensureSize(QWidget*, QScrollArea*, Calamares::ViewStep*)
+    Summary widget is larger than viewport, enlarge by 324 to QSize(834, 812) 
+19:47:18 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+19:47:18 [6]: void Calamares::JobThread::finalize()
+    There are 29 jobs, total weight 23 
+    .. Job 1 "Gerenciando configurações de auto-montagem…" +wt 0.0769231 tot.wt 0.0769231 
+    .. Job 2 "Limpando todas as montagens temporárias…" +wt 0.0769231 tot.wt 0.153846 
+    .. Job 3 "Limpar as montagens para as operações nas partições em /dev/vda" +wt 0.0769231 tot.wt 0.230769 
+    .. Job 4 "Criando nova tabela de partições gpt em /dev/vda…" +wt 0.0769231 tot.wt 0.307692 
+    .. Job 5 "Criar nova partição de 512MiB em /dev/vda (vda) com entradas efi, ESP" +wt 0.0769231 tot.wt 0.384615 
+    .. Job 6 "Criar nova partição de 1024MiB em /dev/vda (vda) com entradas boot" +wt 0.0769231 tot.wt 0.461538 
+    .. Job 7 "Definir marcadores na partição ext4 de 1024MiB" +wt 0.0769231 tot.wt 0.538462 
+    .. Job 8 "Criar nova partição de 20480MiB em /dev/vda (vda) com entradas root" +wt 0.0769231 tot.wt 0.615385 
+    .. Job 9 "Criar nova partição de 4096MiB em /dev/vda (vda) com entradas swap" +wt 0.0769231 tot.wt 0.692308 
+    .. Job 10 "Criar nova partição de 19967MiB em /dev/vda (vda) com entradas home" +wt 0.0769231 tot.wt 0.769231 
+    .. Job 11 "Criar nova partição de 5119MiB em /dev/vda (vda)" +wt 0.0769231 tot.wt 0.846154 
+    .. Job 12 "Definir informações da partição" +wt 0.0769231 tot.wt 0.923077 
+    .. Job 13 "Gerenciando configurações de auto-montagem…" +wt 0.0769231 tot.wt 1 
+    .. Job 14 "mount" +wt 1 tot.wt 2 
+    .. Job 15 "unpackfs" +wt 12 tot.wt 14 
+    .. Job 16 "Gerar machine-id." +wt 1 tot.wt 15 
+    .. Job 17 "fstab" +wt 1 tot.wt 16 
+    .. Job 18 "Definindo fuso horário para America/Sao_Paulo…" +wt 1 tot.wt 17 
+    .. Job 19 "Definindo modelo de teclado para pc105, leiaute como br-nodeadkeys…" +wt 1 tot.wt 18 
+    .. Job 20 "Configurando usuários <pre>sudo</pre>…" +wt 0.166667 tot.wt 18.1667 
+    .. Job 21 "Preparando grupos…" +wt 0.166667 tot.wt 18.3333 
+    .. Job 22 "Criar usuário gsm" +wt 0.166667 tot.wt 18.5 
+    .. Job 23 "Definir senha para usuário gsm" +wt 0.166667 tot.wt 18.6667 
+    .. Job 24 "Definir senha para usuário root" +wt 0.166667 tot.wt 18.8333 
+    .. Job 25 "Definir nome da máquina gsm-standardpc" +wt 0.166667 tot.wt 19 
+    .. Job 26 "hwclock" +wt 1 tot.wt 20 
+    .. Job 27 "bootloader" +wt 1 tot.wt 21 
+    .. Job 28 "Executando processos de shell…" +wt 1 tot.wt 22 
+    .. Job 29 "Desmontando sistema de arquivos…" +wt 1 tot.wt 23 
+19:47:18 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Gerenciando configurações de auto-montagem…" ( 1 / 29 ) 
+19:47:18 [6]: virtual Calamares::JobResult AutoMountManagementJob::exec()
+    Set automount to disable 
+19:47:18 [6]: void Calamares::Partition::querySolidAutoMount(QDBusConnection&, AutoMountInfo&)
+    Solid not available: "Not connected to D-Bus server" 
+19:47:18 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Limpando todas as montagens temporárias…" ( 2 / 29 ) 
+19:47:18 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Limpar as montagens para as operações nas partições em /dev/vda" ( 3 / 29 ) 
+19:47:18 [2]: QStringList getLVMVolumes()
+    WARNING: this system does not seem to have LVM2 tools. 
+19:47:18 [2]: QStringList getPVGroups(const QString&)
+    WARNING: this system does not seem to have LVM2 tools. 
+19:47:18 [6]: QStringList getPartitionsForDevice(const QString&)
+    Reading from "/proc/partitions" looking for "vda" 
+19:47:18 [6]: virtual Calamares::JobResult ClearMountsJob::exec()
+    ClearMountsJob finished. Here's what was done: 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+19:47:18 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criando nova tabela de partições gpt em /dev/vda…" ( 4 / 29 ) 
+19:47:18 [6]: virtual Calamares::JobResult CreatePartitionTableJob::exec()
+    Creating new partition table of type "gpt" , uncommitted partitions: 
+    .. "New Partition" 
+    .. "New Partition" 
+    .. "New Partition" 
+    .. "New Partition" 
+    .. "New Partition" 
+    .. "New Partition" 
+    .. Running QList("lsblk") 
+    .. Finished. Exit code: 0 output:
+NAME  MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+loop0   7:0    0  2.9G  1 loop /run/live/rootfs/filesystem.squashfs
+sr0    11:0    1    3G  0 rom  /run/live/medium
+vda   254:0    0   50G  0 disk
+    .. lsblk output:
+ NAME  MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+loop0   7:0    0  2.9G  1 loop /run/live/rootfs/filesystem.squashfs
+sr0    11:0    1    3G  0 rom  /run/live/medium
+vda   254:0    0   50G  0 disk
+    .. Running QList("mount") 
+    .. Finished. Exit code: 0 output:
+sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+udev on /dev type devtmpfs (rw,nosuid,relatime,size=1935796k,nr_inodes=483949,mode=755,inode64)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=600,ptmxmode=000)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=401596k,mode=755,inode64)
+/dev/sr0 on /run/live/medium type iso9660 (ro,noatime,nojoliet,check=s,map=n,blocksize=2048,iocharset=utf8)
+/dev/loop0 on /run/live/rootfs/filesystem.squashfs type squashfs (ro,noatime,errors=continue)
+tmpfs on /run/live/overlay type tmpfs (rw,noatime,size=2007980k,mode=755,inode64)
+overlay on / type overlay (rw,noatime,lowerdir=/run/live/rootfs/filesystem.squashfs/,upperdir=/run/live/overlay/rw,workdir=/run/live/overlay/work,redirect_dir=on,uuid=on)
+securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,inode64)
+cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
+pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
+systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=40,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=2062)
+hugetlbfs on /dev/hugepages type hugetlbfs (rw,nosuid,nodev,relatime,pagesize=2M)
+debugfs on /sys/kernel/debug type debugfs (rw,nosuid,nodev,noexec,relatime)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k,inode64)
+tmpfs on /run/credentials/systemd-journald.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+fusectl on /sys/fs/fuse/connections type fusectl (rw,nosuid,nodev,noexec,relatime)
+configfs on /sys/kernel/config type configfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /tmp type tmpfs (rw,nosuid,nodev,relatime,inode64)
+binfmt_misc on /proc/sys/fs/binfmt_misc type binfmt_misc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/credentials/getty@tty1.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+tmpfs on /run/user/1000 type tmpfs (rw,nosuid,nodev,relatime,size=401592k,nr_inodes=100398,mode=700,uid=1000,gid=1000,inode64)
+    .. mount output:
+ sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+udev on /dev type devtmpfs (rw,nosuid,relatime,size=1935796k,nr_inodes=483949,mode=755,inode64)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=600,ptmxmode=000)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=401596k,mode=755,inode64)
+/dev/sr0 on /run/live/medium type iso9660 (ro,noatime,nojoliet,check=s,map=n,blocksize=2048,iocharset=utf8)
+/dev/loop0 on /run/live/rootfs/filesystem.squashfs type squashfs (ro,noatime,errors=continue)
+tmpfs on /run/live/overlay type tmpfs (rw,noatime,size=2007980k,mode=755,inode64)
+overlay on / type overlay (rw,noatime,lowerdir=/run/live/rootfs/filesystem.squashfs/,upperdir=/run/live/overlay/rw,workdir=/run/live/overlay/work,redirect_dir=on,uuid=on)
+securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,inode64)
+cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
+pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
+systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=40,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=2062)
+hugetlbfs on /dev/hugepages type hugetlbfs (rw,nosuid,nodev,relatime,pagesize=2M)
+debugfs on /sys/kernel/debug type debugfs (rw,nosuid,nodev,noexec,relatime)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k,inode64)
+tmpfs on /run/credentials/systemd-journald.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+fusectl on /sys/fs/fuse/connections type fusectl (rw,nosuid,nodev,noexec,relatime)
+configfs on /sys/kernel/config type configfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /tmp type tmpfs (rw,nosuid,nodev,relatime,inode64)
+binfmt_misc on /proc/sys/fs/binfmt_misc type binfmt_misc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/credentials/getty@tty1.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+tmpfs on /run/user/1000 type tmpfs (rw,nosuid,nodev,relatime,size=401592k,nr_inodes=100398,mode=700,uid=1000,gid=1000,inode64)
+19:47:19 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criar nova partição de 512MiB em /dev/vda (vda) com entradas efi, ESP" ( 5 / 29 ) 
+19:47:21 [6]: virtual void Calamares::JobThread::run()
+    Skipping non-emergency job "Criar nova partição de 1024MiB em /dev/vda (vda) com entradas boot" 
+    ..  Skipping non-emergency job "Definir marcadores na partição ext4 de 1024MiB" 
+    ..  Skipping non-emergency job "Criar nova partição de 20480MiB em /dev/vda (vda) com entradas root" 
+    ..  Skipping non-emergency job "Criar nova partição de 4096MiB em /dev/vda (vda) com entradas swap" 
+    ..  Skipping non-emergency job "Criar nova partição de 19967MiB em /dev/vda (vda) com entradas home" 
+    ..  Skipping non-emergency job "Criar nova partição de 5119MiB em /dev/vda (vda)" 
+    ..  Skipping non-emergency job "Definir informações da partição" 
+    ..  Skipping non-emergency job "Gerenciando configurações de auto-montagem…" 
+    ..  Skipping non-emergency job "mount" 
+    ..  Skipping non-emergency job "unpackfs" 
+    ..  Skipping non-emergency job "Gerar machine-id." 
+    ..  Skipping non-emergency job "fstab" 
+    ..  Skipping non-emergency job "Definindo fuso horário para America/Sao_Paulo…" 
+    ..  Skipping non-emergency job "Definindo modelo de teclado para pc105, leiaute como br-nodeadkeys…" 
+    ..  Skipping non-emergency job "Configurando usuários <pre>sudo</pre>…" 
+    ..  Skipping non-emergency job "Preparando grupos…" 
+    ..  Skipping non-emergency job "Criar usuário gsm" 
+    ..  Skipping non-emergency job "Definir senha para usuário gsm" 
+    ..  Skipping non-emergency job "Definir senha para usuário root" 
+    ..  Skipping non-emergency job "Definir nome da máquina gsm-standardpc" 
+    ..  Skipping non-emergency job "hwclock" 
+    ..  Skipping non-emergency job "bootloader" 
+    ..  Skipping non-emergency job "Executando processos de shell…" 
+    ..  Skipping non-emergency job "Desmontando sistema de arquivos…" 
+19:47:21 [1]: void Calamares::ViewManager::onInstallationFailed(const QString&, const QString&)
+    ERROR: Installation failed: "O instalador não conseguiu criar partições no disco 'vda'." 
+    .. - message: "O instalador não conseguiu criar partições no disco 'vda'." 
+    .. - details: 
+Create a new partition (512,00 MiB, fat32) on ‘/dev/vda’
+
+
+Job: Create new partition on device ‘/dev/vda’
+
+
+Command: sfdisk --force --append /dev/vda
+
+
+Command: sfdisk --list --output Device,UUID /dev/vda
+
+
+Job: Set the label on partition ‘/dev/vda1’ to "efi"
+
+
+Command: sfdisk --part-label /dev/vda 1 efi
+
+
+Job: Create file system ‘fat32’ on partition ‘/dev/vda1’
+
+
+Command: mkfs.fat -F32 -I -v /dev/vda1
+
+
+Command: sfdisk --part-type /dev/vda 1 ESP
+
+Failed to set the system type for the file system on partition ‘/dev/vda1’.
+
+
+19:47:21 [6]: void Calamares::ViewManager::onInstallationFailed(const QString&, const QString&)
+    Calamares will quit when the dialog closes. 
+19:47:22 [6]: void Config::doNotify(bool, bool)
+    Notification not sent; completion: failed 
+19:47:22 [6]: void {anonymous}::PowerManagementInterface::uninhibitSleep()
+    Sleep was never inhibited. 
+    
+    
+Create a new partition (512,00 MiB, fat32) on ‘/dev/vda’
+
+
+Job: Create new partition on device ‘/dev/vda’
+
+
+Command: sfdisk --force --append /dev/vda
+
+
+Command: sfdisk --list --output Device,UUID /dev/vda
+
+
+Job: Set the label on partition ‘/dev/vda1’ to "efi"
+
+
+Command: sfdisk --part-label /dev/vda 1 efi
+
+
+Job: Create file system ‘fat32’ on partition ‘/dev/vda1’
+
+
+Command: mkfs.fat -F32 -I -v /dev/vda1
+
+
+Command: sfdisk --part-type /dev/vda 1 ESP
+
+Failed to set the system type for the file system on partition ‘/dev/vda1’.
+
+dev@onedevs:~$ lynis audit system
+bash: lynis: command not found
+dev@onedevs:~$ sudo lynis audit system
+
+[ Lynis 3.1.4 ]
+
+################################################################################
+  Lynis comes with ABSOLUTELY NO WARRANTY. This is free software, and you are
+  welcome to redistribute it under the terms of the GNU General Public License.
+  See the LICENSE file for details about using this software.
+
+  2007-2024, CISOfy - https://cisofy.com/lynis/
+  Enterprise support available (compliance, plugins, interface and tools)
+################################################################################
+
+
+[+] Initializing program
+------------------------------------
+
+
+Warning: PID file exists, probably another Lynis process is running.
+------------------------------------------------------------------------------
+If you are unsure if another Lynis process is running currently, you are advised
+to stop the current process and check the process list first. If you cancelled
+a previous instance (by using CTRL+C), you can ignore this message.
+
+You are advised to check for temporary files after program completion.
+------------------------------------------------------------------------------
+
+Note: Cancelling the program can leave temporary files behind
+
+=================================================================
+
+  Exception found!
+
+  Function/test:  [OS Detection]
+  Message:        Unknown OS found in /etc/os-release - Please create an issue on GitHub and share the contents (cat /etc/os-release): https://github.com/CISOfy/lynis
+
+  Help improving the Lynis community with your feedback!
+
+  Steps:
+  - Ensure you are running the latest version (/usr/sbin/lynis update check)
+  - If so, create a GitHub issue at https://github.com/CISOfy/lynis
+  - Include relevant parts of the log file or configuration file
+
+  Thanks!
+
+=================================================================
+
+  - Detecting OS...                                           [ DONE ]
+  - Checking profiles...                                      [ DONE ]
+
+  ---------------------------------------------------
+  Program version:           3.1.4
+  Operating system:          Linux
+  Operating system name:     Debian
+  Operating system version:  13.5
+  Kernel version:            6.12.86+deb13
+  Hardware platform:         x86_64
+  Hostname:                  onedevs
+  ---------------------------------------------------
+  Profiles:                  /etc/lynis/default.prf
+  Log file:                  /var/log/lynis.log
+  Report file:               /var/log/lynis-report.dat
+  Report version:            1.0
+  Plugin directory:          /etc/lynis/plugins
+  ---------------------------------------------------
+  Auditor:                   [Not Specified]
+  Language:                  en
+  Test category:             all
+  Test group:                all
+  ---------------------------------------------------
+  - Program update status...                                  [ NO UPDATE ]
+
+[+] System tools
+------------------------------------
+  - Scanning available tools...
+  - Checking system binaries...
+
+[+] Plugins (phase 1)
+------------------------------------
+ Note: plugins have more extensive tests and may take several minutes to complete
+  
+  - Plugin: debian
+    [
+[+] Debian Tests
+------------------------------------
+  - Checking for system binaries that are required by Debian Tests...
+    - Checking /bin...                                        [ FOUND ]
+    - Checking /sbin...                                       [ FOUND ]
+    - Checking /usr/bin...                                    [ FOUND ]
+    - Checking /usr/sbin...                                   [ FOUND ]
+    - Checking /usr/local/bin...                              [ FOUND ]
+    - Checking /usr/local/sbin...                             [ FOUND ]
+  - Authentication:
+    - PAM (Pluggable Authentication Modules):
+
+  [WARNING]: Test DEB-0001 had a long execution: 17.892451 seconds
+
+      - libpam-tmpdir                                         [ Not Installed ]
+  - File System Checks:
+    - DM-Crypt, Cryptsetup & Cryptmount:
+  - Software:
+    - apt-listbugs                                            [ Not Installed ]
+    - apt-listchanges                                         [ Not Installed ]
+    - needrestart                                             [ Installed ]
+    - fail2ban                                                [ Installed with jail.conf ]
+]
+
+[+] Boot and services
+------------------------------------
+  - Service Manager                                           [ systemd ]
+  - Checking UEFI boot                                        [ DISABLED ]
+    - Boot loader                                             [ NONE FOUND ]
+  - Check running services (systemctl)                        [ DONE ]
+        Result: found 26 running services
+  - Check enabled services at boot (systemctl)                [ DONE ]
+        Result: found 38 enabled services
+  - Check startup files (permissions)                         [ OK ]
+  - Running 'systemd-analyze security'
+      Unit name (exposure value) and predicate
+      --------------------------------
+    - ModemManager.service (value=6.3)                        [ MEDIUM ]
+    - NetworkManager.service (value=7.8)                      [ EXPOSED ]
+    - accounts-daemon.service (value=5.5)                     [ MEDIUM ]
+    - auditd.service (value=8.9)                              [ EXPOSED ]
+    - avahi-daemon.service (value=9.6)                        [ UNSAFE ]
+    - blueman-mechanism.service (value=9.6)                   [ UNSAFE ]
+    - clamav-daemon.service (value=9.6)                       [ UNSAFE ]
+    - colord.service (value=3.5)                              [ PROTECTED ]
+    - containerd.service (value=9.6)                          [ UNSAFE ]
+    - cron.service (value=9.6)                                [ UNSAFE ]
+    - cups-browsed.service (value=9.6)                        [ UNSAFE ]
+    - cups.service (value=9.6)                                [ UNSAFE ]
+    - dbus.service (value=9.3)                                [ UNSAFE ]
+    - docker.service (value=9.6)                              [ UNSAFE ]
+    - emergency.service (value=9.5)                           [ UNSAFE ]
+    - exim4.service (value=6.9)                               [ MEDIUM ]
+    - fail2ban.service (value=9.6)                            [ UNSAFE ]
+    - getty@tty1.service (value=9.6)                          [ UNSAFE ]
+    - lightdm.service (value=9.6)                             [ UNSAFE ]
+    - lynis.service (value=9.6)                               [ UNSAFE ]
+    - netavark-dhcp-proxy.service (value=9.6)                 [ UNSAFE ]
+    - plymouth-start.service (value=9.5)                      [ UNSAFE ]
+    - polkit.service (value=1.2)                              [ PROTECTED ]
+    - rc-local.service (value=9.6)                            [ UNSAFE ]
+    - rescue.service (value=9.5)                              [ UNSAFE ]
+    - rtkit-daemon.service (value=7.2)                        [ MEDIUM ]
+    - snapd.service (value=9.9)                               [ UNSAFE ]
+    - switcheroo-control.service (value=7.6)                  [ EXPOSED ]
+    - systemd-ask-password-console.service (value=9.4)        [ UNSAFE ]
+    - systemd-ask-password-plymouth.service (value=9.5)       [ UNSAFE ]
+    - systemd-ask-password-wall.service (value=9.4)           [ UNSAFE ]
+    - systemd-bsod.service (value=9.5)                        [ UNSAFE ]
+    - systemd-hostnamed.service (value=1.7)                   [ PROTECTED ]
+    - systemd-importd.service (value=5.0)                     [ MEDIUM ]
+    - systemd-initctl.service (value=9.4)                     [ UNSAFE ]
+    - systemd-journald.service (value=4.9)                    [ PROTECTED ]
+    - systemd-logind.service (value=2.8)                      [ PROTECTED ]
+    - systemd-networkd.service (value=2.9)                    [ PROTECTED ]
+    - systemd-rfkill.service (value=9.4)                      [ UNSAFE ]
+    - systemd-udevd.service (value=7.1)                       [ MEDIUM ]
+    - udisks2.service (value=9.6)                             [ UNSAFE ]
+    - upower.service (value=2.4)                              [ PROTECTED ]
+    - user@1000.service (value=9.4)                           [ UNSAFE ]
+    - uuidd.service (value=5.8)                               [ MEDIUM ]
+    - wpa_supplicant.service (value=9.6)                      [ UNSAFE ]
+
+[+] Kernel
+------------------------------------
+  - Checking default runlevel                                 [ runlevel 5 ]
+  - Checking CPU support (NX/PAE)
+    CPU support: PAE and/or NoeXecute supported               [ FOUND ]
+  - Checking kernel version and release                       [ DONE ]
+  - Checking kernel type                                      [ DONE ]
+  - Checking loaded kernel modules                            [ DONE ]
+      Found 134 active modules
+  - Checking Linux kernel configuration file                  [ FOUND ]
+  - Checking default I/O kernel scheduler                     [ NOT FOUND ]
+  - Checking for available kernel update                      [ OK ]
+  - Checking core dumps configuration
+    - configuration in systemd conf files                     [ DEFAULT ]
+    - configuration in /etc/profile                           [ DEFAULT ]
+    - 'hard' configuration in /etc/security/limits.conf       [ ENABLED ]
+    - 'soft' configuration in /etc/security/limits.conf       [ DISABLED ]
+    - Checking setuid core dumps configuration                [ DISABLED ]
+  - Check if reboot is needed                                 [ NO ]
+
+[+] Memory and Processes
+------------------------------------
+  - Checking /proc/meminfo                                    [ FOUND ]
+  - Searching for dead/zombie processes                       [ NOT FOUND ]
+  - Searching for IO waiting processes                        [ NOT FOUND ]
+  - Search prelink tooling                                    [ NOT FOUND ]
+
+[+] Users, Groups and Authentication
+------------------------------------
+  - Administrator accounts                                    [ OK ]
+  - Unique UIDs                                               [ OK ]
+  - Consistency of group files (grpck)                        [ OK ]
+  - Unique group IDs                                          [ OK ]
+  - Unique group names                                        [ OK ]
+  - Password file consistency                                 [ OK ]
+  - Password hashing methods                                  [ OK ]
+  - Checking password hashing rounds                          [ DISABLED ]
+  - Query system users (non daemons)                          [ DONE ]
+  - NIS+ authentication support                               [ NOT ENABLED ]
+  - NIS authentication support                                [ NOT ENABLED ]
+  - Sudoers file(s)                                           [ FOUND ]
+    - Permissions for directory: /etc/sudoers.d               [ WARNING ]
+    - Permissions for: /etc/sudoers                           [ OK ]
+    - Permissions for: /etc/sudoers.d/README                  [ OK ]
+    - Permissions for: /etc/sudoers.d/dev                     [ OK ]
+    - Permissions for: /etc/sudoers.d/live                    [ OK ]
+  - PAM password strength tools                               [ SUGGESTION ]
+  - PAM configuration files (pam.conf)                        [ FOUND ]
+  - PAM configuration files (pam.d)                           [ FOUND ]
+  - PAM modules                                               [ FOUND ]
+  - LDAP module in PAM                                        [ NOT FOUND ]
+  - Accounts without expire date                              [ SUGGESTION ]
+  - Accounts without password                                 [ OK ]
+  - Locked accounts                                           [ OK ]
+  - Checking user password aging (minimum)                    [ DISABLED ]
+  - User password aging (maximum)                             [ DISABLED ]
+  - Checking expired passwords                                [ OK ]
+  - Checking Linux single user mode authentication            [ OK ]
+  - Determining default umask
+    - umask (/etc/profile)                                    [ NOT FOUND ]
+    - umask (/etc/login.defs)                                 [ SUGGESTION ]
+  - LDAP authentication support                               [ NOT ENABLED ]
+  - Logging failed login attempts                             [ DISABLED ]
+
+[+] Kerberos
+------------------------------------
+  - Check for Kerberos KDC and principals                     [ NOT FOUND ]
+
+[+] Shells
+------------------------------------
+  - Checking shells from /etc/shells
+    Result: found 8 shells (valid shells: 8).
+    - Session timeout settings/tools                          [ NONE ]
+  - Checking default umask values
+    - Checking default umask in /etc/bash.bashrc              [ NONE ]
+    - Checking default umask in /etc/profile                  [ NONE ]
+
+[+] File systems
+------------------------------------
+  - Checking mount points
+    - Checking /home mount point                              [ SUGGESTION ]
+    - Checking /tmp mount point                               [ OK ]
+    - Checking /var mount point                               [ SUGGESTION ]
+  - Query swap partitions (fstab)                             [ NONE ]
+  - Testing swap partitions                                   [ OK ]
+  - Testing /proc mount (hidepid)                             [ SUGGESTION ]
+  - Checking for old files in /tmp                            [ OK ]
+  - Checking /tmp sticky bit                                  [ OK ]
+  - Checking /var/tmp sticky bit                              [ OK ]
+  - ACL support root file system                              [ ENABLED ]
+  - Mount options of /                                        [ NON DEFAULT ]
+  - Mount options of /dev                                     [ PARTIALLY HARDENED ]
+  - Mount options of /dev/shm                                 [ PARTIALLY HARDENED ]
+  - Mount options of /run                                     [ HARDENED ]
+  - Mount options of /tmp                                     [ PARTIALLY HARDENED ]
+  - Total without nodev:7 noexec:10 nosuid:5 ro or noexec (W^X): 8 of total 27
+  - Disable kernel support of some filesystems
+
+[+] USB Devices
+------------------------------------
+  - Checking usb-storage driver (modprobe config)             [ NOT DISABLED ]
+  - Checking USB devices authorization                        [ ENABLED ]
+  - Checking USBGuard                                         [ NOT FOUND ]
+
+[+] Storage
+------------------------------------
+  - Checking firewire ohci driver (modprobe config)           [ NOT DISABLED ]
+
+[+] NFS
+------------------------------------
+  - Check running NFS daemon                                  [ NOT FOUND ]
+
+[+] Name services
+------------------------------------
+  - Searching DNS domain name                                 [ UNKNOWN ]
+  - Checking /etc/hosts
+    - Duplicate entries in hosts file                         [ NONE ]
+    - Presence of configured hostname in /etc/hosts           [ FOUND ]
+    - Hostname mapped to localhost                            [ NOT FOUND ]
+    - Localhost mapping to IP address                         [ OK ]
+
+[+] Ports and packages
+------------------------------------
+  - Searching package managers
+    - Searching dpkg package manager                          [ FOUND ]
+      - Querying package manager
+
+  [WARNING]: Test PKGS-7345 had a long execution: 18.540249 seconds
+
+    - Query unpurged packages                                 [ NONE ]
+    - debsums utility                                         [ FOUND ]
+      - Cron job for debsums                                  [ NOT FOUND ]
+  - Checking security repository in sources.list file or directory  [ WARNING ]
+  - Checking APT package database                             [ OK ]
+  - Checking vulnerable packages (apt-get only)               [ DONE ]
+
+  [WARNING]: Test PKGS-7392 had a long execution: 14.416727 seconds
+
+  - Checking upgradeable packages                             [ SKIPPED ]
+  - Checking package audit tool                               [ INSTALLED ]
+    Found: apt-get
+  - Toolkit for automatic upgrades                            [ NOT FOUND ]
+
+[+] Networking
+------------------------------------
+  - Checking IPv6 configuration                               [ ENABLED ]
+      Configuration method                                    [ AUTO ]
+      IPv6 only                                               [ NO ]
+  - Checking configured nameservers
+    - Testing nameservers
+        Nameserver: 192.168.122.1                             [ OK ]
+    - Minimal of 2 responsive nameservers                     [ WARNING ]
+  - Checking default gateway                                  [ DONE ]
+  - Getting listening ports (TCP/UDP)                         [ DONE ]
+  - Checking promiscuous interfaces                           [ OK ]
+  - Checking waiting connections                              [ OK ]
+  - Checking status DHCP client                               [ NOT ACTIVE ]
+  - Checking for ARP monitoring software                      [ NOT FOUND ]
+  - Uncommon network protocols                                [ 0 ]
+
+[+] Printers and Spools
+------------------------------------
+  - Checking cups daemon                                      [ RUNNING ]
+  - Checking CUPS configuration file                          [ OK ]
+    - File permissions                                        [ WARNING ]
+  - Checking CUPS addresses/sockets                           [ FOUND ]
+  - Checking lp daemon                                        [ NOT RUNNING ]
+
+[+] Software: e-mail and messaging
+------------------------------------
+  - Exim status                                               [ RUNNING ]
+    - Type                                                    [ LOCAL ONLY ]
+
+[+] Software: firewalls
+------------------------------------
+  - Checking iptables kernel module                           [ FOUND ]
+    - Checking iptables policies of chains                    [ FOUND ]
+      - Chain INPUT (table: filter, target: ACCEPT)           [ ACCEPT ]
+      - Chain INPUT (table: security, target: ACCEPT)         [ ACCEPT ]
+    - Checking for empty ruleset                              [ OK ]
+    - Checking for unused rules                               [ FOUND ]
+  - Checking host based firewall                              [ ACTIVE ]
+
+[+] Software: webserver
+------------------------------------
+  - Checking Apache                                           [ NOT FOUND ]
+  - Checking nginx                                            [ NOT FOUND ]
+
+[+] SSH Support
+------------------------------------
+  - Checking running SSH daemon                               [ NOT FOUND ]
+
+[+] SNMP Support
+------------------------------------
+  - Checking running SNMP daemon                              [ NOT FOUND ]
+
+[+] Databases
+------------------------------------
+    No database engines found
+
+[+] LDAP Services
+------------------------------------
+  - Checking OpenLDAP instance                                [ NOT FOUND ]
+
+[+] PHP
+------------------------------------
+  - Checking PHP                                              [ NOT FOUND ]
+
+[+] Squid Support
+------------------------------------
+  - Checking running Squid daemon                             [ NOT FOUND ]
+
+[+] Logging and files
+------------------------------------
+  - Checking for a running log daemon                         [ OK ]
+    - Checking Syslog-NG status                               [ NOT FOUND ]
+    - Checking systemd journal status                         [ FOUND ]
+    - Checking Metalog status                                 [ NOT FOUND ]
+    - Checking RSyslog status                                 [ NOT FOUND ]
+    - Checking RFC 3195 daemon status                         [ NOT FOUND ]
+    - Checking minilogd instances                             [ NOT FOUND ]
+    - Checking wazuh-agent daemon status                      [ NOT FOUND ]
+  - Checking logrotate presence                               [ OK ]
+  - Checking remote logging                                   [ NOT ENABLED ]
+  - Checking log directories (static list)                    [ DONE ]
+  - Checking open log files                                   [ DONE ]
+  - Checking deleted files in use                             [ FILES FOUND ]
+
+[+] Insecure services
+------------------------------------
+  - Installed inetd package                                   [ NOT FOUND ]
+  - Installed xinetd package                                  [ OK ]
+    - xinetd status                                           [ NOT ACTIVE ]
+  - Installed rsh client package                              [ OK ]
+  - Installed rsh server package                              [ OK ]
+  - Installed telnet client package                           [ OK ]
+  - Installed telnet server package                           [ NOT FOUND ]
+  - Checking NIS client installation                          [ OK ]
+  - Checking NIS server installation                          [ OK ]
+  - Checking TFTP client installation                         [ OK ]
+  - Checking TFTP server installation                         [ OK ]
+
+[+] Banners and identification
+------------------------------------
+  - /etc/issue                                                [ FOUND ]
+    - /etc/issue contents                                     [ WEAK ]
+  - /etc/issue.net                                            [ FOUND ]
+    - /etc/issue.net contents                                 [ WEAK ]
+
+[+] Scheduled tasks
+------------------------------------
+  - Checking crontab and cronjob files                        [ DONE ]
+
+[+] Accounting
+------------------------------------
+  - Checking accounting information                           [ NOT FOUND ]
+  - Checking sysstat accounting data                          [ NOT FOUND ]
+  - Checking auditd                                           [ ENABLED ]
+    - Checking audit rules                                    [ SUGGESTION ]
+    - Checking audit configuration file                       [ OK ]
+    - Checking auditd log file                                [ FOUND ]
+
+[+] Time and Synchronization
+------------------------------------
+
+[+] Cryptography
+------------------------------------
+  - Checking for expired SSL certificates [0/152]             [ NONE ]
+
+  [WARNING]: Test CRYP-7902 had a long execution: 58.898874 seconds
+
+  - Kernel entropy is sufficient                              [ YES ]
+  - HW RNG & rngd                                             [ NO ]
+  - SW prng                                                   [ NO ]
+  - MOR variable not found                                    [ WEAK ]
+
+[+] Virtualization
+------------------------------------
+
+[+] Containers
+------------------------------------
+    - Docker
+      - Docker daemon                                         [ RUNNING ]
+        - Docker info output (warnings)                       [ NONE ]
+      - Containers
+        - Total containers                                    [ 0 ]
+    - File permissions                                        [ OK ]
+
+[+] Security frameworks
+------------------------------------
+  - Checking presence AppArmor                                [ FOUND ]
+    - Checking AppArmor status                                [ ENABLED ]
+        Found 77 unconfined processes
+  - Checking presence SELinux                                 [ NOT FOUND ]
+  - Checking presence TOMOYO Linux                            [ NOT FOUND ]
+  - Checking presence grsecurity                              [ NOT FOUND ]
+  - Checking for implemented MAC framework                    [ OK ]
+
+[+] Software: file integrity
+------------------------------------
+  - Checking file integrity tools
+    - AIDE                                                    [ FOUND ]
+      - AIDE config file                                      [ FOUND ]
+      - AIDE database                                         [ NOT FOUND ]
+    - Tripwire                                                [ FOUND ]
+      - AIDE config (Checksum)                                [ Suggestion ]
+  - Checking presence integrity tool                          [ FOUND ]
+
+[+] Software: System tooling
+------------------------------------
+  - Checking automation tooling
+  - Automation tooling                                        [ NOT FOUND ]
+  - Checking presence of Fail2ban                             [ FOUND ]
+    - Checking Fail2ban jails                                 [ ENABLED ]
+  - Checking for IDS/IPS tooling                              [ FOUND ]
+
+[+] Software: Malware
+------------------------------------
+  - Checking ClamAV scanner                                   [ FOUND ]
+  - Malware software components                               [ FOUND ]
+    - Active agent                                            [ NOT FOUND ]
+    - Rootkit scanner                                         [ NOT FOUND ]
+
+[+] File Permissions
+------------------------------------
+  - Starting file permissions check
+    File: /etc/crontab                                        [ SUGGESTION ]
+    File: /etc/group                                          [ OK ]
+    File: /etc/group-                                         [ OK ]
+    File: /etc/hosts.allow                                    [ OK ]
+    File: /etc/hosts.deny                                     [ OK ]
+    File: /etc/issue                                          [ OK ]
+    File: /etc/issue.net                                      [ OK ]
+    File: /etc/motd                                           [ OK ]
+    File: /etc/passwd                                         [ OK ]
+    File: /etc/passwd-                                        [ OK ]
+    Directory: /root/.ssh                                     [ OK ]
+    Directory: /etc/cron.d                                    [ SUGGESTION ]
+    Directory: /etc/cron.daily                                [ SUGGESTION ]
+    Directory: /etc/cron.hourly                               [ SUGGESTION ]
+    Directory: /etc/cron.weekly                               [ SUGGESTION ]
+    Directory: /etc/cron.monthly                              [ SUGGESTION ]
+
+[+] Home directories
+------------------------------------
+  - Permissions of home directories                           [ OK ]
+  - Ownership of home directories                             [ OK ]
+  - Checking shell history files                              [ OK ]
+
+[+] Kernel Hardening
+------------------------------------
+  - Comparing sysctl key pairs with scan profile
+    - dev.tty.ldisc_autoload (exp: 0)                         [ DIFFERENT ]
+    - fs.protected_fifos (exp: 2)                             [ DIFFERENT ]
+    - fs.protected_hardlinks (exp: 1)                         [ OK ]
+    - fs.protected_regular (exp: 2)                           [ OK ]
+    - fs.protected_symlinks (exp: 1)                          [ OK ]
+    - fs.suid_dumpable (exp: 0)                               [ OK ]
+    - kernel.core_uses_pid (exp: 1)                           [ OK ]
+    - kernel.ctrl-alt-del (exp: 0)                            [ OK ]
+    - kernel.dmesg_restrict (exp: 1)                          [ OK ]
+    - kernel.kptr_restrict (exp: 2)                           [ DIFFERENT ]
+    - kernel.modules_disabled (exp: 1)                        [ DIFFERENT ]
+    - kernel.perf_event_paranoid (exp: 2 3 4)                 [ OK ]
+    - kernel.randomize_va_space (exp: 2)                      [ OK ]
+    - kernel.sysrq (exp: 0)                                   [ DIFFERENT ]
+    - kernel.unprivileged_bpf_disabled (exp: 1)               [ DIFFERENT ]
+    - kernel.yama.ptrace_scope (exp: 1 2 3)                   [ DIFFERENT ]
+    - net.core.bpf_jit_harden (exp: 2)                        [ DIFFERENT ]
+    - net.ipv4.conf.all.accept_redirects (exp: 0)             [ OK ]
+    - net.ipv4.conf.all.accept_source_route (exp: 0)          [ OK ]
+    - net.ipv4.conf.all.bootp_relay (exp: 0)                  [ OK ]
+    - net.ipv4.conf.all.forwarding (exp: 0)                   [ DIFFERENT ]
+    - net.ipv4.conf.all.log_martians (exp: 1)                 [ DIFFERENT ]
+    - net.ipv4.conf.all.mc_forwarding (exp: 0)                [ OK ]
+    - net.ipv4.conf.all.proxy_arp (exp: 0)                    [ OK ]
+    - net.ipv4.conf.all.rp_filter (exp: 1)                    [ DIFFERENT ]
+    - net.ipv4.conf.all.send_redirects (exp: 0)               [ DIFFERENT ]
+    - net.ipv4.conf.default.accept_redirects (exp: 0)         [ DIFFERENT ]
+    - net.ipv4.conf.default.accept_source_route (exp: 0)      [ OK ]
+    - net.ipv4.conf.default.log_martians (exp: 1)             [ DIFFERENT ]
+    - net.ipv4.icmp_echo_ignore_broadcasts (exp: 1)           [ OK ]
+    - net.ipv4.icmp_ignore_bogus_error_responses (exp: 1)     [ OK ]
+    - net.ipv4.tcp_syncookies (exp: 1)                        [ OK ]
+    - net.ipv4.tcp_timestamps (exp: 0 1)                      [ OK ]
+    - net.ipv6.conf.all.accept_redirects (exp: 0)             [ DIFFERENT ]
+    - net.ipv6.conf.all.accept_source_route (exp: 0)          [ OK ]
+    - net.ipv6.conf.default.accept_redirects (exp: 0)         [ DIFFERENT ]
+    - net.ipv6.conf.default.accept_source_route (exp: 0)      [ OK ]
+
+[+] Hardening
+------------------------------------
+    - Installed compiler(s)                                   [ FOUND ]
+    - Installed malware scanner                               [ FOUND ]
+    - Non-native binary formats                               [ FOUND ]
+
+[+] Custom tests
+------------------------------------
+  - Running custom tests...                                   [ NONE ]
+
+[+] Plugins (phase 2)
+------------------------------------
+
+================================================================================
+
+  -[ Lynis 3.1.4 Results ]-
+
+  Warnings (3):
+  ----------------------------
+  ! Can't find any security repository in /etc/apt/sources.list or sources.list.d directory [PKGS-7388] 
+      https://cisofy.com/lynis/controls/PKGS-7388/
+
+  ! Couldn't find 2 responsive nameservers [NETW-2705] 
+      https://cisofy.com/lynis/controls/NETW-2705/
+
+  ! No AIDE database was found, needed for AIDE functionality [FINT-4316] 
+      https://cisofy.com/lynis/controls/FINT-4316/
+
+  Suggestions (40):
+  ----------------------------
+  * Disable drivers like USB storage when not used, to prevent unauthorized storage or data theft [USB-1000] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/USB-1000/
+
+  * Disable drivers like firewire storage when not used, to prevent unauthorized storage or data theft [STRG-1846] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/STRG-1846/
+
+  * This release is more than 4 months old. Check the website or GitHub to see if there is an update available. [LYNIS] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/LYNIS/
+
+  * Install libpam-tmpdir to set $TMP and $TMPDIR for PAM sessions [DEB-0280] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/DEB-0280/
+
+  * Install apt-listbugs to display a list of critical bugs prior to each APT installation. [DEB-0810] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/DEB-0810/
+
+  * Install apt-listchanges to display any significant changes prior to any upgrade via APT. [DEB-0811] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/DEB-0811/
+
+  * Copy /etc/fail2ban/jail.conf to jail.local to prevent it being changed by updates. [DEB-0880] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/DEB-0880/
+
+  * Determine runlevel and services at startup [BOOT-5180] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/BOOT-5180/
+
+  * Consider hardening system services [BOOT-5264] 
+    - Details  : Run '/usr/bin/systemd-analyze security SERVICE' for each service
+    - Related resources
+      * Article: Systemd features to secure service files: https://linux-audit.com/systemd/systemd-features-to-secure-units-and-services/
+      * Website: https://cisofy.com/lynis/controls/BOOT-5264/
+
+  * Configure password hashing rounds in /etc/login.defs [AUTH-9230] 
+    - Related resources
+      * Article: Linux password security: hashing rounds: https://linux-audit.com/authentication/configure-the-minimum-password-length-on-linux-systems/
+      * Website: https://cisofy.com/lynis/controls/AUTH-9230/
+
+  * Install a PAM module for password strength testing like pam_cracklib or pam_passwdqc or libpam-passwdqc [AUTH-9262] 
+    - Related resources
+      * Article: Configure minimum password length for Linux systems: https://linux-audit.com/configure-the-minimum-password-length-on-linux-systems/
+      * Website: https://cisofy.com/lynis/controls/AUTH-9262/
+
+  * When possible set expire dates for all password protected accounts [AUTH-9282] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/AUTH-9282/
+
+  * Configure minimum password age in /etc/login.defs [AUTH-9286] 
+    - Related resources
+      * Article: Configure minimum password length for Linux systems: https://linux-audit.com/configure-the-minimum-password-length-on-linux-systems/
+      * Website: https://cisofy.com/lynis/controls/AUTH-9286/
+
+  * Configure maximum password age in /etc/login.defs [AUTH-9286] 
+    - Related resources
+      * Article: Configure minimum password length for Linux systems: https://linux-audit.com/configure-the-minimum-password-length-on-linux-systems/
+      * Website: https://cisofy.com/lynis/controls/AUTH-9286/
+
+  * Default umask in /etc/login.defs could not be found and defaults usually to 022, which could be more strict like 027 [AUTH-9328] 
+    - Related resources
+      * Article: Set default file permissions on Linux with umask: https://linux-audit.com/filesystems/file-permissions/set-default-file-permissions-with-umask/
+      * Website: https://cisofy.com/lynis/controls/AUTH-9328/
+
+  * To decrease the impact of a full /home file system, place /home on a separate partition [FILE-6310] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/FILE-6310/
+
+  * To decrease the impact of a full /var file system, place /var on a separate partition [FILE-6310] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/FILE-6310/
+
+  * Disable drivers like USB storage when not used, to prevent unauthorized storage or data theft [USB-1000] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/USB-1000/
+
+  * Disable drivers like firewire storage when not used, to prevent unauthorized storage or data theft [STRG-1846] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/STRG-1846/
+
+  * Check DNS configuration for the dns domain name [NAME-4028] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/NAME-4028/
+
+  * Check debsums configuration and enable checking regularly via a cron job (CRON_CHECK in default file). [PKGS-7370] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/PKGS-7370/
+
+  * Install package apt-show-versions for patch management purposes [PKGS-7394] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/PKGS-7394/
+
+  * Consider using a tool to automatically apply upgrades [PKGS-7420] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/PKGS-7420/
+
+  * Check your resolv.conf file and fill in a backup nameserver if possible [NETW-2705] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/NETW-2705/
+
+  * Determine if protocol 'dccp' is really needed on this system [NETW-3200] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/NETW-3200/
+
+  * Determine if protocol 'sctp' is really needed on this system [NETW-3200] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/NETW-3200/
+
+  * Determine if protocol 'rds' is really needed on this system [NETW-3200] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/NETW-3200/
+
+  * Determine if protocol 'tipc' is really needed on this system [NETW-3200] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/NETW-3200/
+
+  * Access to CUPS configuration could be more strict. [PRNT-2307] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/PRNT-2307/
+
+  * Check iptables rules to see which rules are currently not used [FIRE-4513] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/FIRE-4513/
+
+  * Enable logging to an external logging host for archiving purposes and additional protection [LOGG-2154] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/LOGG-2154/
+
+  * Check what deleted files are still in use and why. [LOGG-2190] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/LOGG-2190/
+
+  * Add a legal banner to /etc/issue, to warn unauthorized users [BANN-7126] 
+    - Related resources
+      * Article: The real purpose of login banners: https://linux-audit.com/the-real-purpose-of-login-banners-on-linux/
+      * Website: https://cisofy.com/lynis/controls/BANN-7126/
+
+  * Add legal banner to /etc/issue.net, to warn unauthorized users [BANN-7130] 
+    - Related resources
+      * Article: The real purpose of login banners: https://linux-audit.com/the-real-purpose-of-login-banners-on-linux/
+      * Website: https://cisofy.com/lynis/controls/BANN-7130/
+
+  * Enable process accounting [ACCT-9622] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/ACCT-9622/
+
+  * Enable sysstat to collect accounting (no results) [ACCT-9626] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/ACCT-9626/
+
+  * Audit daemon is enabled with an empty ruleset. Disable the daemon or define rules [ACCT-9630] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/ACCT-9630/
+
+  * Use SHA256 or SHA512 to create checksums in AIDE [FINT-4402] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/FINT-4402/
+
+  * Determine if automation tools are present for system management [TOOL-5002] 
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/TOOL-5002/
+
+  * Consider restricting file permissions [FILE-7524] 
+    - Details  : See screen output or log file
+    - Solution : Use chmod to change file permissions
+    - Related resources
+      * Website: https://cisofy.com/lynis/controls/FILE-7524/
+
+  * One or more sysctl values differ from the scan profile and could be tweaked [KRNL-6000] 
+    - Solution : Change sysctl value or disable test (skip-test=KRNL-6000:<sysctl-key>)
+    - Related resources
+      * Article: Linux hardening with sysctl settings: https://linux-audit.com/linux-hardening-with-sysctl/
+      * Article: Overview of sysctl options and values: https://linux-audit.com/kernel/sysctl/
+      * Website: https://cisofy.com/lynis/controls/KRNL-6000/
+
+  * Harden compilers like restricting access to root user only [HRDN-7222] 
+    - Related resources
+      * Article: Why remove compilers from your system?: https://linux-audit.com/software/why-remove-compilers-from-your-system/
+      * Website: https://cisofy.com/lynis/controls/HRDN-7222/
+
+  Follow-up:
+  ----------------------------
+  - Show details of a test (lynis show details TEST-ID)
+  - Check the logfile for all details (less /var/log/lynis.log)
+  - Read security controls texts (https://cisofy.com)
+  - Use --upload to upload data to central system (Lynis Enterprise users)
+
+================================================================================
+
+  Lynis security scan details:
+
+  Hardening index : 68 [#############       ]
+  Tests performed : 266
+  Plugins enabled : 1
+
+  Components:
+  - Firewall               [V]
+  - Malware scanner        [V]
+
+  Scan mode:
+  Normal [V]  Forensics [ ]  Integration [ ]  Pentest [ ]
+
+  Lynis modules:
+  - Compliance status      [?]
+  - Security audit         [V]
+  - Vulnerability scan     [V]
+
+  Files:
+  - Test and debug information      : /var/log/lynis.log
+  - Report data                     : /var/log/lynis-report.dat
+
+================================================================================
+
+  Lynis 3.1.4
+
+  Auditing, system hardening, and compliance for UNIX-based systems
+  (Linux, macOS, BSD, and others)
+
+  2007-2024, CISOfy - https://cisofy.com/lynis/
+  Enterprise support available (compliance, plugins, interface and tools)
+
+================================================================================
+
+  [TIP]: Enhance Lynis audits by adding your settings to custom.prf (see /etc/lynis/default.prf for all settings)
+
+dev@onedevs:~$ 
+
+____________
+____________
+____________
 
