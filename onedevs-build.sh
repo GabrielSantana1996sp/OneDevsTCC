@@ -128,11 +128,9 @@ john
 nikto
 sqlmap
 binwalk
-#netcat nao tem no apt trixie
 
 # Bootloader UEFI (grub-efi — bare metal SSD moderno)
 # grub-pc e grub-efi-amd64 conflitam no Debian Trixie: não instale os dois.
-# Calamares usa grub-efi para instalar no SSD em modo UEFI.
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
@@ -183,6 +181,7 @@ fonts-noto fonts-noto-cjk
 polkitd pkexec
 snapd
 chromium
+fastfetch
 
 # Instalador
 calamares
@@ -208,13 +207,12 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
   fi
 
-  # Nenhum pacote excluído — grub-efi é o único bootloader
+  # grub-efi é o único bootloader — sem exclude list necessária
 
-  # ── Hook 0001: configura grub-efi (único bootloader — UEFI bare metal) ──
+  # ── Hook 0001: configura grub-efi para UEFI ──────────────────────────────
   cat > config/hooks/live/0001-grub-efi-config.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-echo "Configurando grub-efi para instalação UEFI..."
 mkdir -p /etc/default/grub.d
 cat > /etc/default/grub.d/onedevs.cfg <<'GRUBCFG'
 GRUB_TIMEOUT=5
@@ -222,7 +220,7 @@ GRUB_DISTRIBUTOR="OneDevsOS"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
 GRUB_CMDLINE_LINUX=""
 GRUBCFG
-echo "grub-efi configurado para UEFI."
+echo "grub-efi configurado."
 EOF
   chmod +x config/hooks/live/0001-grub-efi-config.hook.chroot
 
@@ -342,18 +340,18 @@ defaultPartitionTableType: gpt
 allowManualPartitioning: true
 requiredStorage: 15.0
 
-# Partição EFI para UEFI bare metal SSD
+# Partição EFI — Calamares identifica pelo mountPoint /boot/efi
 efiSystemPartitionSize: 512M
 efiSystemPartitionName: EFI
 efiSystemPartitionMountPoint: /boot/efi
 
 # Layout completo: EFI + /boot + / + swap + /home
-# "100%" na última entrada = usa todo espaço restante do disco
+# IMPORTANTE: NÃO usar type:"ESP" nem attributes:"boot,esp" no partitionLayout —
+# causam "sfdisk --part-type ... ESP" que falha no Debian Trixie.
+# O Calamares reconhece a partição EFI pelo mountPoint /boot/efi.
 partitionLayout:
   - name: "efi"
     size: "512M"
-    type: "ESP"
-    attributes: "boot,esp"
     mountPoint: "/boot/efi"
     filesystem: "fat32"
   - name: "boot"
@@ -693,9 +691,14 @@ run_build() {
       ISO_NAME="onedevsos-${CODENAME_LC}-1.0-${ARCH}.iso"
       mv "${ISO_CANDIDATE}" "${ISO_NAME}" || true
       log "ISO: ${ISO_NAME} ($(du -h "${ISO_NAME}" | cut -f1))"
-      log "Testar em UEFI: qemu-system-x86_64 -m 4096 -enable-kvm -bios /usr/share/ovmf/OVMF.fd -cdrom ${ISO_NAME} -boot d -hda disco.img"
-      log "  (instale ovmf: sudo apt install ovmf)"
-      log "  (crie disco: qemu-img create -f qcow2 disco.img 40G)"
+      log "Testar em UEFI (obrigatório):"
+      log "  sudo apt install ovmf"
+      log "  qemu-img create -f qcow2 disco.img 50G"
+      log "  cp /usr/share/OVMF/OVMF_VARS.fd /tmp/OVMF_VARS.fd"
+      log "  qemu-system-x86_64 -m 4096 -enable-kvm -machine q35,smm=on \\"
+      log "    -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd \\"
+      log "    -drive if=pflash,format=raw,file=/tmp/OVMF_VARS.fd \\"
+      log "    -cdrom ${ISO_NAME} -drive file=disco.img,format=qcow2,if=virtio -boot d"
     else
       log "ISO não encontrada; verifique build-onedevsos.log"
     fi
