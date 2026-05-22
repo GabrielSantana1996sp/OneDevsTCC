@@ -128,9 +128,9 @@ john
 nikto
 sqlmap
 binwalk
+netcat
 
-# Bootloader UEFI (grub-efi — bare metal SSD moderno)
-# grub-pc e grub-efi-amd64 conflitam no Debian Trixie: não instale os dois.
+# Bootloader UEFI (grub-efi — grub-pc conflita com grub-efi no Debian Trixie)
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
@@ -181,10 +181,12 @@ fonts-noto fonts-noto-cjk
 polkitd pkexec
 snapd
 chromium
-fastfetch
 
 # Instalador
 calamares
+
+# Fastfetch (neofetch moderno)
+fastfetch
 
 # Plymouth
 plymouth plymouth-themes
@@ -207,7 +209,7 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
   fi
 
-  # grub-efi é o único bootloader — sem exclude list necessária
+  # grub-efi é o único bootloader — sem lista de exclusão
 
   # ── Hook 0001: configura grub-efi para UEFI ──────────────────────────────
   cat > config/hooks/live/0001-grub-efi-config.hook.chroot <<'EOF'
@@ -218,7 +220,6 @@ cat > /etc/default/grub.d/onedevs.cfg <<'GRUBCFG'
 GRUB_TIMEOUT=5
 GRUB_DISTRIBUTOR="OneDevsOS"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
-GRUB_CMDLINE_LINUX=""
 GRUBCFG
 echo "grub-efi configurado."
 EOF
@@ -276,6 +277,15 @@ fi
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
+
+# Fastfetch no login do terminal
+cat >> /etc/skel/.bashrc <<'BASHEOF'
+
+# OneDevs OS — system info
+if command -v fastfetch >/dev/null 2>&1; then
+  fastfetch
+fi
+BASHEOF
 cat > /etc/os-release <<'OSRELEASE'
 NAME="OneDevsOS"
 VERSION="1.0 (AlbertEinstein)"
@@ -339,16 +349,11 @@ defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
 allowManualPartitioning: true
 requiredStorage: 15.0
-
-# Partição EFI — Calamares identifica pelo mountPoint /boot/efi
 efiSystemPartitionSize: 512M
 efiSystemPartitionName: EFI
 efiSystemPartitionMountPoint: /boot/efi
-
-# Layout completo: EFI + /boot + / + swap + /home
-# IMPORTANTE: NÃO usar type:"ESP" nem attributes:"boot,esp" no partitionLayout —
-# causam "sfdisk --part-type ... ESP" que falha no Debian Trixie.
-# O Calamares reconhece a partição EFI pelo mountPoint /boot/efi.
+# NÃO usar type:"ESP" nem attributes no partitionLayout —
+# causa sfdisk --part-type ESP que falha no Debian Trixie.
 partitionLayout:
   - name: "efi"
     size: "512M"
@@ -369,7 +374,6 @@ partitionLayout:
     size: "100%"
     mountPoint: "/home"
     filesystem: "ext4"
-
 userSwapChoices:
   - none
   - small
@@ -395,22 +399,13 @@ EOF
 ---
 mountOptions:
   - filesystem: default
-    options:
-      - defaults
-      - relatime
+    options: [ defaults, relatime ]
   - filesystem: ext4
-    options:
-      - defaults
-      - relatime
-      - errors=remount-ro
+    options: [ defaults, relatime, errors=remount-ro ]
   - filesystem: fat32
-    options:
-      - defaults
-      - umask=0077
-      - shortname=mixed
+    options: [ defaults, umask=0077, shortname=mixed ]
   - filesystem: linuxswap
-    options:
-      - sw
+    options: [ sw ]
 efiMountPoint: /boot/efi
 efiMountOptions: defaults,umask=0077
 ssdExtraMountOptions:
@@ -642,6 +637,84 @@ EOF
 EOF
 
   log "Arquivos do live-build gerados/atualizados."
+
+  # ── Fastfetch: arte ASCII + config ────────────────────────────────────────
+  log "Integrando fastfetch..."
+
+  mkdir -p config/includes.chroot/etc/fastfetch
+  mkdir -p config/includes.chroot/etc/skel/.config/fastfetch
+
+  # Gera arte ASCII com cores ANSI (escudo partido: esq escuro / dir azul + listras)
+  python3 - > config/includes.chroot/etc/fastfetch/onedevsos.txt <<'PYEOF'
+B  = '\033[38;5;75m'
+GR = '\033[38;5;240m'
+W  = '\033[97m'
+R  = '\033[0m'
+BLD= '\033[1m'
+lines = [
+    f"{B}\u2571\u2571{R}",
+    f"{B} \u2571\u2571\u2571{R}",
+    f"{B}  \u2571\u2571\u2571\u2571{R}",
+    f"{B}   \u2571\u2571{R}",
+    f"         {B}\u256d\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e{R}",
+    f"        {B}\u256d\u256f{W}\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2570\u256e{R}",
+    f"       {B}\u256d\u256f{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2570\u256e{R}",
+    f"      {B}\u2502{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2502{R}",
+    f"      {B}\u2502{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2502{R}",
+    f"      {B}\u2502{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2502{R}",
+    f"      {B}\u2502{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2502{R}",
+    f"       {B}\u2570\u256e{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u256d\u256f{R}",
+    f"         {B}\u2570\u256e{GR}\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593{B}\u256d\u256f{R}",
+    f"           {B}\u2570\u256e{GR}\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593{B}\u256d\u256f{R}",
+    f"             {B}\u2570\u256e{GR}\u2593{B}|{B}\u2593{B}\u256d\u256f{R}",
+    f"               {B}\u2570\u2500\u253c\u2500\u256f{R}",
+    f"",
+    f"        {W}{BLD}Bem-Vindo ao{R}",
+    f"    {B}{BLD}One{R} {W}{BLD}Devs{R} {B}{BLD}OS{R}  {GR}AlbertEinstein{R}",
+    f"",
+    f"   {GR}DevSecOps \u00b7 Pentest \u00b7 Dev{R}",
+    f"",
+]
+print('\n'.join(lines))
+PYEOF
+
+  # Config do fastfetch
+  cat > config/includes.chroot/etc/skel/.config/fastfetch/config.jsonc <<'EOF'
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "source": "/etc/fastfetch/onedevsos.txt",
+    "type": "file",
+    "padding": { "top": 1, "left": 1, "right": 2 }
+  },
+  "display": {
+    "separator": "  \u2192  ",
+    "color": { "keys": "blue", "title": "blue" }
+  },
+  "modules": [
+    {
+      "type": "title",
+      "format": "{user-name}@{host-name}",
+      "color": { "user": "bright_blue", "at": "white", "host": "white" }
+    },
+    "separator",
+    { "type": "os",       "key": "  OS     " },
+    { "type": "kernel",   "key": "  Kernel " },
+    { "type": "shell",    "key": "  Shell  " },
+    { "type": "de",       "key": "  DE     " },
+    { "type": "wm",       "key": "  WM     " },
+    { "type": "cpu",      "key": "  CPU    " },
+    { "type": "memory",   "key": "  RAM    " },
+    { "type": "disk",     "key": "  Disk   " },
+    { "type": "uptime",   "key": "  Uptime " },
+    { "type": "datetime", "key": "  Data   ", "format": "%d/%m/%Y %H:%M" },
+    "separator",
+    { "type": "colors", "symbol": "circle", "paddingLeft": 3 }
+  ]
+}
+EOF
+
+  log "Fastfetch integrado."
 } # end generate_livebuild_files
 
 # ── Build ─────────────────────────────────────────────────────────────────────
@@ -691,14 +764,7 @@ run_build() {
       ISO_NAME="onedevsos-${CODENAME_LC}-1.0-${ARCH}.iso"
       mv "${ISO_CANDIDATE}" "${ISO_NAME}" || true
       log "ISO: ${ISO_NAME} ($(du -h "${ISO_NAME}" | cut -f1))"
-      log "Testar em UEFI (obrigatório):"
-      log "  sudo apt install ovmf"
-      log "  qemu-img create -f qcow2 disco.img 50G"
-      log "  cp /usr/share/OVMF/OVMF_VARS.fd /tmp/OVMF_VARS.fd"
-      log "  qemu-system-x86_64 -m 4096 -enable-kvm -machine q35,smm=on \\"
-      log "    -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd \\"
-      log "    -drive if=pflash,format=raw,file=/tmp/OVMF_VARS.fd \\"
-      log "    -cdrom ${ISO_NAME} -drive file=disco.img,format=qcow2,if=virtio -boot d"
+      log "Testar: qemu-system-x86_64 -m 4096 -cdrom ${ISO_NAME} -boot d -enable-kvm"
     else
       log "ISO não encontrada; verifique build-onedevsos.log"
     fi
