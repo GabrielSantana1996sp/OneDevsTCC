@@ -1,17 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2025 Gabriel Santana
-#
-# Este arquivo faz parte do projeto OneDevs.
-# Licenciado sob Apache License 2.0 (veja LICENSE).
-#
-# Atenção: este projeto pode incluir softwares de terceiros
-# licenciados sob GPL, MIT, BSD e outras licenças.
-# Cada componente mantém sua licença original.
-
 set -euo pipefail
-
-# ── Config ────────────────────────────────────────────────────────────────────
 DIST="trixie"
 CODENAME="AlbertEinstein"
 APPNAME="OneDevsOS - ${CODENAME}"
@@ -23,14 +13,10 @@ ARCH="amd64"
 LIVEBUILD_DIR="$(pwd)"
 PACKAGE_LIST="${LIVEBUILD_DIR}/config/package-lists/onedevs.list.chroot"
 ARCHIVES_DIR="${LIVEBUILD_DIR}/config/archives"
-
 COMMIT="38f0fe21e88015f157a1cfccbd06fc67a5e9bb18"
 RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/${COMMIT}/IMG"
-
 log()  { printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
 error(){ log "ERRO: $*"; exit 1; }
-
-# ── Checagem de rede ──────────────────────────────────────────────────────────
 ONLINE=0
 check_network() {
   if ! ip route show default >/dev/null 2>&1; then ONLINE=0; return 0; fi
@@ -40,8 +26,6 @@ check_network() {
 }
 check_network
 [ "${ONLINE}" -eq 1 ] && log "Rede detectada: modo ONLINE" || log "Nenhuma rede: modo OFFLINE"
-
-# ── Verificação de dependências ───────────────────────────────────────────────
 check_dependencies() {
   log "Verificando dependências..."
   local DEPS="debootstrap live-build xorriso squashfs-tools syslinux-common isolinux"
@@ -57,11 +41,8 @@ check_dependencies() {
     log "Todas as dependências instaladas."
   fi
 }
-
-# ── Gera arquivos do live-build ───────────────────────────────────────────────
 generate_livebuild_files() {
   log "Gerando arquivos do live-build..."
-
   mkdir -p config/{package-lists,hooks/live,apt,archives}
   mkdir -p config/includes.chroot/etc/{calamares/modules,calamares/scripts,apt/apt.conf.d}
   mkdir -p config/includes.chroot/etc/{lightdm/lightdm-gtk-greeter.conf.d,sysctl.d}
@@ -76,14 +57,11 @@ Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
 EOF
 
+  # FIX: sem bloqueio de grub-pc (conflito resolvido usando só grub-efi)
   cat > config/apt/preferences <<'EOF'
 Package: *
 Pin: release o=Debian
 Pin-Priority: 500
-
-Package: grub-pc grub-pc-bin
-Pin: release *
-Pin-Priority: -1
 EOF
 
   cat > config/includes.chroot/etc/apt/apt.conf.d/99onedevs <<'EOF'
@@ -132,9 +110,9 @@ john
 nikto
 sqlmap
 binwalk
-netcat
+netcat-openbsd
 
-# Bootloader EFI
+# Bootloader UEFI (grub-efi APENAS — grub-pc conflita no Debian Trixie)
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
@@ -162,6 +140,7 @@ gpg
 logcheck
 
 # Utilitários
+util-linux
 tmux
 htop
 ranger
@@ -212,24 +191,23 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
   fi
 
-  cat > config/package-lists/exclude.list.chroot <<'EOF'
-!grub-pc
-!grub-pc-bin
-EOF
+  # FIX: sem exclude list — grub-efi é o único bootloader
+  # (remover !grub-pc evita conflito de pacotes)
 
-  # ── Hook 0001: bloqueia grub-pc ───────────────────────────────────────────
-  cat > config/hooks/live/0001-block-grub-pc.hook.chroot <<'EOF'
+  # ── Hook 0001: configura grub-efi para UEFI ──────────────────────────────
+  cat > config/hooks/live/0001-grub-efi-config.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-mkdir -p /etc/apt/preferences.d
-cat > /etc/apt/preferences.d/block-grub-pc <<'PREF'
-Package: grub-pc grub-pc-bin
-Pin: release *
-Pin-Priority: -1
-PREF
-echo "grub-pc bloqueado."
+mkdir -p /etc/default/grub.d
+cat > /etc/default/grub.d/onedevs.cfg <<'GRUBCFG'
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="OneDevsOS"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX=""
+GRUBCFG
+echo "grub-efi configurado para UEFI."
 EOF
-  chmod +x config/hooks/live/0001-block-grub-pc.hook.chroot
+  chmod +x config/hooks/live/0001-grub-efi-config.hook.chroot
 
   # ── Hook 9997: assets do GitHub ───────────────────────────────────────────
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<HOOKEOF
@@ -252,13 +230,11 @@ dl "\${RAW}/Ligthdm/LigthDM.png"         /usr/share/backgrounds/onedevs/wallpape
 dl "\${RAW}/Calamares/Calamares.png"      /usr/share/calamares/branding/onedevs/logo.png   "logo Calamares"
 cp /usr/share/calamares/branding/onedevs/logo.png /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
 dl "\${RAW}/BootSlash/Boot%20splash%20(Plymouth).png" /usr/share/plymouth/themes/onedevs/boot.png "boot splash"
-
-# ── Fastfetch: config e arte ASCII do repositório ────────────────────────
+# ── Fastfetch: config e arte ASCII do repositório ─────────────────────────
 FF_COMMIT="a2c07762c6279c468a00c5cb61ad61d2a5945a93"
 FF_RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/\${FF_COMMIT}"
-mkdir -p /etc/fastfetch
-mkdir -p /etc/skel/.config/fastfetch
-dl "\${FF_RAW}/onedevos.txt"    /etc/fastfetch/onedevsos.txt       "fastfetch art"
+mkdir -p /etc/fastfetch /etc/skel/.config/fastfetch
+dl "\${FF_RAW}/onedevos.txt"    /etc/fastfetch/onedevsos.txt              "fastfetch art"
 dl "\${FF_RAW}/fastfetch.jsonc" /etc/skel/.config/fastfetch/config.jsonc "fastfetch config"
 echo "=== Assets OK ==="
 HOOKEOF
@@ -291,8 +267,6 @@ fi
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
-
-# Fastfetch no login do terminal
 cat >> /etc/skel/.bashrc <<'BASHEOF'
 
 # OneDevs OS — system info
@@ -313,7 +287,6 @@ OSRELEASE
 cat > /etc/issue <<'ISSUE'
 OneDevsOS 1.0 AlbertEinstein - DevSecOps Edition
 Usuário: dev | Senha: live
-
 \l
 ISSUE
 echo "Configuração concluída."
@@ -356,30 +329,50 @@ prompt-install: true
 dont-chroot: false
 EOF
 
-  # ── Calamares: partition.conf (SEM encrypt forçado) ───────────────────────
+  # ── Calamares: partition.conf ─────────────────────────────────────────────
+  # FIX: removido erase-ram15 inválido, adicionado partitionLayout correto
+  # FIX: NÃO usar type:"ESP" nem attributes — causa sfdisk --part-type ESP
+  #      que falha no Debian Trixie. Calamares identifica EFI pelo mountPoint.
   cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
 ---
 defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
 allowManualPartitioning: true
+requiredStorage: 15.0
+efiSystemPartitionSize: 512M
+efiSystemPartitionName: EFI
+efiSystemPartitionMountPoint: /boot/efi
+partitionLayout:
+  - name: "efi"
+    size: "512M"
+    mountPoint: "/boot/efi"
+    filesystem: "fat32"
+  - name: "boot"
+    size: "1024M"
+    mountPoint: "/boot"
+    filesystem: "ext4"
+  - name: "root"
+    size: "20480M"
+    mountPoint: "/"
+    filesystem: "ext4"
+  - name: "swap"
+    size: "4096M"
+    filesystem: "linuxswap"
+  - name: "home"
+    size: "100%"
+    mountPoint: "/home"
+    filesystem: "ext4"
 userSwapChoices:
   - none
   - small
   - suspend
-  - reuse
   - file
 initialSwapChoice: small
-erase-ram15:
-  filesystem: ext4
-  mountPoint: /
-  swap:
-    size: "ram:15%"
-    min: 512MiB
-    max: 8GiB
 EOF
 
-  # ── Calamares: bootloader.conf ───────────────────────────────────────────
-  # installEFIFallback: true → usa --removable, não precisa de EFI vars (funciona em VM)
+  # ── Calamares: bootloader.conf ────────────────────────────────────────────
+  # FIX: installEFIFallback:true → grub-install --removable
+  #      funciona em VM e bare metal sem precisar de EFI vars
   cat > config/includes.chroot/etc/calamares/modules/bootloader.conf <<'EOF'
 ---
 efiBootLoader: grub
@@ -412,7 +405,8 @@ ssdExtraMountOptions:
     options: noatime
 EOF
 
-  # ── Calamares: unpackfs.conf (path correto do live-build) ─────────────────
+  # ── Calamares: unpackfs.conf ──────────────────────────────────────────────
+  # FIX: path correto — medium/live/ (não rootfs/)
   cat > config/includes.chroot/etc/calamares/modules/unpackfs.conf <<'EOF'
 ---
 unpack:
@@ -422,6 +416,7 @@ unpack:
 EOF
 
   # ── Calamares: mount.conf ─────────────────────────────────────────────────
+  # FIX: removidos /dev e /run com options:bind (bug Calamares 3.3.14)
   cat > config/includes.chroot/etc/calamares/modules/mount.conf <<'EOF'
 ---
 extraMounts:
@@ -483,7 +478,6 @@ passwd -l root 2>/dev/null || true
 sed -i 's/^autologin-user=.*//' /etc/lightdm/lightdm.conf 2>/dev/null || true
 cat > /etc/issue <<'ISSUE'
 OneDevsOS 1.0 AlbertEinstein - DevSecOps Edition
-
 \n \l
 ISSUE
 echo "[OneDevsOS] Sistema pronto."
@@ -518,7 +512,6 @@ EOF
 
   cat > config/includes.chroot/usr/share/calamares/branding/onedevs/show.qml <<'EOF'
 import QtQuick 2.0
-
 Rectangle {
   color: "#2c3e50"
   anchors.fill: parent
@@ -634,19 +627,16 @@ EOF
 EOF
 
   log "Arquivos do live-build gerados/atualizados."
-} # end generate_livebuild_files
+}
 
-# ── Build ─────────────────────────────────────────────────────────────────────
 run_build() {
   log "Sincronizando relógio..."
   sudo timedatectl set-ntp true 2>/dev/null || true
   sleep 3
   command -v ntpdate >/dev/null 2>&1 && sudo ntpdate -u pool.ntp.org 2>/dev/null || true
   log "Horário: $(date)"
-
   log "Limpando ambiente anterior..."
   sudo lb clean --purge || true
-
   log "Executando lb config..."
   lb config \
     --mode debian \
@@ -668,11 +658,9 @@ run_build() {
     --iso-volume "$VOLUME" \
     --iso-publisher "$PUBLISHER" \
     --bootappend-live "boot=live components quiet splash persistence persistence-label=ONDEVS username=$USERNAME hostname=$HOSTNAME"
-
   log "Iniciando build da ISO (pode levar 1-2h)..."
   sudo lb build 2>&1 | tee build-onedevsos.log
   local BUILD_EXIT=${PIPESTATUS[0]:-0}
-
   if [ "${BUILD_EXIT}" -eq 0 ]; then
     log "Build concluído com sucesso!"
     local ISO_CANDIDATE
@@ -683,7 +671,14 @@ run_build() {
       ISO_NAME="onedevsos-${CODENAME_LC}-1.0-${ARCH}.iso"
       mv "${ISO_CANDIDATE}" "${ISO_NAME}" || true
       log "ISO: ${ISO_NAME} ($(du -h "${ISO_NAME}" | cut -f1))"
-      log "Testar: qemu-system-x86_64 -m 4096 -cdrom ${ISO_NAME} -boot d -enable-kvm"
+      log "Testar em UEFI:"
+      log "  cp /usr/share/OVMF/OVMF_VARS_4M.fd /tmp/OVMF_VARS.fd"
+      log "  qemu-img create -f qcow2 disco.img 50G"
+      log "  qemu-system-x86_64 -m 4096 -enable-kvm -machine q35,smm=on \\"
+      log "    -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.fd \\"
+      log "    -drive if=pflash,format=raw,file=/tmp/OVMF_VARS.fd \\"
+      log "    -cdrom ${ISO_NAME} -drive file=disco.img,format=qcow2,if=virtio -boot d \\"
+      log "    -vga virtio -display gtk"
     else
       log "ISO não encontrada; verifique build-onedevsos.log"
     fi
@@ -692,7 +687,6 @@ run_build() {
   fi
 }
 
-# ── CLI ───────────────────────────────────────────────────────────────────────
 case "${1:-}" in
   generate_only)
     generate_livebuild_files
@@ -708,7 +702,6 @@ case "${1:-}" in
     ;;
 esac
 
-# ── Main ──────────────────────────────────────────────────────────────────────
 log "OneDevsOS Build Script - ${CODENAME} (${DIST}) ${ARCH}"
 check_dependencies
 generate_livebuild_files
