@@ -80,6 +80,10 @@ EOF
 Package: *
 Pin: release o=Debian
 Pin-Priority: 500
+
+Package: grub-pc grub-pc-bin
+Pin: release *
+Pin-Priority: -1
 EOF
 
   cat > config/includes.chroot/etc/apt/apt.conf.d/99onedevs <<'EOF'
@@ -130,7 +134,7 @@ sqlmap
 binwalk
 netcat
 
-# Bootloader UEFI (grub-efi — grub-pc conflita com grub-efi no Debian Trixie)
+# Bootloader EFI
 grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
@@ -158,7 +162,6 @@ gpg
 logcheck
 
 # Utilitários
-util-linux
 tmux
 htop
 ranger
@@ -185,7 +188,7 @@ chromium
 # Instalador
 calamares
 
-# Fastfetch (neofetch moderno)
+# Fastfetch
 fastfetch
 
 # Plymouth
@@ -209,21 +212,24 @@ EOF
     log "Criada config/package-lists/onedevs.list.chroot"
   fi
 
-  # grub-efi é o único bootloader — sem lista de exclusão
+  cat > config/package-lists/exclude.list.chroot <<'EOF'
+!grub-pc
+!grub-pc-bin
+EOF
 
-  # ── Hook 0001: configura grub-efi para UEFI ──────────────────────────────
-  cat > config/hooks/live/0001-grub-efi-config.hook.chroot <<'EOF'
+  # ── Hook 0001: bloqueia grub-pc ───────────────────────────────────────────
+  cat > config/hooks/live/0001-block-grub-pc.hook.chroot <<'EOF'
 #!/bin/bash
 set -e
-mkdir -p /etc/default/grub.d
-cat > /etc/default/grub.d/onedevs.cfg <<'GRUBCFG'
-GRUB_TIMEOUT=5
-GRUB_DISTRIBUTOR="OneDevsOS"
-GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
-GRUBCFG
-echo "grub-efi configurado."
+mkdir -p /etc/apt/preferences.d
+cat > /etc/apt/preferences.d/block-grub-pc <<'PREF'
+Package: grub-pc grub-pc-bin
+Pin: release *
+Pin-Priority: -1
+PREF
+echo "grub-pc bloqueado."
 EOF
-  chmod +x config/hooks/live/0001-grub-efi-config.hook.chroot
+  chmod +x config/hooks/live/0001-block-grub-pc.hook.chroot
 
   # ── Hook 9997: assets do GitHub ───────────────────────────────────────────
   cat > config/hooks/live/9997-onedevs-assets.hook.chroot <<HOOKEOF
@@ -246,6 +252,14 @@ dl "\${RAW}/Ligthdm/LigthDM.png"         /usr/share/backgrounds/onedevs/wallpape
 dl "\${RAW}/Calamares/Calamares.png"      /usr/share/calamares/branding/onedevs/logo.png   "logo Calamares"
 cp /usr/share/calamares/branding/onedevs/logo.png /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
 dl "\${RAW}/BootSlash/Boot%20splash%20(Plymouth).png" /usr/share/plymouth/themes/onedevs/boot.png "boot splash"
+
+# ── Fastfetch: config e arte ASCII do repositório ────────────────────────
+FF_COMMIT="a2c07762c6279c468a00c5cb61ad61d2a5945a93"
+FF_RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/\${FF_COMMIT}"
+mkdir -p /etc/fastfetch
+mkdir -p /etc/skel/.config/fastfetch
+dl "\${FF_RAW}/onedevos.txt"    /etc/fastfetch/onedevsos.txt       "fastfetch art"
+dl "\${FF_RAW}/fastfetch.jsonc" /etc/skel/.config/fastfetch/config.jsonc "fastfetch config"
 echo "=== Assets OK ==="
 HOOKEOF
   chmod +x config/hooks/live/9997-onedevs-assets.hook.chroot
@@ -342,47 +356,30 @@ prompt-install: true
 dont-chroot: false
 EOF
 
-  # ── Calamares: partition.conf ─────────────────────────────────────────────
+  # ── Calamares: partition.conf (SEM encrypt forçado) ───────────────────────
   cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
 ---
 defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
 allowManualPartitioning: true
-requiredStorage: 15.0
-efiSystemPartitionSize: 512M
-efiSystemPartitionName: EFI
-efiSystemPartitionMountPoint: /boot/efi
-# NÃO usar type:"ESP" nem attributes no partitionLayout —
-# causa sfdisk --part-type ESP que falha no Debian Trixie.
-partitionLayout:
-  - name: "efi"
-    size: "512M"
-    mountPoint: "/boot/efi"
-    filesystem: "fat32"
-  - name: "boot"
-    size: "1024M"
-    mountPoint: "/boot"
-    filesystem: "ext4"
-  - name: "root"
-    size: "20480M"
-    mountPoint: "/"
-    filesystem: "ext4"
-  - name: "swap"
-    size: "4096M"
-    filesystem: "linuxswap"
-  - name: "home"
-    size: "100%"
-    mountPoint: "/home"
-    filesystem: "ext4"
 userSwapChoices:
   - none
   - small
   - suspend
+  - reuse
   - file
 initialSwapChoice: small
+erase-ram15:
+  filesystem: ext4
+  mountPoint: /
+  swap:
+    size: "ram:15%"
+    min: 512MiB
+    max: 8GiB
 EOF
 
-  # ── Calamares: bootloader.conf (UEFI grub-efi) ───────────────────────────
+  # ── Calamares: bootloader.conf ───────────────────────────────────────────
+  # installEFIFallback: true → usa --removable, não precisa de EFI vars (funciona em VM)
   cat > config/includes.chroot/etc/calamares/modules/bootloader.conf <<'EOF'
 ---
 efiBootLoader: grub
@@ -637,84 +634,6 @@ EOF
 EOF
 
   log "Arquivos do live-build gerados/atualizados."
-
-  # ── Fastfetch: arte ASCII + config ────────────────────────────────────────
-  log "Integrando fastfetch..."
-
-  mkdir -p config/includes.chroot/etc/fastfetch
-  mkdir -p config/includes.chroot/etc/skel/.config/fastfetch
-
-  # Gera arte ASCII com cores ANSI (escudo partido: esq escuro / dir azul + listras)
-  python3 - > config/includes.chroot/etc/fastfetch/onedevsos.txt <<'PYEOF'
-B  = '\033[38;5;75m'
-GR = '\033[38;5;240m'
-W  = '\033[97m'
-R  = '\033[0m'
-BLD= '\033[1m'
-lines = [
-    f"{B}\u2571\u2571{R}",
-    f"{B} \u2571\u2571\u2571{R}",
-    f"{B}  \u2571\u2571\u2571\u2571{R}",
-    f"{B}   \u2571\u2571{R}",
-    f"         {B}\u256d\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e{R}",
-    f"        {B}\u256d\u256f{W}\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2570\u256e{R}",
-    f"       {B}\u256d\u256f{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2570\u256e{R}",
-    f"      {B}\u2502{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2502{R}",
-    f"      {B}\u2502{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2502{R}",
-    f"      {B}\u2502{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2502{R}",
-    f"      {B}\u2502{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u2502{R}",
-    f"       {B}\u2570\u256e{GR}\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593\u2593\u2593{B}\u256d\u256f{R}",
-    f"         {B}\u2570\u256e{GR}\u2593\u2593\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593\u2593\u2593{B}\u256d\u256f{R}",
-    f"           {B}\u2570\u256e{GR}\u2593\u2593\u2593{B}|{B}\u2593\u2593\u2593{B}\u256d\u256f{R}",
-    f"             {B}\u2570\u256e{GR}\u2593{B}|{B}\u2593{B}\u256d\u256f{R}",
-    f"               {B}\u2570\u2500\u253c\u2500\u256f{R}",
-    f"",
-    f"        {W}{BLD}Bem-Vindo ao{R}",
-    f"    {B}{BLD}One{R} {W}{BLD}Devs{R} {B}{BLD}OS{R}  {GR}AlbertEinstein{R}",
-    f"",
-    f"   {GR}DevSecOps \u00b7 Pentest \u00b7 Dev{R}",
-    f"",
-]
-print('\n'.join(lines))
-PYEOF
-
-  # Config do fastfetch
-  cat > config/includes.chroot/etc/skel/.config/fastfetch/config.jsonc <<'EOF'
-{
-  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-  "logo": {
-    "source": "/etc/fastfetch/onedevsos.txt",
-    "type": "file",
-    "padding": { "top": 1, "left": 1, "right": 2 }
-  },
-  "display": {
-    "separator": "  \u2192  ",
-    "color": { "keys": "blue", "title": "blue" }
-  },
-  "modules": [
-    {
-      "type": "title",
-      "format": "{user-name}@{host-name}",
-      "color": { "user": "bright_blue", "at": "white", "host": "white" }
-    },
-    "separator",
-    { "type": "os",       "key": "  OS     " },
-    { "type": "kernel",   "key": "  Kernel " },
-    { "type": "shell",    "key": "  Shell  " },
-    { "type": "de",       "key": "  DE     " },
-    { "type": "wm",       "key": "  WM     " },
-    { "type": "cpu",      "key": "  CPU    " },
-    { "type": "memory",   "key": "  RAM    " },
-    { "type": "disk",     "key": "  Disk   " },
-    { "type": "uptime",   "key": "  Uptime " },
-    { "type": "datetime", "key": "  Data   ", "format": "%d/%m/%Y %H:%M" },
-    "separator",
-    { "type": "colors", "symbol": "circle", "paddingLeft": 3 }
-  ]
-}
-EOF
-
-  log "Fastfetch integrado."
 } # end generate_livebuild_files
 
 # ── Build ─────────────────────────────────────────────────────────────────────
