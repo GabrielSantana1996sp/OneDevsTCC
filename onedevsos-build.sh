@@ -110,7 +110,6 @@ john
 nikto
 sqlmap
 binwalk
-netcat-openbsd
 
 # Bootloader UEFI (grub-efi APENAS — grub-pc conflita no Debian Trixie)
 grub-efi-amd64
@@ -301,6 +300,9 @@ instances:
 - id: remove-live
   module: shellprocess
   config: shellprocess@remove-live.conf
+- id: setup-efi
+  module: shellprocess
+  config: shellprocess@setup-efi.conf
 sequence:
 - show:
   - welcome
@@ -319,6 +321,7 @@ sequence:
   - keyboard
   - users
   - hwclock
+  - shellprocess@setup-efi
   - bootloader
   - shellprocess@remove-live
   - umount
@@ -371,18 +374,56 @@ initialSwapChoice: small
 EOF
 
   # ── Calamares: bootloader.conf ────────────────────────────────────────────
-  # FIX: installEFIFallback:true → grub-install --removable
-  #      funciona em VM e bare metal sem precisar de EFI vars
+  # grubInstall aponta para o wrapper que resolve NVRAM vs --no-nvram
   cat > config/includes.chroot/etc/calamares/modules/bootloader.conf <<'EOF'
 ---
 efiBootLoader: grub
-grubInstall: grub-install
+grubInstall: grub-install-uefi
 grubMkconfig: grub-mkconfig
 grubCfg: /boot/grub/grub.cfg
 grubProbe: grub-probe
 efiBootLoaderId: OneDevsOS
 installEFIFallback: true
 EOF
+
+  # ── Calamares: shellprocess@setup-efi.conf ────────────────────────────────
+  # Roda NO CHROOT do sistema instalado (dontChroot: false)
+  # Cria wrapper grub-install-uefi antes do step bootloader
+  cat > config/includes.chroot/etc/calamares/modules/shellprocess@setup-efi.conf <<'EOF'
+---
+dontChroot: false
+timeout: 30
+script:
+  - "-": /etc/calamares/scripts/setup-efi.sh
+EOF
+
+  cat > config/includes.chroot/etc/calamares/scripts/setup-efi.sh <<'EOF'
+#!/bin/bash
+set -e
+echo "[OneDevsOS] Configurando grub-install wrapper..."
+
+# Wrapper inteligente:
+# 1. Tenta instalar normalmente (com NVRAM — melhor para bare metal)
+# 2. Se falhar, cai em --no-nvram --removable (funciona em VM e UEFI restrito)
+cat > /usr/local/sbin/grub-install-uefi <<'WRAPPER'
+#!/bin/bash
+echo "[grub-wrapper] Tentando instalação EFI normal..."
+if grub-install "$@" 2>/tmp/grub-install.log; then
+  echo "[grub-wrapper] Sucesso com NVRAM."
+  exit 0
+fi
+echo "[grub-wrapper] Falhou. Tentando --no-nvram --removable..."
+exec grub-install --no-nvram --removable "$@"
+WRAPPER
+
+chmod +x /usr/local/sbin/grub-install-uefi
+
+# Garante que o PATH inclui /usr/local/sbin
+export PATH="/usr/local/sbin:$PATH"
+
+echo "[OneDevsOS] Wrapper grub-install-uefi criado."
+EOF
+  chmod +x config/includes.chroot/etc/calamares/scripts/setup-efi.sh
 
   # ── Calamares: fstab.conf ─────────────────────────────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/fstab.conf <<'EOF'
