@@ -7606,3 +7606,831 @@ ____________
 ____________
 ____________
 
+15:07:58 [6]: void ChoicePage::updateActionChoicePreview(InstallChoice)
+    Updating partitioning preview widgets. 
+15:07:58 [6]: DEBUG (Qt): smartctl initialization failed for  "/dev/vda" :  No such file or directory
+15:07:58 [6]: DEBUG (Qt): error during smart output parsing for  "/dev/vda" :  No such file or directory
+15:07:58 [2]: WARNING (Qt): unknown file system type  ""  on  "/dev/vda"
+15:07:58 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:07:58 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:07:58 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:07:58 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:07:58 [2]: void PartitionCoreModule::scanForEfiSystemPartitions()
+    WARNING: system is EFI but no EFI system partitions found. 
+15:07:59 [6]: PartitionTable* CreatePartitionTableJob::createTable()
+    CreatePartitionTableJob::createTable trying to make table for device "/dev/vda" 
+15:07:59 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:07:59 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:07:59 [2]: void PartitionCoreModule::scanForEfiSystemPartitions()
+    WARNING: system is EFI but no EFI system partitions found. 
+15:07:59 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:07:59 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:07:59 [6]: void PartitionCoreModule::scanForEfiSystemPartitions()
+    system is EFI and new EFI system partition has been found. 
+15:07:59 [6]: quint64 swapSuggestion(quint64, Config::SwapChoice)
+    Suggested swap size: 8 GiB 
+15:07:59 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:07:59 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:07:59 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:07:59 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:07:59 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:07:59 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:07:59 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:07:59 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:07:59 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:07:59 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:07:59 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:07:59 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:07:59 [6]: void PartitionCoreModule::dumpQueue() const
+    # Queue: 
+    .. ## Device: "/dev/vda" 
+    .. - CreatePartitionTableJob 
+    .. - CreatePartitionJob 
+    .. - SetPartFlagsJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+15:08:05 [6]: void ChoicePage::applyActionChoice(InstallChoice)
+    InstallChoice Config::Erase "erase" 
+15:08:05 [6]: void ChoicePage::updateActionChoicePreview(InstallChoice)
+    Updating partitioning preview widgets. 
+15:08:05 [6]: DEBUG (Qt): smartctl initialization failed for  "/dev/vda" :  No such file or directory
+15:08:05 [6]: DEBUG (Qt): error during smart output parsing for  "/dev/vda" :  No such file or directory
+15:08:05 [2]: WARNING (Qt): unknown file system type  ""  on  "/dev/vda"
+15:08:05 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:05 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:05 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:05 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:05 [2]: void PartitionCoreModule::scanForEfiSystemPartitions()
+    WARNING: system is EFI but no EFI system partitions found. 
+15:08:05 [6]: PartitionTable* CreatePartitionTableJob::createTable()
+    CreatePartitionTableJob::createTable trying to make table for device "/dev/vda" 
+15:08:05 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:05 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:05 [2]: void PartitionCoreModule::scanForEfiSystemPartitions()
+    WARNING: system is EFI but no EFI system partitions found. 
+15:08:05 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:05 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:05 [6]: void PartitionCoreModule::scanForEfiSystemPartitions()
+    system is EFI and new EFI system partition has been found. 
+15:08:05 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:05 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:06 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:06 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:06 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:06 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:06 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:06 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:06 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:06 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:06 [6]: void PartitionCoreModule::dumpQueue() const
+    # Queue: 
+    .. ## Device: "/dev/vda" 
+    .. - CreatePartitionTableJob 
+    .. - CreatePartitionJob 
+    .. - SetPartFlagsJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+15:08:24 [6]: void ChoicePage::applyActionChoice(InstallChoice)
+    InstallChoice Config::Erase "erase" 
+15:08:24 [6]: void ChoicePage::updateActionChoicePreview(InstallChoice)
+    Updating partitioning preview widgets. 
+15:08:24 [6]: DEBUG (Qt): smartctl initialization failed for  "/dev/vda" :  No such file or directory
+15:08:24 [6]: DEBUG (Qt): error during smart output parsing for  "/dev/vda" :  No such file or directory
+15:08:24 [2]: WARNING (Qt): unknown file system type  ""  on  "/dev/vda"
+15:08:24 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:24 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:24 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:24 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:24 [2]: void PartitionCoreModule::scanForEfiSystemPartitions()
+    WARNING: system is EFI but no EFI system partitions found. 
+15:08:24 [6]: PartitionTable* CreatePartitionTableJob::createTable()
+    CreatePartitionTableJob::createTable trying to make table for device "/dev/vda" 
+15:08:24 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:24 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:25 [2]: void PartitionCoreModule::scanForEfiSystemPartitions()
+    WARNING: system is EFI but no EFI system partitions found. 
+15:08:25 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:25 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:25 [6]: void PartitionCoreModule::scanForEfiSystemPartitions()
+    system is EFI and new EFI system partition has been found. 
+15:08:25 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:25 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:25 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:25 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:25 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:25 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:25 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:25 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:25 [2]: WARNING (Qt): beginResetModel called on BootLoaderModel(0x55813c88fe90) without calling endResetModel first
+15:08:25 [2]: WARNING (Qt): endResetModel called on BootLoaderModel(0x55813c88fe90) without calling beginResetModel first
+15:08:25 [6]: void PartitionCoreModule::dumpQueue() const
+    # Queue: 
+    .. ## Device: "/dev/vda" 
+    .. - CreatePartitionTableJob 
+    .. - CreatePartitionJob 
+    .. - SetPartFlagsJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+    .. - CreatePartitionJob 
+15:08:48 [2]: WARNING (Qt): QString::arg: Argument missing: Configure timezone para 1, America/Sao Paulo
+15:08:48 [2]: WARNING (Qt): QString::arg: Argument missing: modelo teclado foi configurado para 1, Generic 105-key PC
+15:08:48 [2]: WARNING (Qt): QObject::setParent: Cannot set parent, new parent is in a different thread
+15:08:48 [6]: virtual QString PartitionViewStep::prettyStatus() const
+    Summary for Partition 1 Config::Erase 
+15:08:48 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+15:08:48 [6]: QVariantList FillGlobalStorageJob::createPartitionList() const
+    Building partition information map 
+    .. partitions on "/dev/vda" 
+    ..  mapping for "" "unallocated" 
+     partlabel :   "" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "unknown" 
+     fsName :   "unknown" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "false" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "EFI" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "efi" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "boot" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "root" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "swap" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "linuxswap" 
+     fsName :   "linuxswap" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "home" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/home" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+15:08:48 [2]: WARNING (Qt): QLayout: Attempting to add QLayout "" to QWidget "", which already has a layout
+15:08:48 [2]: WARNING (Qt): QObject::setParent: Cannot set parent, new parent is in a different thread
+15:08:48 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+15:08:48 [6]: QVariantList FillGlobalStorageJob::createPartitionList() const
+    Building partition information map 
+    .. partitions on "/dev/vda" 
+    ..  mapping for "" "unallocated" 
+     partlabel :   "" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "unknown" 
+     fsName :   "unknown" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "false" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "EFI" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "efi" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "boot" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "root" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "swap" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "linuxswap" 
+     fsName :   "linuxswap" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+    ..  mapping for "" "New Partition" 
+     partlabel :   "home" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/home" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "true" 
+15:08:48 [6]: void ensureSize(QWidget*, QScrollArea*, Calamares::ViewStep*)
+    Summary widget is larger than viewport, enlarge by 324 to QSize(834, 812) 
+15:09:06 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+15:09:06 [6]: void Calamares::JobThread::finalize()
+    There are 30 jobs, total weight 24 
+    .. Job 1 "Gerenciando configurações de auto-montagem…" +wt 0.0769231 tot.wt 0.0769231 
+    .. Job 2 "Limpando todas as montagens temporárias…" +wt 0.0769231 tot.wt 0.153846 
+    .. Job 3 "Limpar as montagens para as operações nas partições em /dev/vda" +wt 0.0769231 tot.wt 0.230769 
+    .. Job 4 "Criando nova tabela de partições gpt em /dev/vda…" +wt 0.0769231 tot.wt 0.307692 
+    .. Job 5 "Criar nova partição de 512MiB em /dev/vda (vda) com entradas EFI" +wt 0.0769231 tot.wt 0.384615 
+    .. Job 6 "Definir marcadores na partição fat32 de 512MiB" +wt 0.0769231 tot.wt 0.461538 
+    .. Job 7 "Criar nova partição de 512MiB em /dev/vda (vda) com entradas efi" +wt 0.0769231 tot.wt 0.538462 
+    .. Job 8 "Criar nova partição de 1024MiB em /dev/vda (vda) com entradas boot" +wt 0.0769231 tot.wt 0.615385 
+    .. Job 9 "Criar nova partição de 20480MiB em /dev/vda (vda) com entradas root" +wt 0.0769231 tot.wt 0.692308 
+    .. Job 10 "Criar nova partição de 4096MiB em /dev/vda (vda) com entradas swap" +wt 0.0769231 tot.wt 0.769231 
+    .. Job 11 "Criar nova partição de 24573MiB em /dev/vda (vda) com entradas home" +wt 0.0769231 tot.wt 0.846154 
+    .. Job 12 "Definir informações da partição" +wt 0.0769231 tot.wt 0.923077 
+    .. Job 13 "Gerenciando configurações de auto-montagem…" +wt 0.0769231 tot.wt 1 
+    .. Job 14 "mount" +wt 1 tot.wt 2 
+    .. Job 15 "unpackfs" +wt 12 tot.wt 14 
+    .. Job 16 "Gerar machine-id." +wt 1 tot.wt 15 
+    .. Job 17 "fstab" +wt 1 tot.wt 16 
+    .. Job 18 "Definindo fuso horário para America/Sao_Paulo…" +wt 1 tot.wt 17 
+    .. Job 19 "Definindo modelo de teclado para pc105, leiaute como br-nodeadkeys…" +wt 1 tot.wt 18 
+    .. Job 20 "Configurando usuários <pre>sudo</pre>…" +wt 0.166667 tot.wt 18.1667 
+    .. Job 21 "Preparando grupos…" +wt 0.166667 tot.wt 18.3333 
+    .. Job 22 "Criar usuário gsm" +wt 0.166667 tot.wt 18.5 
+    .. Job 23 "Definir senha para usuário gsm" +wt 0.166667 tot.wt 18.6667 
+    .. Job 24 "Definir senha para usuário root" +wt 0.166667 tot.wt 18.8333 
+    .. Job 25 "Definir nome da máquina gsm-standardpc" +wt 0.166667 tot.wt 19 
+    .. Job 26 "hwclock" +wt 1 tot.wt 20 
+    .. Job 27 "Executando processos de shell…" +wt 1 tot.wt 21 
+    .. Job 28 "bootloader" +wt 1 tot.wt 22 
+    .. Job 29 "Executando processos de shell…" +wt 1 tot.wt 23 
+    .. Job 30 "Desmontando sistema de arquivos…" +wt 1 tot.wt 24 
+15:09:06 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Gerenciando configurações de auto-montagem…" ( 1 / 30 ) 
+15:09:06 [6]: virtual Calamares::JobResult AutoMountManagementJob::exec()
+    Set automount to disable 
+15:09:06 [6]: void Calamares::Partition::querySolidAutoMount(QDBusConnection&, AutoMountInfo&)
+    Solid not available: "Not connected to D-Bus server" 
+15:09:06 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Limpando todas as montagens temporárias…" ( 2 / 30 ) 
+15:09:06 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Limpar as montagens para as operações nas partições em /dev/vda" ( 3 / 30 ) 
+15:09:06 [2]: QStringList getLVMVolumes()
+    WARNING: this system does not seem to have LVM2 tools. 
+15:09:06 [2]: QStringList getPVGroups(const QString&)
+    WARNING: this system does not seem to have LVM2 tools. 
+15:09:06 [6]: QStringList getPartitionsForDevice(const QString&)
+    Reading from "/proc/partitions" looking for "vda" 
+15:09:06 [6]: virtual Calamares::JobResult ClearMountsJob::exec()
+    ClearMountsJob finished. Here's what was done: 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+15:09:06 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criando nova tabela de partições gpt em /dev/vda…" ( 4 / 30 ) 
+15:09:06 [6]: virtual Calamares::JobResult CreatePartitionTableJob::exec()
+    Creating new partition table of type "gpt" , uncommitted partitions: 
+    .. "unallocated" 
+    .. "New Partition" 
+    .. "New Partition" 
+    .. "New Partition" 
+    .. "New Partition" 
+    .. "New Partition" 
+    .. "New Partition" 
+    .. Running QList("lsblk") 
+    .. Finished. Exit code: 0 output:
+NAME  MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+loop0   7:0    0  2.9G  1 loop /run/live/rootfs/filesystem.squashfs
+sr0    11:0    1    3G  0 rom  /run/live/medium
+vda   254:0    0   50G  0 disk
+    .. lsblk output:
+ NAME  MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+loop0   7:0    0  2.9G  1 loop /run/live/rootfs/filesystem.squashfs
+sr0    11:0    1    3G  0 rom  /run/live/medium
+vda   254:0    0   50G  0 disk
+    .. Running QList("mount") 
+    .. Finished. Exit code: 0 output:
+sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+udev on /dev type devtmpfs (rw,nosuid,relatime,size=1915420k,nr_inodes=478855,mode=755,inode64)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=600,ptmxmode=000)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=401016k,mode=755,inode64)
+/dev/sr0 on /run/live/medium type iso9660 (ro,noatime,nojoliet,check=s,map=n,blocksize=2048,iocharset=utf8)
+/dev/loop0 on /run/live/rootfs/filesystem.squashfs type squashfs (ro,noatime,errors=continue)
+tmpfs on /run/live/overlay type tmpfs (rw,noatime,size=2005068k,mode=755,inode64)
+overlay on / type overlay (rw,noatime,lowerdir=/run/live/rootfs/filesystem.squashfs/,upperdir=/run/live/overlay/rw,workdir=/run/live/overlay/work,redirect_dir=on,uuid=on)
+securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,inode64)
+cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
+pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+efivarfs on /sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
+bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
+systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=40,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=1651)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+hugetlbfs on /dev/hugepages type hugetlbfs (rw,nosuid,nodev,relatime,pagesize=2M)
+tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k,inode64)
+debugfs on /sys/kernel/debug type debugfs (rw,nosuid,nodev,noexec,relatime)
+tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/credentials/systemd-journald.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+fusectl on /sys/fs/fuse/connections type fusectl (rw,nosuid,nodev,noexec,relatime)
+configfs on /sys/kernel/config type configfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /tmp type tmpfs (rw,nosuid,nodev,relatime,inode64)
+binfmt_misc on /proc/sys/fs/binfmt_misc type binfmt_misc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/credentials/getty@tty1.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+tmpfs on /run/user/1000 type tmpfs (rw,nosuid,nodev,relatime,size=401012k,nr_inodes=100253,mode=700,uid=1000,gid=1000,inode64)
+    .. mount output:
+ sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+udev on /dev type devtmpfs (rw,nosuid,relatime,size=1915420k,nr_inodes=478855,mode=755,inode64)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=600,ptmxmode=000)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=401016k,mode=755,inode64)
+/dev/sr0 on /run/live/medium type iso9660 (ro,noatime,nojoliet,check=s,map=n,blocksize=2048,iocharset=utf8)
+/dev/loop0 on /run/live/rootfs/filesystem.squashfs type squashfs (ro,noatime,errors=continue)
+tmpfs on /run/live/overlay type tmpfs (rw,noatime,size=2005068k,mode=755,inode64)
+overlay on / type overlay (rw,noatime,lowerdir=/run/live/rootfs/filesystem.squashfs/,upperdir=/run/live/overlay/rw,workdir=/run/live/overlay/work,redirect_dir=on,uuid=on)
+securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,inode64)
+cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
+pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+efivarfs on /sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
+bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
+systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=40,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=1651)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+hugetlbfs on /dev/hugepages type hugetlbfs (rw,nosuid,nodev,relatime,pagesize=2M)
+tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k,inode64)
+debugfs on /sys/kernel/debug type debugfs (rw,nosuid,nodev,noexec,relatime)
+tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/credentials/systemd-journald.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+fusectl on /sys/fs/fuse/connections type fusectl (rw,nosuid,nodev,noexec,relatime)
+configfs on /sys/kernel/config type configfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /tmp type tmpfs (rw,nosuid,nodev,relatime,inode64)
+binfmt_misc on /proc/sys/fs/binfmt_misc type binfmt_misc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/credentials/getty@tty1.service type tmpfs (ro,nosuid,nodev,noexec,relatime,nosymfollow,size=1024k,nr_inodes=1024,mode=700,inode64,noswap)
+tmpfs on /run/user/1000 type tmpfs (rw,nosuid,nodev,relatime,size=401012k,nr_inodes=100253,mode=700,uid=1000,gid=1000,inode64)
+15:09:07 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criar nova partição de 512MiB em /dev/vda (vda) com entradas EFI" ( 5 / 30 ) 
+15:09:10 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definir marcadores na partição /dev/vda1" ( 6 / 30 ) 
+15:09:10 [6]: virtual Calamares::JobResult SetPartFlagsJob::exec()
+    Setting flags on "/dev/vda" partition "/dev/vda1" 
+     "boot" 
+15:09:11 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criar nova partição de 512MiB em /dev/vda (vda) com entradas efi" ( 7 / 30 ) 
+15:09:16 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criar nova partição de 1024MiB em /dev/vda (vda) com entradas boot" ( 8 / 30 ) 
+15:09:22 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criar nova partição de 20480MiB em /dev/vda (vda) com entradas root" ( 9 / 30 ) 
+15:09:28 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criar nova partição de 4096MiB em /dev/vda (vda) com entradas swap" ( 10 / 30 ) 
+15:09:35 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criar nova partição de 24573MiB em /dev/vda (vda) com entradas home" ( 11 / 30 ) 
+15:09:43 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definir informações da partição" ( 12 / 30 ) 
+15:09:43 [6]: QVariantList FillGlobalStorageJob::createPartitionList() const
+    Building partition information map 
+    .. partitions on "/dev/vda" 
+    ..  mapping for "" "unallocated" 
+     partlabel :   "" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "unknown" 
+     fsName :   "unknown" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "false" 
+    ..  mapping for "/dev/vda1" "/dev/vda1" 
+     partlabel :   "EFI" 
+     partition-uuid (partuuid) :   "PartUUID$70da2189" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$4dbd6674" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda2" "/dev/vda2" 
+     partlabel :   "efi" 
+     partition-uuid (partuuid) :   "PartUUID$1a0e3b32" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$e32373f6" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda3" "/dev/vda3" 
+     partlabel :   "boot" 
+     partition-uuid (partuuid) :   "PartUUID$4c2c3864" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$d0a9a3" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda4" "/dev/vda4" 
+     partlabel :   "root" 
+     partition-uuid (partuuid) :   "PartUUID$731e59a8" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$3964da96" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda5" "/dev/vda5" 
+     partlabel :   "swap" 
+     partition-uuid (partuuid) :   "PartUUID$a2a08ae0" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "linuxswap" 
+     fsName :   "linuxswap" 
+     filesystem-uuid (uuid) :   "FSUUID$cb9fa1a5" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda6" "/dev/vda6" 
+     partlabel :   "home" 
+     partition-uuid (partuuid) :   "PartUUID$f84e5447" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/home" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$e191af62" 
+     claimed :   "true" 
+15:09:43 [6]: virtual Calamares::JobResult FillGlobalStorageJob::exec()
+    Saving partition information map to GlobalStorage["partitions"] 
+15:09:43 [6]: virtual Calamares::JobResult FillGlobalStorageJob::exec()
+    FillGlobalStorageJob writing empty bootLoader value 
+15:09:43 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Gerenciando configurações de auto-montagem…" ( 13 / 30 ) 
+15:09:43 [6]: virtual Calamares::JobResult AutoMountManagementJob::exec()
+    Restore automount settings 
+15:09:43 [6]: virtual void Calamares::JobThread::run()
+    Starting job "mount" ( 14 / 30 ) 
+[PYTHON JOB]: Found gettext "pt_BR" in "/usr/share/locale/pt_BR" 
+    .. Running QList("swapon", "/dev/vda5") 
+chcon: failed to get security context of '/': No data available
+    .. Running QList("mount", "-t", "ext4", "-o", "defaults", "/dev/vda4", "/tmp/calamares-root-hkue2sk6/") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+chcon: failed to get security context of '/boot': No data available
+    .. Running QList("mount", "-t", "ext4", "-o", "defaults", "/dev/vda3", "/tmp/calamares-root-hkue2sk6/boot") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+chcon: failed to get security context of '/boot/efi': No such file or directory
+    .. Running QList("mount", "-t", "vfat", "-o", "defaults", "/dev/vda1", "/tmp/calamares-root-hkue2sk6/boot/efi") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+chcon: failed to get security context of '/boot/efi': No such file or directory
+    .. Running QList("mount", "-t", "vfat", "-o", "defaults", "/dev/vda2", "/tmp/calamares-root-hkue2sk6/boot/efi") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+chcon: failed to get security context of '/home': No data available
+    .. Running QList("mount", "-t", "ext4", "-o", "defaults", "/dev/vda6", "/tmp/calamares-root-hkue2sk6/home") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+chcon: failed to get security context of '/proc': Operation not supported
+    .. Running QList("mount", "-t", "proc", "-o", "defaults", "proc", "/tmp/calamares-root-hkue2sk6/proc") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+chcon: failed to get security context of '/sys': No data available
+    .. Running QList("mount", "-t", "sysfs", "-o", "defaults", "sys", "/tmp/calamares-root-hkue2sk6/sys") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+15:09:45 [6]: virtual void Calamares::JobThread::run()
+    Starting job "unpackfs" ( 15 / 30 ) 
+[PYTHON JOB]: Found gettext "pt_BR" in "/usr/share/locale/pt_BR" 
+    .. Running QList("mount", "-t", "squashfs", "-o", "loop", "/run/live/medium/live/filesystem.squashfs", "/tmp/tmpfn394j0z/filesystem") 
+    .. Finished. Exit code: 0 output:
+mount: /tmp/tmpfn394j0z/filesystem: WARNING: source write-protected, mounted read-only.
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+    .. Running QList("unsquashfs", "-l", "/run/live/medium/live/filesystem.squashfs") 
+15:09:47 [2]: WARNING (Qt): QString::arg: Argument missing: modelo teclado foi configurado para 1, Generic 105-key PC
+    .. Running QList("rsync", "-aHAXSr", "--filter=-x trusted.overlay.*", "--exclude", "/proc/", "--exclude", "/sys/", "--progress", "/tmp/tmpfn394j0z/filesystem/", "/tmp/calamares-root-hkue2sk6") 
+15:20:06 [2]: WARNING (Qt): QObject::setParent: Cannot set parent, new parent is in a different thread
+15:20:06 [6]: virtual QString PartitionViewStep::prettyStatus() const
+    Summary for Partition 1 Config::Erase 
+15:20:06 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+15:20:06 [6]: QVariantList FillGlobalStorageJob::createPartitionList() const
+    Building partition information map 
+    .. partitions on "/dev/vda" 
+    ..  mapping for "" "unallocated" 
+     partlabel :   "" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "unknown" 
+     fsName :   "unknown" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "false" 
+    ..  mapping for "/dev/vda1" "/dev/vda1" 
+     partlabel :   "EFI" 
+     partition-uuid (partuuid) :   "PartUUID$70da2189" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$4dbd6674" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda2" "/dev/vda2" 
+     partlabel :   "efi" 
+     partition-uuid (partuuid) :   "PartUUID$1a0e3b32" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$e32373f6" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda3" "/dev/vda3" 
+     partlabel :   "boot" 
+     partition-uuid (partuuid) :   "PartUUID$4c2c3864" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$d0a9a3" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda4" "/dev/vda4" 
+     partlabel :   "root" 
+     partition-uuid (partuuid) :   "PartUUID$731e59a8" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$3964da96" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda5" "/dev/vda5" 
+     partlabel :   "swap" 
+     partition-uuid (partuuid) :   "PartUUID$a2a08ae0" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "linuxswap" 
+     fsName :   "linuxswap" 
+     filesystem-uuid (uuid) :   "FSUUID$cb9fa1a5" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda6" "/dev/vda6" 
+     partlabel :   "home" 
+     partition-uuid (partuuid) :   "PartUUID$f84e5447" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/home" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$e191af62" 
+     claimed :   "true" 
+15:25:01 [2]: WARNING (Qt): QObject::setParent: Cannot set parent, new parent is in a different thread
+15:25:01 [6]: virtual QString PartitionViewStep::prettyStatus() const
+    Summary for Partition 1 Config::Erase 
+15:25:01 [6]: QStringList findEssentialLVs(const QList<PartitionCoreModule::DeviceInfo*>&)
+    Checking LVM use on 1 devices 
+15:25:02 [6]: QVariantList FillGlobalStorageJob::createPartitionList() const
+    Building partition information map 
+    .. partitions on "/dev/vda" 
+    ..  mapping for "" "unallocated" 
+     partlabel :   "" 
+     partition-uuid (partuuid) :   "PartUUID$13e382f9" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "unknown" 
+     fsName :   "unknown" 
+     filesystem-uuid (uuid) :   "FSUUID$5514db02" 
+     claimed :   "false" 
+    ..  mapping for "/dev/vda1" "/dev/vda1" 
+     partlabel :   "EFI" 
+     partition-uuid (partuuid) :   "PartUUID$70da2189" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$4dbd6674" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda2" "/dev/vda2" 
+     partlabel :   "efi" 
+     partition-uuid (partuuid) :   "PartUUID$1a0e3b32" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot/efi" 
+     fs: :   "fat32" 
+     fsName :   "fat32" 
+     filesystem-uuid (uuid) :   "FSUUID$e32373f6" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda3" "/dev/vda3" 
+     partlabel :   "boot" 
+     partition-uuid (partuuid) :   "PartUUID$4c2c3864" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/boot" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$d0a9a3" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda4" "/dev/vda4" 
+     partlabel :   "root" 
+     partition-uuid (partuuid) :   "PartUUID$731e59a8" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$3964da96" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda5" "/dev/vda5" 
+     partlabel :   "swap" 
+     partition-uuid (partuuid) :   "PartUUID$a2a08ae0" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "" 
+     fs: :   "linuxswap" 
+     fsName :   "linuxswap" 
+     filesystem-uuid (uuid) :   "FSUUID$cb9fa1a5" 
+     claimed :   "true" 
+    ..  mapping for "/dev/vda6" "/dev/vda6" 
+     partlabel :   "home" 
+     partition-uuid (partuuid) :   "PartUUID$f84e5447" 
+     parttype :   "" 
+     partattrs :   "0" 
+     mountPoint: :   "/home" 
+     fs: :   "ext4" 
+     fsName :   "ext4" 
+     filesystem-uuid (uuid) :   "FSUUID$e191af62" 
+     claimed :   "true" 
+15:25:13 [2]: WARNING (Qt): QString::arg: Argument missing: Configure timezone para 1, America/Sao Paulo
+15:27:18 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Gerar machine-id." ( 16 / 30 ) 
+15:27:18 [6]: virtual void Calamares::JobThread::run()
+    Starting job "fstab" ( 17 / 30 ) 
+[PYTHON JOB]: Found gettext "pt_BR" in "/usr/share/locale/pt_BR" 
+15:27:18 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definindo fuso horário para America/Sao_Paulo…" ( 18 / 30 ) 
+    .. Running QList("rm", "-f", "/etc/localtime") 
+    .. Running QList("ln", "-s", "/usr/share/zoneinfo/America/Sao_Paulo", "/etc/localtime") 
+15:27:18 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definindo modelo de teclado para pc105, leiaute como br-nodeadkeys…" ( 19 / 30 ) 
+15:27:18 [6]: virtual Calamares::JobResult SetKeyboardLayoutJob::exec()
+    Executing SetKeyboardLayoutJob 
+15:27:18 [6]: bool SetKeyboardLayoutJob::writeVConsoleData(const QString&, const QString&) const
+    Writing vconsole data to "/tmp/calamares-root-hkue2sk6/etc/vconsole.conf" 
+15:27:18 [6]: QString SetKeyboardLayoutJob::findConvertedKeymap(const QString&) const
+    Looking for converted keymap in "" 
+15:27:18 [6]: QString findLegacyKeymap(const QString&, const QString&, const QString&)
+    Looking for legacy keymap "br" "pc105" "nodeadkeys" in QRC 
+    .. Found legacy keymap "br-abnt2" with score 10 
+    .. Written KEYMAP= "br-abnt2" to vconsole.conf 0 
+15:27:18 [6]: bool SetKeyboardLayoutJob::writeX11Data(const QString&) const
+    Writing X11 configuration to "/tmp/calamares-root-hkue2sk6/etc/X11/xorg.conf.d/00-keyboard.conf" 
+    .. Written XkbLayout "br" ; XkbModel "pc105" ; XkbVariant "nodeadkeys" to X.org file "/tmp/calamares-root-hkue2sk6/etc/X11/xorg.conf.d/00-keyboard.conf" 0 
+15:27:18 [6]: bool SetKeyboardLayoutJob::writeDefaultKeyboardData(const QString&) const
+    Writing default keyboard data to "/tmp/calamares-root-hkue2sk6/etc/default/keyboard" 
+    .. Written XKBMODEL "pc105" ; XKBLAYOUT "br" ; XKBVARIANT "nodeadkeys" to /etc/default/keyboard file "/tmp/calamares-root-hkue2sk6/etc/default/keyboard" 0 
+15:27:18 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Configurando usuários <pre>sudo</pre>…" ( 20 / 30 ) 
+15:27:18 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Preparando grupos…" ( 21 / 30 ) 
+    .. Running QList("groupadd", "network") 
+    .. Running QList("groupadd", "storage") 
+    .. Running QList("groupadd", "wheel") 
+    .. Running QList("groupadd", "autologin") 
+15:27:19 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Criar usuário gsm" ( 22 / 30 ) 
+15:27:19 [6]: virtual Calamares::JobResult CreateUserJob::exec()
+    [CREATEUSER]: creating user 
+    .. Running QList("useradd", "-m", "-U", "-s", "/bin/bash", "-c", "gsm", "gsm") 
+    .. Running "usermod" "-aG" "users,lp,video,network,storage,wheel,audio,sudo,netdev,plugdev,autologin" "gsm" 
+    .. Running QList("chown", "-R", "gsm:gsm", "/home/gsm") 
+15:27:19 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definir senha para usuário gsm" ( 23 / 30 ) 
+    .. Running "usermod" "-p" "$y$j9T$2eCeXOtA00ENMgRaxG2l0.$axfv1.2mpoYcgGw4BuhHiYEhQjfwcrweEBqKT7wP8b8" "gsm" 
+15:27:20 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definir senha para usuário root" ( 24 / 30 ) 
+    .. Running "usermod" "-p" "$y$j9T$KK85JD5j3tb3gDY46gr6J0$KdRieWZIqCHb9zu89gbyj5St3h56kvrRSxEdW1eWHL3" "root" 
+15:27:20 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Definir nome da máquina gsm-standardpc" ( 25 / 30 ) 
+15:27:20 [6]: virtual void Calamares::JobThread::run()
+    Starting job "hwclock" ( 26 / 30 ) 
+[PYTHON JOB]: Found gettext "pt_BR" in "/usr/share/locale/pt_BR" 
+    .. Running QList("hwclock", "--systohc", "--utc") 
+    .. Target cmd: QList("hwclock", "--systohc", "--utc") Exit code: 127 output:
+chroot: failed to run command 'hwclock': No such file or directory
+[PYTHON JOB]: "Hwclock returned error code 127" 
+[PYTHON JOB]: "  .. RTC method failed, trying ISA bus method." 
+    .. Running QList("hwclock", "--systohc", "--utc", "--directisa") 
+    .. Target cmd: QList("hwclock", "--systohc", "--utc", "--directisa") Exit code: 127 output:
+chroot: failed to run command 'hwclock': No such file or directory
+[PYTHON JOB]: "Hwclock returned error code 127" 
+[PYTHON JOB]: "  .. ISA bus method failed." 
+[PYTHON JOB]: "BIOS or Kernel BUG: Setting hwclock failed." 
+15:27:20 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Executando processos de shell…" ( 27 / 30 ) 
+15:27:20 [2]: virtual Calamares::JobResult ShellProcessJob::exec()
+    WARNING: No commands to execute "shellprocess@setup-efi" 
+15:27:20 [6]: virtual void Calamares::JobThread::run()
+    Starting job "bootloader" ( 28 / 30 ) 
+/usr/lib/x86_64-linux-gnu/calamares/modules/bootloader/main.py:392: SyntaxWarning: invalid escape sequence '\$'
+  prefix, generator_name = re.match("(.*)\${([^}]*)}$", name).groups()
+[PYTHON JOB]: Found gettext "pt_BR" in "/usr/share/locale/pt_BR" 
+[PYTHON JOB]: "Bootloader: grub (efi)" 
+    .. Running QList("grub-install-uefi", "--target=x86_64-efi", "--efi-directory=/boot/efi", "--bootloader-id=OneDevsOS", "--force") 
+    .. Target cmd: QList("grub-install-uefi", "--target=x86_64-efi", "--efi-directory=/boot/efi", "--bootloader-id=OneDevsOS", "--force") Exit code: 127 output:
+chroot: failed to run command 'grub-install-uefi': No such file or directory
+WARNING: [PYTHON JOB]: "Command 'grub-install-uefi --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=OneDevsOS --force' returned non-zero exit status 127." 
+[PYTHON JOB]: "stdout:chroot: failed to run command 'grub-install-uefi': No such file or directory" 
+[PYTHON JOB]: "stderr:None" 
+15:27:21 [6]: virtual void Calamares::JobThread::run()
+    Skipping non-emergency job "Executando processos de shell…" 
+    ..  Skipping non-emergency job "Desmontando sistema de arquivos…" 
+15:27:21 [1]: void Calamares::ViewManager::onInstallationFailed(const QString&, const QString&)
+    ERROR: Installation failed: "Erro de instalação do carregador de inicialização" 
+    .. - message: "Erro de instalação do carregador de inicialização" 
+    .. - details: O carregador de inicialização não pôde ser instalado. O comando de instalação <pre>grub-install-uefi --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=OneDevsOS --force</pre> retornou o código de erro 127.
+15:27:21 [6]: void Calamares::ViewManager::onInstallationFailed(const QString&, const QString&)
+    Calamares will quit when the dialog closes. 
+15:27:21 [6]: void Config::doNotify(bool, bool)
+    Notification not sent; completion: failed 
+15:27:21 [6]: void {anonymous}::PowerManagementInterface::uninhibitSleep()
+    Sleep was never inhibited. 
+
+
+O carregador de inicialização não pôde ser instalado. O comando de instalação <pre>grub-install-uefi --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=OneDevsOS --force</pre> retornou o código de erro 127.
+____
+____
+_____
