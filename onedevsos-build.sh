@@ -26,6 +26,7 @@ check_network() {
 }
 check_network
 [ "${ONLINE}" -eq 1 ] && log "Rede detectada: modo ONLINE" || log "Nenhuma rede: modo OFFLINE"
+
 check_dependencies() {
   log "Verificando dependências..."
   local DEPS="debootstrap live-build xorriso squashfs-tools syslinux-common isolinux"
@@ -41,6 +42,7 @@ check_dependencies() {
     log "Todas as dependências instaladas."
   fi
 }
+
 generate_livebuild_files() {
   log "Gerando arquivos do live-build..."
   mkdir -p config/{package-lists,hooks/live,apt,archives}
@@ -49,7 +51,7 @@ generate_livebuild_files() {
   mkdir -p config/includes.chroot/etc/skel/{Desktop,.config/autostart}
   mkdir -p config/includes.chroot/usr/share/{calamares/branding/onedevs,backgrounds/onedevs}
   mkdir -p config/includes.chroot/usr/share/{plymouth/themes/onedevs,applications,polkit-1/actions}
-  mkdir -p config/includes.chroot/usr/local/bin
+  mkdir -p config/includes.chroot/usr/local/{bin,sbin}
 
   # ── APT ───────────────────────────────────────────────────────────────────
   cat > config/apt/apt.conf <<'EOF'
@@ -57,7 +59,6 @@ Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
 EOF
 
-  # FIX: sem bloqueio de grub-pc (conflito resolvido usando só grub-efi)
   cat > config/apt/preferences <<'EOF'
 Package: *
 Pin: release o=Debian
@@ -69,9 +70,8 @@ Acquire::Check-Valid-Until "false";
 Acquire::Check-Date "false";
 EOF
 
-  # ── Lista de pacotes ──────────────────────────────────────────────────────
-  if [ ! -f config/package-lists/onedevs.list.chroot ]; then
-    cat > config/package-lists/onedevs.list.chroot <<'EOF'
+  # ── Lista de pacotes (sempre regenerada) ──────────────────────────────────
+  cat > config/package-lists/onedevs.list.chroot <<'EOF'
 # Sistema Base
 live-boot live-config live-config-systemd
 
@@ -110,6 +110,7 @@ john
 nikto
 sqlmap
 binwalk
+netcat-openbsd
 
 # Bootloader UEFI (grub-efi APENAS — grub-pc conflita no Debian Trixie)
 grub-efi-amd64
@@ -187,11 +188,26 @@ xserver-xorg
 xserver-xorg-video-all
 mesa-utils
 EOF
-    log "Criada config/package-lists/onedevs.list.chroot"
-  fi
+  log "Criada config/package-lists/onedevs.list.chroot"
 
-  # FIX: sem exclude list — grub-efi é o único bootloader
-  # (remover !grub-pc evita conflito de pacotes)
+  # ── FIX: grub-install-uefi criado no BUILD (não via shellprocess) ─────────
+  # Wrapper inteligente: tenta com NVRAM primeiro, cai em --no-nvram se falhar
+  # Criado em includes.chroot → estará disponível no chroot durante instalação
+  cat > config/includes.chroot/usr/local/sbin/grub-install-uefi <<'EOF'
+#!/bin/bash
+# OneDevs OS — grub-install wrapper
+# Tenta instalação EFI normal (com NVRAM — melhor para bare metal)
+# Se falhar, usa --no-nvram --removable (funciona em VM e UEFI restrito)
+echo "[grub-wrapper] Tentando instalação EFI com NVRAM..."
+if /usr/sbin/grub-install "$@" 2>/tmp/grub-normal.log; then
+  echo "[grub-wrapper] Sucesso com NVRAM."
+  exit 0
+fi
+echo "[grub-wrapper] NVRAM falhou. Tentando --no-nvram --removable..."
+cat /tmp/grub-normal.log || true
+exec /usr/sbin/grub-install --no-nvram --removable "$@"
+EOF
+  chmod 755 config/includes.chroot/usr/local/sbin/grub-install-uefi
 
   # ── Hook 0001: configura grub-efi para UEFI ──────────────────────────────
   cat > config/hooks/live/0001-grub-efi-config.hook.chroot <<'EOF'
@@ -204,6 +220,8 @@ GRUB_DISTRIBUTOR="OneDevsOS"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
 GRUB_CMDLINE_LINUX=""
 GRUBCFG
+# Garante que grub-install-uefi está no PATH
+ln -sf /usr/local/sbin/grub-install-uefi /usr/local/bin/grub-install-uefi || true
 echo "grub-efi configurado para UEFI."
 EOF
   chmod +x config/hooks/live/0001-grub-efi-config.hook.chroot
@@ -229,7 +247,6 @@ dl "\${RAW}/Ligthdm/LigthDM.png"         /usr/share/backgrounds/onedevs/wallpape
 dl "\${RAW}/Calamares/Calamares.png"      /usr/share/calamares/branding/onedevs/logo.png   "logo Calamares"
 cp /usr/share/calamares/branding/onedevs/logo.png /etc/calamares/branding/onedevs/logo.png 2>/dev/null || true
 dl "\${RAW}/BootSlash/Boot%20splash%20(Plymouth).png" /usr/share/plymouth/themes/onedevs/boot.png "boot splash"
-# ── Fastfetch: config e arte ASCII do repositório ─────────────────────────
 FF_COMMIT="a2c07762c6279c468a00c5cb61ad61d2a5945a93"
 FF_RAW="https://raw.githubusercontent.com/GabrielSantana1996sp/OneDevsTCC/\${FF_COMMIT}"
 mkdir -p /etc/fastfetch /etc/skel/.config/fastfetch
@@ -293,6 +310,7 @@ EOF
   chmod +x config/hooks/live/9999-onedevs-config.hook.chroot
 
   # ── Calamares: settings.conf ──────────────────────────────────────────────
+  # FIX: removido shellprocess@setup-efi (não funciona no Calamares 3.3.14)
   cat > config/includes.chroot/etc/calamares/settings.conf <<'EOF'
 ---
 modules-search: [ local, /usr/lib/calamares/modules ]
@@ -300,9 +318,6 @@ instances:
 - id: remove-live
   module: shellprocess
   config: shellprocess@remove-live.conf
-- id: setup-efi
-  module: shellprocess
-  config: shellprocess@setup-efi.conf
 sequence:
 - show:
   - welcome
@@ -321,7 +336,6 @@ sequence:
   - keyboard
   - users
   - hwclock
-  - shellprocess@setup-efi
   - bootloader
   - shellprocess@remove-live
   - umount
@@ -333,18 +347,15 @@ dont-chroot: false
 EOF
 
   # ── Calamares: partition.conf ─────────────────────────────────────────────
-  # FIX: removido erase-ram15 inválido, adicionado partitionLayout correto
+  # FIX: removido efiSystemPartitionSize/Name/MountPoint — causava EFI duplicada!
+  # O partitionLayout já cria a partição EFI, não precisar desses campos.
   # FIX: NÃO usar type:"ESP" nem attributes — causa sfdisk --part-type ESP
-  #      que falha no Debian Trixie. Calamares identifica EFI pelo mountPoint.
   cat > config/includes.chroot/etc/calamares/modules/partition.conf <<'EOF'
 ---
 defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
 allowManualPartitioning: true
 requiredStorage: 15.0
-efiSystemPartitionSize: 512M
-efiSystemPartitionName: EFI
-efiSystemPartitionMountPoint: /boot/efi
 partitionLayout:
   - name: "efi"
     size: "512M"
@@ -374,7 +385,7 @@ initialSwapChoice: small
 EOF
 
   # ── Calamares: bootloader.conf ────────────────────────────────────────────
-  # grubInstall aponta para o wrapper que resolve NVRAM vs --no-nvram
+  # grub-install-uefi é o wrapper criado em includes.chroot/usr/local/sbin/
   cat > config/includes.chroot/etc/calamares/modules/bootloader.conf <<'EOF'
 ---
 efiBootLoader: grub
@@ -385,45 +396,6 @@ grubProbe: grub-probe
 efiBootLoaderId: OneDevsOS
 installEFIFallback: true
 EOF
-
-  # ── Calamares: shellprocess@setup-efi.conf ────────────────────────────────
-  # Roda NO CHROOT do sistema instalado (dontChroot: false)
-  # Cria wrapper grub-install-uefi antes do step bootloader
-  cat > config/includes.chroot/etc/calamares/modules/shellprocess@setup-efi.conf <<'EOF'
----
-dontChroot: false
-timeout: 30
-script:
-  - "-": /etc/calamares/scripts/setup-efi.sh
-EOF
-
-  cat > config/includes.chroot/etc/calamares/scripts/setup-efi.sh <<'EOF'
-#!/bin/bash
-set -e
-echo "[OneDevsOS] Configurando grub-install wrapper..."
-
-# Wrapper inteligente:
-# 1. Tenta instalar normalmente (com NVRAM — melhor para bare metal)
-# 2. Se falhar, cai em --no-nvram --removable (funciona em VM e UEFI restrito)
-cat > /usr/local/sbin/grub-install-uefi <<'WRAPPER'
-#!/bin/bash
-echo "[grub-wrapper] Tentando instalação EFI normal..."
-if grub-install "$@" 2>/tmp/grub-install.log; then
-  echo "[grub-wrapper] Sucesso com NVRAM."
-  exit 0
-fi
-echo "[grub-wrapper] Falhou. Tentando --no-nvram --removable..."
-exec grub-install --no-nvram --removable "$@"
-WRAPPER
-
-chmod +x /usr/local/sbin/grub-install-uefi
-
-# Garante que o PATH inclui /usr/local/sbin
-export PATH="/usr/local/sbin:$PATH"
-
-echo "[OneDevsOS] Wrapper grub-install-uefi criado."
-EOF
-  chmod +x config/includes.chroot/etc/calamares/scripts/setup-efi.sh
 
   # ── Calamares: fstab.conf ─────────────────────────────────────────────────
   cat > config/includes.chroot/etc/calamares/modules/fstab.conf <<'EOF'
@@ -447,7 +419,6 @@ ssdExtraMountOptions:
 EOF
 
   # ── Calamares: unpackfs.conf ──────────────────────────────────────────────
-  # FIX: path correto — medium/live/ (não rootfs/)
   cat > config/includes.chroot/etc/calamares/modules/unpackfs.conf <<'EOF'
 ---
 unpack:
@@ -457,7 +428,6 @@ unpack:
 EOF
 
   # ── Calamares: mount.conf ─────────────────────────────────────────────────
-  # FIX: removidos /dev e /run com options:bind (bug Calamares 3.3.14)
   cat > config/includes.chroot/etc/calamares/modules/mount.conf <<'EOF'
 ---
 extraMounts:
@@ -506,7 +476,7 @@ EOF
 dontChroot: false
 timeout: 30
 script:
-  - "-": /etc/calamares/scripts/remove-live-user.sh
+  - /etc/calamares/scripts/remove-live-user.sh
 EOF
 
   cat > config/includes.chroot/etc/calamares/scripts/remove-live-user.sh <<'EOF'
@@ -712,7 +682,7 @@ run_build() {
       ISO_NAME="onedevsos-${CODENAME_LC}-1.0-${ARCH}.iso"
       mv "${ISO_CANDIDATE}" "${ISO_NAME}" || true
       log "ISO: ${ISO_NAME} ($(du -h "${ISO_NAME}" | cut -f1))"
-      log "Testar em UEFI:"
+      log "Testar em UEFI (obrigatório):"
       log "  cp /usr/share/OVMF/OVMF_VARS_4M.fd /tmp/OVMF_VARS.fd"
       log "  qemu-img create -f qcow2 disco.img 50G"
       log "  qemu-system-x86_64 -m 4096 -enable-kvm -machine q35,smm=on \\"
