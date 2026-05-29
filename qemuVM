@@ -11,13 +11,16 @@ cp /usr/share/OVMF/OVMF_VARS.fd /tmp/OVMF_VARS.fd
 
 # Inicia em modo UEFI
 qemu-system-x86_64 \
-  -m 4096 \
-  -enable-kvm \
-  -machine q35,smm=on \
-  -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd \
-  -drive if=pflash,format=raw,file=/tmp/OVMF_VARS.fd \
-  -cdrom onedevsos-alberteinstein-1.0-amd64.iso \
-  -drive file=disco.img,format=qcow2,if=virtio \
-  -boot d \
-  -vga virtio \
-  -display gtk
+   -m 4096 \
+   -enable-kvm \
+   -machine q35,smm=on \
+   -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd \
+   -drive if=pflash,format=raw,file=/tmp/OVMF_VARS.fd \
+   -cdrom debian-live-13.5.0-amd64-xfce.iso \
+   -drive file=disco-build.img,format=qcow2,if=virtio \
+   -boot d \
+   -vga std \
+   -display sdl
+
+
+
