@@ -54,21 +54,6 @@ generate_livebuild_files() {
   mkdir -p config/includes.chroot/usr/local/{bin,sbin}
   mkdir -p config/archives
 
-  # ── Repositório Microsoft VSCode ──────────────────────────────────────────
-  cat > config/archives/vscode.list.chroot <<'EOF'
-deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-vscode.gpg] https://packages.microsoft.com/repos/vscode stable main
-EOF
-
-  cat > config/hooks/live/0002-vscode-repo.hook.chroot <<'EOF'
-#!/bin/bash
-set -e
-echo "Adicionando chave GPG Microsoft para VSCode..."
-curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
-  | gpg --dearmor -o /usr/share/keyrings/microsoft-vscode.gpg
-echo "Chave Microsoft adicionada."
-EOF
-  chmod +x config/hooks/live/0002-vscode-repo.hook.chroot
-
   # ── APT ───────────────────────────────────────────────────────────────────
   cat > config/apt/apt.conf <<'EOF'
 Acquire::Check-Valid-Until "false";
@@ -126,7 +111,6 @@ john
 nikto
 sqlmap
 binwalk
-netcat-openbsd
 
 # Bootloader UEFI (grub-efi APENAS — grub-pc conflita no Debian Trixie)
 grub-efi-amd64
@@ -184,7 +168,7 @@ chromium
 calamares
 
 # Editor / IDE
-code
+codium
 geany
 
 # Fastfetch
