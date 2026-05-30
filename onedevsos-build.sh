@@ -168,7 +168,6 @@ chromium
 calamares
 
 # Editor / IDE
-codium
 geany
 
 # Fastfetch
@@ -200,8 +199,20 @@ EOF
   cat > config/includes.chroot/usr/local/sbin/grub-install-uefi <<'EOF'
 #!/bin/bash
 # OneDevs OS — grub-install wrapper
-# Tenta instalação EFI normal (com NVRAM — melhor para bare metal)
-# Se falhar, usa --no-nvram --removable (funciona em VM e UEFI restrito)
+# 1. Seta ESP flag com GUID completo (fix bare metal)
+# 2. Tenta instalação normal com NVRAM (bare metal ideal)
+# 3. Fallback: --no-nvram --removable (VM e UEFI restrito)
+
+# Seta o tipo GPT da partição EFI como ESP usando GUID completo
+# (evita o bug do sfdisk que não reconhece o alias "ESP")
+EFI_DEV=$(findmnt -n -o SOURCE /boot/efi 2>/dev/null || true)
+if [ -n "$EFI_DEV" ]; then
+  DISK=$(echo "$EFI_DEV" | sed 's/[0-9]*$//')
+  PART=$(echo "$EFI_DEV" | grep -o '[0-9]*$')
+  echo "[grub-wrapper] Setando ESP GUID em $EFI_DEV..."
+  sfdisk --part-type "$DISK" "$PART" C12A7328-F81F-11D2-BA4B-00A0C93EC93B 2>/dev/null || true
+fi
+
 echo "[grub-wrapper] Tentando instalação EFI com NVRAM..."
 if /usr/sbin/grub-install "$@" 2>/tmp/grub-normal.log; then
   echo "[grub-wrapper] Sucesso com NVRAM."
