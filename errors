@@ -8618,3 +8618,25 @@ Command: sfdisk --part-label /dev/sda 2 efi
 
 
 Job: Create file system ‘luks’ on partition ‘/dev/sda2’
+( wireshark )
+Please check to make sure you have sufficient permissions.
+
+On Debian and Debian derivatives such as Ubuntu, if you have installed Wireshark from a package, try running
+
+    sudo dpkg-reconfigure wireshark-common
+
+selecting "<Yes>" in response to the question
+
+    Should non-superusers be able to capture packets?
+
+adding yourself to the "wireshark" group by running
+
+    sudo usermod -a -G wireshark {your username}
+
+and then logging out and logging back in again.
+
+If you did not install Wireshark from a package, ensure that Dumpcap has the needed CAP_NET_RAW and CAP_NET_ADMIN capabilities by running 
+
+    sudo setcap cap_net_raw,cap_net_admin=ep {path/to/}dumpcap
+
+and then restarting Wireshark
