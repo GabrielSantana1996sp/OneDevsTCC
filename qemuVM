@@ -1,26 +1,26 @@
-cd ~/tcc
-
-# Localiza o OVMF no Alpine
-find /usr -name "OVMF*.fd" 2>/dev/null
-
-# Cria disco virtual
+# Instalação dos pacotes
+sudo apt update && sudo apt upgrade -y
+sudo apt install qemu qemu-kvm qemu-system qemu-utils -y
+sudo apt install libvirt-daemon-system libvirt-clients bridge-utils -y
+sudo apt install virt-manager -y
+sudo apt install ovmf -y
+sudo usermod -aG kvm $USER
+# Criar disco virtual
 qemu-img create -f qcow2 disco.img 50G
-
-# Copia vars UEFI (substitua o path pelo que encontrou acima)
+# Preparar firmware UEFI
+find /usr -name "OVMF*.fd" 2>/dev/null
 cp /usr/share/OVMF/OVMF_VARS.fd /tmp/OVMF_VARS.fd
-
-# Inicia em modo UEFI
+# Instalar Debian no disco
 qemu-system-x86_64 \
    -m 4096 \
    -enable-kvm \
    -machine q35,smm=on \
    -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd \
    -drive if=pflash,format=raw,file=/tmp/OVMF_VARS.fd \
-   -cdrom debian-live-13.5.0-amd64-xfce.iso \
-   -drive file=disco-build.img,format=qcow2,if=virtio \
+   -cdrom debian-13.5.0-amd64-netinst.iso \
+   -drive file=disco.img,format=qcow2,if=virtio \
    -boot d \
    -vga std \
    -display sdl
-
-
-
+# Rodar Debian já instalado
+qemu-system-x86_64 -m 4096 -enable-kvm -hda disco.img -boot c
