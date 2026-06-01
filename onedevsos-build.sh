@@ -183,9 +183,6 @@ chromium
 # Instalador
 calamares
 
-# Editor / IDE
-code
-
 # Fastfetch
 fastfetch
 
