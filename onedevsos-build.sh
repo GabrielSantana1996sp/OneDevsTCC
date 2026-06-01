@@ -54,6 +54,21 @@ generate_livebuild_files() {
   mkdir -p config/includes.chroot/usr/local/{bin,sbin}
   mkdir -p config/archives
 
+  # ── Repositório Microsoft VSCode ──────────────────────────────────────────
+  cat > config/archives/vscode.list.chroot <<'EOF'
+deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-vscode.gpg] https://packages.microsoft.com/repos/vscode stable main
+EOF
+
+  cat > config/hooks/live/0002-vscode-repo.hook.chroot <<'EOF'
+#!/bin/bash
+set -e
+echo "Adicionando chave GPG Microsoft para VSCode..."
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+  | gpg --dearmor -o /usr/share/keyrings/microsoft-vscode.gpg
+echo "Chave Microsoft adicionada."
+EOF
+  chmod +x config/hooks/live/0002-vscode-repo.hook.chroot
+
   # ── APT ───────────────────────────────────────────────────────────────────
   cat > config/apt/apt.conf <<'EOF'
 Acquire::Check-Valid-Until "false";
@@ -111,6 +126,7 @@ john
 nikto
 sqlmap
 binwalk
+netcat-openbsd
 
 # Bootloader UEFI (grub-efi APENAS — grub-pc conflita no Debian Trixie)
 grub-efi-amd64
@@ -168,7 +184,7 @@ chromium
 calamares
 
 # Editor / IDE
-geany
+code
 
 # Fastfetch
 fastfetch
@@ -298,6 +314,11 @@ fi
 echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 chmod 440 /etc/sudoers.d/dev
 chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
+
+# Wireshark — permite captura sem root
+dpkg-reconfigure -f noninteractive wireshark-common || true
+usermod -a -G wireshark dev 2>/dev/null || true
+echo "wireshark ALL=(root) NOPASSWD: /usr/bin/dumpcap" >> /etc/sudoers.d/wireshark 2>/dev/null || true
 cat >> /etc/skel/.bashrc <<'BASHEOF'
 
 # OneDevs OS — system info
@@ -371,6 +392,14 @@ defaultFileSystemType: ext4
 defaultPartitionTableType: gpt
 allowManualPartitioning: true
 requiredStorage: 15.0
+
+# Necessário para o Calamares identificar qual partição é a EFI
+# Sem isso, ele cria uma partição extra com tipo errado (luks)
+efiSystemPartitionMountPoint: /boot/efi
+
+# Evita warning e comportamento inesperado de criptografia
+luksGeneration: luks1
+
 partitionLayout:
   - name: "efi"
     size: "512M"
