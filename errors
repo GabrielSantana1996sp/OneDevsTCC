@@ -8694,3 +8694,27 @@ Reading state information...
 gsm@debian:~/OneDevsOS$ 
 
 O carregador de inicialização não pôde ser instalado. O comando de instalação <pre>grub-install-uefi --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=OneDevsOS --force</pre> retornou o código de erro 127.
+
+_____
+_____
+_____
+
+Create a new partition (512,00 MiB, luks) on ‘/dev/sdb’
+
+
+Job: Create new partition on device ‘/dev/sdb’
+
+
+Command: sfdisk --force --append /dev/sdb
+
+
+Command: sfdisk --list --output Device,UUID /dev/sdb
+
+
+Job: Set the label on partition ‘/dev/sdb2’ to "efi"
+
+
+Command: sfdisk --part-label /dev/sdb 2 efi
+
+
+Job: Create file system ‘luks’ on partition ‘/dev/sdb2’
