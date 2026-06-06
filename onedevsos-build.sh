@@ -123,7 +123,6 @@ wireshark
 aircrack-ng
 medusa
 john
-nikto
 sqlmap
 binwalk
 netcat-openbsd
@@ -140,6 +139,7 @@ podman
 ansible
 docker.io
 systemd-container
+
 
 # Segurança DevSecOps
 apparmor
