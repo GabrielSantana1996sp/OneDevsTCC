@@ -156,6 +156,7 @@ gpg
 logcheck
 
 # Utilitários
+nano
 util-linux
 tmux
 htop
