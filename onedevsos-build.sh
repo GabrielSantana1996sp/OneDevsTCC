@@ -140,7 +140,6 @@ ansible
 docker.io
 systemd-container
 
-
 # Segurança DevSecOps
 apparmor
 nftables
@@ -156,7 +155,6 @@ gpg
 logcheck
 
 # Utilitários
-nano
 util-linux
 tmux
 htop
